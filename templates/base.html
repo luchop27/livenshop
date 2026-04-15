@@ -1,0 +1,808 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <title>Ecomus - Ultimate HTML</title>
+
+    <meta name="author" content="themesflat.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description"
+        content="Themesflat Ecomus - A modern and versatile eCommerce template designed for various online stores, including fashion, furniture, electronics, and more. SEO-friendly, fast-loading, and highly customizable.">
+
+    <!-- font -->
+    <link rel="stylesheet" href="{% static 'fonts/fonts.css' %}">
+    <!-- Icons -->
+    <link rel="stylesheet" href="{% static 'fonts/font-icons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/custom-overrides.css' %}" />
+
+    <!-- Favicon and Touch Icons  -->
+    <link rel="shortcut icon" href="{% static 'images/logo/favicon.png' %}">
+    <link rel="apple-touch-icon-precomposed" href="{% static 'images/logo/favicon.png' %}">
+
+</head>
+
+<body class="preload-wrapper bg_f5f5ec">
+    <!-- RTL -->
+    <!-- <a href="#" id="toggle-rtl" class="tf-btn animate-hover-btn btn-fill">RTL</a> -->
+    <!-- /RTL  -->
+    <!-- preload -->
+    <div class="preload preload-container">
+        <div class="preload-logo">
+            <div class="spinner"></div>
+        </div>
+    </div>
+    <!-- /preload -->
+    <div id="wrapper">
+
+        <!-- announcement-bar -->
+        <div class="announcement-bar bg_liven-blue">
+            <div class="wrap-announcement-bar">
+                <div class="box-sw-announcement-bar run-reverse">
+                    <div class="announcement-bar-item">
+                        <p>FREE SHIPPING AND RETURNS</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>NEW SEASON, NEW STYLES: FASHION SALE YOU CAN'T MISS</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>LIMITED TIME OFFER: FASHION SALE YOU CAN'T RESIST</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>FREE SHIPPING AND RETURNS</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>NEW SEASON, NEW STYLES: FASHION SALE YOU CAN'T MISS</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>LIMITED TIME OFFER: FASHION SALE YOU CAN'T RESIST</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>FREE SHIPPING AND RETURNS</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>NEW SEASON, NEW STYLES: FASHION SALE YOU CAN'T MISS</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>LIMITED TIME OFFER: FASHION SALE YOU CAN'T RESIST</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>FREE SHIPPING AND RETURNS</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>NEW SEASON, NEW STYLES: FASHION SALE YOU CAN'T MISS</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>LIMITED TIME OFFER: FASHION SALE YOU CAN'T RESIST</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>FREE SHIPPING AND RETURNS</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>NEW SEASON, NEW STYLES: FASHION SALE YOU CAN'T MISS</p>
+                    </div>
+                    <div class="announcement-bar-item">
+                        <p>LIMITED TIME OFFER: FASHION SALE YOU CAN'T RESIST</p>
+                    </div>
+                </div>
+            </div>
+            <span class="icon-close close-announcement-bar"></span>
+
+        </div>
+        <!-- /announcement-bar -->
+
+        <!-- Header -->
+        <header id="header" class="header-default header-style-2">
+            <div class="main-header line">
+                <div class="container-full px_15 lg-px_40">
+                    <div class="row wrapper-header align-items-center">
+                        <div class="col-xl-5 tf-md-hidden">
+                            
+                        </div>
+                        <div class="col-md-4 col-3 tf-lg-hidden">
+                            <a href="#mobileMenu" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16"
+                                    fill="none">
+                                    <path
+                                        d="M2.00056 2.28571H16.8577C17.1608 2.28571 17.4515 2.16531 17.6658 1.95098C17.8802 1.73665 18.0006 1.44596 18.0006 1.14286C18.0006 0.839753 17.8802 0.549063 17.6658 0.334735C17.4515 0.120408 17.1608 0 16.8577 0H2.00056C1.69745 0 1.40676 0.120408 1.19244 0.334735C0.978109 0.549063 0.857702 0.839753 0.857702 1.14286C0.857702 1.44596 0.978109 1.73665 1.19244 1.95098C1.40676 2.16531 1.69745 2.28571 2.00056 2.28571ZM0.857702 8C0.857702 7.6969 0.978109 7.40621 1.19244 7.19188C1.40676 6.97755 1.69745 6.85714 2.00056 6.85714H22.572C22.8751 6.85714 23.1658 6.97755 23.3801 7.19188C23.5944 7.40621 23.7148 7.6969 23.7148 8C23.7148 8.30311 23.5944 8.59379 23.3801 8.80812C23.1658 9.02245 22.8751 9.14286 22.572 9.14286H2.00056C1.69745 9.14286 1.40676 9.02245 1.19244 8.80812C0.978109 8.59379 0.857702 8.30311 0.857702 8ZM0.857702 14.8571C0.857702 14.554 0.978109 14.2633 1.19244 14.049C1.40676 13.8347 1.69745 13.7143 2.00056 13.7143H12.2863C12.5894 13.7143 12.8801 13.8347 13.0944 14.049C13.3087 14.2633 13.4291 14.554 13.4291 14.8571C13.4291 15.1602 13.3087 15.4509 13.0944 15.6653C12.8801 15.8796 12.5894 16 12.2863 16H2.00056C1.69745 16 1.40676 15.8796 1.19244 15.6653C0.978109 15.4509 0.857702 15.1602 0.857702 14.8571Z"
+                                        fill="currentColor"></path>
+                                </svg>
+                            </a>
+                        </div>
+                        <div class="col-xl-2 col-md-4 col-6 text-center">
+                            <a href="{% url 'home' %}" class="logo-header">
+                                <img src="{% static 'images/logo/logoliven.png' %}" alt="logo" class="logo">
+                            </a>
+                        </div>
+
+                        <div class="col-xl-5 col-md-4 col-3">
+                            <ul class="nav-icon d-flex justify-content-end align-items-center gap-20">
+                                <li class="nav-search"><a href="#canvasSearch" data-bs-toggle="offcanvas"
+                                        aria-controls="offcanvasLeft" class="link nav-icon-item text_liven-blue"><i
+                                            class="icon icon-search"></i></a></li>
+                                <li class="nav-account"><a href="#login" data-bs-toggle="modal"
+                                        class="link  nav-icon-item text_liven-blue"><i class="icon icon-account"></i></a></li>
+                                <li class="nav-wishlist"><a href="wishlist.html" class="link nav-icon-item text_liven-blue"><i
+                                            class="icon icon-heart"></i><span class="count-box bg_liven-blue">0</span></a></li>
+                                <li class="nav-cart"><a href="#shoppingCart" data-bs-toggle="modal"
+                                        class="link nav-icon-item text_liven-blue"><i class="icon icon-bag"></i><span
+                                            class="count-box bg_liven-blue">0</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-bottom line tf-md-hidden">
+                <div class="container-full px_15 lg-px_40">
+                    <div class="wrapper-header d-flex justify-content-center align-items-center">
+                        <nav class="box-navigation text-center">
+                            <ul class="box-nav-ul d-flex align-items-center justify-content-center gap-30">
+                                
+                                <li class="menu-item">
+                                    <a href="{% url 'home' %}" class="item-link text_liven-blue">Home</a>
+                                </li>
+                                <li class="menu-item position-relative">
+                                    <a href="{% url 'shop' %}" class="item-link text_liven-blue">Shop<i class="icon icon-arrow-down"></i></a>
+                                    <div class="sub-menu submenu-default">
+                                        <ul class="menu-list">
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Apothecary</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Velas aromáticas</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Aceites esenciales</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Incienso</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Library</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Libros decorativos</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Revistas</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Papelería</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Pantry</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Café</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Té</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Snacks gourmet</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Decor</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Cuadros</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Jarrones</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Espejos</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Tabletop</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Platos</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Vasos</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Cubiertos</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Textiles</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Cojines</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Mantas</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Cortinas</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Furniture</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Sillas</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Mesas</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Estanterías</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Vintage</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Decoración antigua</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Muebles vintage</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Coleccionables</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Art</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Pinturas</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Esculturas</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Ilustraciones</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Office</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Escritorios</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Organizadores</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Sillas de oficina</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Gift Card</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Tarjeta $25</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Tarjeta $50</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Tarjeta $100</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Workshops</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Decoración</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Arte</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">DIY</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+
+                                            <li class="menu-item-2">
+                                                <a href="#" class="menu-link-text link text_black-2">Sale</a>
+                                                <div class="sub-menu submenu-default">
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Descuentos</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Últimas unidades</a></li>
+                                                        <li><a href="#" class="menu-link-text link text_black-2">Ofertas especiales</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                            
+
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{% url 'brands' %}" class="item-link text_liven-blue">Brands</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{% url 'portfolio' %}" class="item-link text_liven-blue">Portfolio</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{% url 'services' %}" class="item-link text_liven-blue">Services</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{% url 'about' %}" class="item-link text_liven-blue">About</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{% url 'contact' %}" class="item-link text_liven-blue">Contact</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+        </header>
+        <!-- /Header -->
+
+        <!-- mobile menu -->
+        <div class="offcanvas offcanvas-start canvas-mb" id="mobileMenu">
+        <span class="icon-close icon-close-popup" data-bs-dismiss="offcanvas" aria-label="Close"></span>
+        <div class="mb-canvas-content">
+            <div class="mb-body">
+                <ul class="nav-ul-mb" id="wrapper-menu-navigation">
+
+                    <!-- Home -->
+                    <li class="nav-mb-item">
+                        <a href="{% url 'home' %}" class="mb-menu-link text_liven-blue">Home</a>
+                    </li>
+
+                    <!-- Shop -->
+                    <li class="nav-mb-item">
+                        <a href="#dropdown-categories" class="collapsed mb-menu-link current text_liven-blue1"
+                            data-bs-toggle="collapse" aria-expanded="true" aria-controls="dropdown-categories">
+                            <span>Shop</span>
+                            <span class="btn-open-sub"></span>
+                        </a>
+
+                        <div id="dropdown-categories" class="collapse">
+                            <ul class="sub-nav-menu">
+
+                                <!-- Apothecary -->
+                                <li>
+                                    <a href="#sub-apothecary" class="sub-nav-link collapsed" data-bs-toggle="collapse">
+                                        <span>Apothecary</span>
+                                        <span class="btn-open-sub"></span>
+                                    </a>
+                                    <div id="sub-apothecary" class="collapse">
+                                        <ul class="sub-nav-menu sub-menu-level-2">
+                                            <li><a href="{% url 'shop' %}" class="sub-nav-link">Velas</a></li>
+                                            <li><a href="#" class="sub-nav-link">Aceites</a></li>
+                                            <li><a href="#" class="sub-nav-link">Incienso</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- Library -->
+                                <li>
+                                    <a href="#sub-library" class="sub-nav-link collapsed" data-bs-toggle="collapse">
+                                        <span>Library</span>
+                                        <span class="btn-open-sub"></span>
+                                    </a>
+                                    <div id="sub-library" class="collapse">
+                                        <ul class="sub-nav-menu sub-menu-level-2">
+                                            <li><a href="#" class="sub-nav-link">Libros</a></li>
+                                            <li><a href="#" class="sub-nav-link">Revistas</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- Pantry -->
+                                <li>
+                                    <a href="#sub-pantry" class="sub-nav-link collapsed" data-bs-toggle="collapse">
+                                        <span>Pantry</span>
+                                        <span class="btn-open-sub"></span>
+                                    </a>
+                                    <div id="sub-pantry" class="collapse">
+                                        <ul class="sub-nav-menu sub-menu-level-2">
+                                            <li><a href="#" class="sub-nav-link">Café</a></li>
+                                            <li><a href="#" class="sub-nav-link">Té</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- Decor -->
+                                <li>
+                                    <a href="#sub-decor" class="sub-nav-link collapsed" data-bs-toggle="collapse">
+                                        <span>Decor</span>
+                                        <span class="btn-open-sub"></span>
+                                    </a>
+                                    <div id="sub-decor" class="collapse">
+                                        <ul class="sub-nav-menu sub-menu-level-2">
+                                            <li><a href="#" class="sub-nav-link">Cuadros</a></li>
+                                            <li><a href="#" class="sub-nav-link">Jarrones</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- Tabletop -->
+                                <li>
+                                    <a href="#sub-tabletop" class="sub-nav-link collapsed" data-bs-toggle="collapse">
+                                        <span>Tabletop</span>
+                                        <span class="btn-open-sub"></span>
+                                    </a>
+                                    <div id="sub-tabletop" class="collapse">
+                                        <ul class="sub-nav-menu sub-menu-level-2">
+                                            <li><a href="#" class="sub-nav-link">Platos</a></li>
+                                            <li><a href="#" class="sub-nav-link">Vasos</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- Textiles -->
+                                <li>
+                                    <a href="#sub-textiles" class="sub-nav-link collapsed" data-bs-toggle="collapse">
+                                        <span>Textiles</span>
+                                        <span class="btn-open-sub"></span>
+                                    </a>
+                                    <div id="sub-textiles" class="collapse">
+                                        <ul class="sub-nav-menu sub-menu-level-2">
+                                            <li><a href="#" class="sub-nav-link">Cojines</a></li>
+                                            <li><a href="#" class="sub-nav-link">Mantas</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- Furniture -->
+                                <li>
+                                    <a href="#sub-furniture" class="sub-nav-link collapsed" data-bs-toggle="collapse">
+                                        <span>Furniture</span>
+                                        <span class="btn-open-sub"></span>
+                                    </a>
+                                    <div id="sub-furniture" class="collapse">
+                                        <ul class="sub-nav-menu sub-menu-level-2">
+                                            <li><a href="#" class="sub-nav-link">Sillas</a></li>
+                                            <li><a href="#" class="sub-nav-link">Mesas</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- Vintage -->
+                                <li>
+                                    <a href="#sub-vintage" class="sub-nav-link collapsed" data-bs-toggle="collapse">
+                                        <span>Vintage</span>
+                                        <span class="btn-open-sub"></span>
+                                    </a>
+                                    <div id="sub-vintage" class="collapse">
+                                        <ul class="sub-nav-menu sub-menu-level-2">
+                                            <li><a href="#" class="sub-nav-link">Decoración</a></li>
+                                            <li><a href="#" class="sub-nav-link">Coleccionables</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- Art -->
+                                <li>
+                                    <a href="#sub-art" class="sub-nav-link collapsed" data-bs-toggle="collapse">
+                                        <span>Art</span>
+                                        <span class="btn-open-sub"></span>
+                                    </a>
+                                    <div id="sub-art" class="collapse">
+                                        <ul class="sub-nav-menu sub-menu-level-2">
+                                            <li><a href="#" class="sub-nav-link">Pinturas</a></li>
+                                            <li><a href="#" class="sub-nav-link">Ilustraciones</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- Office -->
+                                <li>
+                                    <a href="#sub-office" class="sub-nav-link collapsed" data-bs-toggle="collapse">
+                                        <span>Office</span>
+                                        <span class="btn-open-sub"></span>
+                                    </a>
+                                    <div id="sub-office" class="collapse">
+                                        <ul class="sub-nav-menu sub-menu-level-2">
+                                            <li><a href="#" class="sub-nav-link">Escritorios</a></li>
+                                            <li><a href="#" class="sub-nav-link">Organizadores</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- Gift Card -->
+                                <li><a href="#" class="sub-nav-link">Gift Card</a></li>
+
+                                <!-- Workshops -->
+                                <li><a href="#" class="sub-nav-link">Workshops</a></li>
+
+                                <!-- Sale -->
+                                <li><a href="#" class="sub-nav-link">Sale</a></li>
+
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- Brands -->
+                    <li class="nav-mb-item">
+                        <a href="{% url 'brands' %}" class="mb-menu-link text_liven-blue">Brands</a>
+                    </li>
+                    <!-- Portfolio -->
+                    <li class="nav-mb-item">
+                        <a href="{% url 'portfolio' %}" class="mb-menu-link text_liven-blue">Portfolio</a>
+                    </li>
+                    <!-- Services -->
+                    <li class="nav-mb-item">
+                        <a href="{% url 'services' %}" class="mb-menu-link text_liven-blue">Services</a>
+                    </li>
+
+                    <!-- About -->
+                    <li class="nav-mb-item">
+                        <a href="{% url 'about' %}" class="mb-menu-link text_liven-blue">About</a>
+                    </li>
+
+                    <!-- Contact -->
+                    <li class="nav-mb-item">
+                        <a href="{% url 'contact' %}" class="mb-menu-link text_liven-blue">Contact</a>
+                    </li>
+
+
+                    
+
+                </ul>
+                <div class="mb-other-content">
+                    <div class="d-flex group-icon">
+                        <a href="wishlist.html" class="site-nav-icon"><i class="icon icon-heart"></i>Wishlist</a>
+                        <a href="home-search.html" class="site-nav-icon"><i class="icon icon-search"></i>Search</a>
+                    </div>
+                    <div class="mb-notice">
+                        <a href="contact-1.html" class="text-need">Need help ?</a>
+                    </div>
+                    <ul class="mb-info">
+                        <li>Address: 1234 Fashion Street, Suite 567, <br> New York, NY 10001</li>
+                        <li>Email: <b>info@fashionshop.com</b></li>
+                        <li>Phone: <b>(212) 555-1234</b></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mb-bottom">
+                <a href="login.html" class="site-nav-icon"><i class="icon icon-account"></i>Login</a>
+                <div class="bottom-bar-language">
+                    <div class="tf-currencies">
+                        <select class="image-select center style-default type-currencies">
+                            <option data-thumbnail="{% static 'images/country/fr.svg' %}">EUR € | France</option>
+                            <option data-thumbnail="{% static 'images/country/de.svg' %}">EUR € | Germany</option>
+                            <option selected data-thumbnail="{% static 'images/country/us.svg' %}">USD $ | United States</option>
+                            <option data-thumbnail="{% static 'images/country/vn.svg' %}">VND ₫ | Vietnam</option>
+                        </select>
+                    </div>
+                    <div class="tf-languages">
+                        <select class="image-select center style-default type-languages">
+                            <option>English</option>
+                            <option>العربية</option>
+                            <option>简体中文</option>
+                            <option>اردو</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /mobile menu -->
+
+        {% block content %}{% endblock %}
+        <!-- gotop -->
+        <button id="goTop">
+            <span class="border-progress"></span>
+            <span class="icon icon-arrow-up"></span>
+        </button>
+        <!-- /gotop -->
+
+        <!-- Footer -->
+        <footer id="footer" class="footer bg_liven-blue">
+            <div class="footer-wrap wow fadeIn" data-wow-delay="0s">
+                <div class="footer-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-xl-3 col-md-6 col-12">
+                                <div class="footer-infor">
+                                    <div class="footer-logo">
+                                        <a href="{% url 'home' %}">
+                                            <img src="{% static 'images/logo/logolivenblanco.png' %}" alt="">
+                                        </a>
+                                    </div>
+                                    <ul>
+                                        <li>
+                                            <p>Address: 1234 Fashion Street, Suite 567, <br> New York, NY 10001</p>
+                                        </li>
+                                        <li>
+                                            <p>Email: <a href="#">info@fashionshop.com</a></p>
+                                        </li>
+                                        <li>
+                                            <p>Phone: <a href="#">(212) 555-1234</a></p>
+                                        </li>
+                                    </ul>
+                                    <a href="contact-1.html" class="tf-btn btn-line">Get direction<i
+                                            class="icon icon-arrow1-top-left"></i></a>
+                                    <ul class="tf-social-icon d-flex gap-10 style-white">
+                                        <li><a href="#" class="box-icon w_34 round social-facebook social-line"><i
+                                                    class="icon fs-14 icon-fb"></i></a></li>
+                                        <li><a href="#" class="box-icon w_34 round social-twiter social-line"><i
+                                                    class="icon fs-12 icon-Icon-x"></i></a></li>
+                                        <li><a href="#" class="box-icon w_34 round social-instagram social-line"><i
+                                                    class="icon fs-14 icon-instagram"></i></a></li>
+                                        <li><a href="#" class="box-icon w_34 round social-tiktok social-line"><i
+                                                    class="icon fs-14 icon-tiktok"></i></a></li>
+                                        <li><a href="#" class="box-icon w_34 round social-pinterest social-line"><i
+                                                    class="icon fs-14 icon-pinterest-1"></i></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 col-12 footer-col-block">
+                                <div class="footer-heading footer-heading-desktop">
+                                    <h6>Help</h6>
+                                </div>
+                                <div class="footer-heading footer-heading-moblie">
+                                    <h6>Help</h6>
+                                </div>
+                                <ul class="footer-menu-list tf-collapse-content">
+                                    <li>
+                                        <a href="privacy-policy.html" class="footer-menu_item">Privacy Policy</a>
+                                    </li>
+                                    <li>
+                                        <a href="delivery-return.html" class="footer-menu_item"> Returns + Exchanges
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="shipping-delivery.html" class="footer-menu_item">Shipping</a>
+                                    </li>
+                                    <li>
+                                        <a href="terms-conditions.html" class="footer-menu_item">Terms &amp;
+                                            Conditions</a>
+                                    </li>
+                                    <li>
+                                        <a href="faq-1.html" class="footer-menu_item">FAQ’s</a>
+                                    </li>
+                                    <li>
+                                        <a href="compare.html" class="footer-menu_item">Compare</a>
+                                    </li>
+                                    <li>
+                                        <a href="wishlist.html" class="footer-menu_item">My Wishlist</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-xl-3 col-md-6 col-12 footer-col-block">
+                                <div class="footer-heading footer-heading-desktop">
+                                    <h6>About us</h6>
+                                </div>
+                                <div class="footer-heading footer-heading-moblie">
+                                    <h6>About us</h6>
+                                </div>
+                                <ul class="footer-menu-list tf-collapse-content">
+                                    <li>
+                                        <a href="about-us.html" class="footer-menu_item">Our Story</a>
+                                    </li>
+                                    <li>
+                                        <a href="our-store.html" class="footer-menu_item">Visit Our Store</a>
+                                    </li>
+                                    <li>
+                                        <a href="contact-1.html" class="footer-menu_item">Contact Us</a>
+                                    </li>
+                                    <li>
+                                        <a href="login.html" class="footer-menu_item">Account</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-xl-3 col-md-6 col-12">
+                                <div class="footer-newsletter footer-col-block">
+                                    <div class="footer-heading footer-heading-desktop">
+                                        <h6>Sign Up for Email</h6>
+                                    </div>
+                                    <div class="footer-heading footer-heading-moblie">
+                                        <h6>Sign Up for Email</h6>
+                                    </div>
+                                    <div class="tf-collapse-content">
+                                        <div class="footer-menu_item">Sign up to get first dibs on new arrivals, sales,
+                                            exclusive content, events and more!</div>
+                                        <form class="form-newsletter" id="subscribe-form" action="#" method="post"
+                                            accept-charset="utf-8" data-mailchimp="true">
+                                            <div id="subscribe-content">
+                                                <fieldset class="email">
+                                                    <input type="email" name="email-form" id="subscribe-email"
+                                                        placeholder="Enter your email...." tabindex="0"
+                                                        aria-required="true">
+                                                </fieldset>
+                                                <div class="button-submit">
+                                                    <button id="subscribe-button"
+                                                        class="tf-btn btn-sm radius-3 btn-fill btn-icon animate-hover-btn"
+                                                        type="button">Subscribe<i
+                                                            class="icon icon-arrow1-top-left"></i></button>
+                                                </div>
+                                            </div>
+                                            <div id="subscribe-msg"></div>
+                                        </form>
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <div
+                                    class="footer-bottom-wrap d-flex gap-20 flex-wrap justify-content-between align-items-center">
+                                    <div class="footer-menu_item">© 2025 Ecomus Store. All Rights Reserved</div>
+                                    <div class="tf-payment">
+                                        <img src="images/payments/visa.png" alt="">
+                                        <img src="images/payments/img-1.png" alt="">
+                                        <img src="images/payments/img-2.png" alt="">
+                                        <img src="images/payments/img-3.png" alt="">
+                                        <img src="images/payments/img-4.png" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- /Footer -->
+
+        {% include "includes/modals.html" %}
+
+    <!-- Javascript -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'js/carousel.js' %}"></script>
+    <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
+    <script src="{% static 'js/lazysize.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
+    <script src="{% static 'js/count-down.js' %}"></script>
+    <script src="{% static 'js/wow.min.js' %}"></script>
+    <script src="{% static 'js/multiple-modal.js' %}"></script>
+    <script src="{% static 'js/magnific-popup.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script src="{% static 'js/nouislider.min.js' %}"></script>
+    <script src="{% static 'js/shop.js' %}"></script>
+
+</body>
+<style>
+/* 🔥 Forzar color en menú móvil */
+.sub-nav-link,
+.mb-menu-link {
+    color: #1e3a8a !important; /* tu azul liven */
+}
+
+/* Hover */
+.sub-nav-link:hover,
+.mb-menu-link:hover {
+    color: #1e3a8a !important;
+}
+
+/* Cuando está activo o abierto */
+.sub-nav-link.active,
+.mb-menu-link.active,
+.sub-nav-link.collapsed,
+.mb-menu-link.collapsed {
+    color: #1e3a8a !important;
+}
+.footer-logo img {
+    width: 140px; /* tamaño en PC */
+    height: auto;
+}
+
+/* 📱 móvil */
+@media (max-width: 768px) {
+    .footer-logo img {
+        width: 100px; /* más pequeño en móvil */
+    }
+}
+
+/* enlaces principales del menú móvil */
+.nav-mb-item > a {
+    color: #1e3a8a !important;
+}
+
+/* texto dentro del enlace */
+.nav-mb-item > a span {
+    color: #1e3a8a !important;
+}
+
+/* submenú nivel 1 */
+.nav-mb-item .sub-nav-link {
+    color: #1e3a8a !important;
+}
+
+/* submenú nivel 2 */
+.nav-mb-item .sub-menu-level-2 .sub-nav-link {
+    color: #1e3a8a !important;
+}
+
+/* hover */
+.nav-mb-item a:hover {
+    color: #1e3a8a !important;
+}
+</style>
+
+</html>

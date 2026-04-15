@@ -1,0 +1,152 @@
+/* Quick View Modal - Tamaño fijo y consistente */
+
+/* Forzar ancho máximo del modal */
+#quick_view .modal-dialog {
+    max-width: 1200px !important;
+    width: 95% !important;
+}
+
+/* Contenedor principal del modal con altura fija */
+#quick_view .modal-content .wrap {
+    display: flex;
+    min-height: 650px;
+    max-height: 650px;
+}
+
+/* Contenedor de imagen - tamaño fijo */
+#quick_view .tf-product-media-wrap {
+    width: 50%;
+    min-width: 500px;
+    max-width: 500px;
+    height: 650px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+/* Contenedor del swiper con altura fija */
+#quick_view .tf-product-media-wrap .swiper {
+    height: 100%;
+}
+
+/* Item de imagen - SIN espacios arriba/abajo */
+#quick_view .tf-product-media-wrap .swiper-slide .item {
+    width: 100%;
+    height: 650px;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    background-color: #f8f8f8;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+/* Imágenes ajustadas sin deformar - COVER para llenar todo el espacio */
+#quick_view .tf-product-media-wrap .swiper-slide .item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Llena todo el espacio sin espacios en blanco */
+    object-position: center;
+}
+
+/* Contenedor de información del producto */
+#quick_view .tf-product-info-wrap {
+    width: 50%;
+    padding: 40px;
+    overflow-y: auto;
+    max-height: 650px;
+    flex-shrink: 0;
+}
+
+/* Ajustar scrollbar del panel de información */
+#quick_view .tf-product-info-wrap::-webkit-scrollbar {
+    width: 6px;
+}
+
+#quick_view .tf-product-info-wrap::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#quick_view .tf-product-info-wrap::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+#quick_view .tf-product-info-wrap::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Responsive - Tablet */
+@media (max-width: 991px) {
+    #quick_view .modal-dialog {
+        max-width: 90% !important;
+    }
+    
+    #quick_view .tf-product-media-wrap {
+        min-width: 400px;
+        max-width: 400px;
+        height: 600px;
+    }
+    
+    #quick_view .tf-product-media-wrap .swiper-slide .item {
+        height: 600px;
+    }
+    
+    #quick_view .modal-content .wrap {
+        min-height: 600px;
+        max-height: 600px;
+    }
+    
+    #quick_view .tf-product-info-wrap {
+        max-height: 600px;
+        padding: 30px;
+    }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 767px) {
+    #quick_view .modal-dialog {
+        max-width: 95% !important;
+    }
+    
+    #quick_view .modal-content .wrap {
+        flex-direction: column;
+        min-height: auto;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    #quick_view .tf-product-media-wrap {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        height: 400px;
+    }
+    
+    #quick_view .tf-product-media-wrap .swiper-slide .item {
+        height: 400px;
+    }
+    
+    #quick_view .tf-product-info-wrap {
+        width: 100%;
+        max-height: none;
+        padding: 20px;
+    }
+}
+
+/* Asegurar que los botones de navegación del swiper estén visibles */
+#quick_view .swiper-button-next,
+#quick_view .swiper-button-prev {
+    color: #000;
+    background: rgba(255, 255, 255, 0.9);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#quick_view .swiper-button-next:after,
+#quick_view .swiper-button-prev:after {
+    font-size: 18px;
+}

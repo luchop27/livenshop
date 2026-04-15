@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <!-- page-title -->
+    <div class="tf-page-title style-2">
+        <div class="container-full">
+            <div class="heading text-center">Portfolio</div>
+        </div>
+    </div>
+    <!-- /page-title -->
+
+    <style>
+        .portfolio-image-wrap {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            overflow: hidden;
+        }
+        .portfolio-image-wrap .image {
+            height: 100%;
+        }
+        .portfolio-image-wrap .image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .portfolio-text {
+            padding: 3rem 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+        .portfolio-item {
+            align-items: stretch;
+            min-height: 600px;
+        }
+        .portfolio-item .w-50 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
+
+    <!-- Portfolio -->
+    <section class="flat-spacing-12">
+        <div class="container-full px_15 lg-px_40">
+            <div class="d-flex flex-column">
+
+                <!-- Item 1 - imagen izquierda -->
+                <div class="d-flex portfolio-item">
+                    <div class="w-50">
+                        <div class="wrap-lookbook lookbook-1 portfolio-image-wrap">
+                            <div class="image">
+                                <img class="lazyload" data-src="{% static 'images/slider/009furniture-banner-10.jpg' %}" alt="">
+                            </div>
+                            <div class="lookbook-item item-1">
+                                <div class="inner">
+                                    <div class="btn-group dropdown dropup dropdown-center">
+                                        <button class="tf-pin-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span></span>
+                                        </button>
+                                        <ul class="dropdown-menu p-0 border-0">
+                                            <li>
+                                                <div class="lookbook-product">
+                                                    <a href="product-detail.html" class="image">
+                                                        <img class="lazyload" data-src="{% static 'images/shop/products/lb-furniture-1.jpg' %}" alt="">
+                                                    </a>
+                                                    <div class="content-wrap">
+                                                        <div class="product-title"><a href="#">Brasilia Lounge Chair</a></div>
+                                                        <div class="price">$982.00</div>
+                                                    </div>
+                                                    <a href="#quick_view" data-bs-toggle="modal"><i class="icon-view"></i></a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lookbook-item item-2">
+                                <div class="inner">
+                                    <div class="btn-group dropdown dropup dropdown-center">
+                                        <button class="tf-pin-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span></span>
+                                        </button>
+                                        <ul class="dropdown-menu p-0 border-0">
+                                            <li>
+                                                <div class="lookbook-product">
+                                                    <a href="product-detail.html" class="image">
+                                                        <img class="lazyload" data-src="{% static 'images/shop/products/lb-furniture-2.jpg' %}" alt="">
+                                                    </a>
+                                                    <div class="content-wrap">
+                                                        <div class="product-title"><a href="#">AJ Wall Sconce</a></div>
+                                                        <div class="price">$982.00</div>
+                                                    </div>
+                                                    <a href="#quick_view" data-bs-toggle="modal"><i class="icon-view"></i></a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-50">
+                        <div class="portfolio-text">
+                            <div class="fw-7 mb-2">PROYECTO 1</div>
+                            <h4 class="mb-3">Inception and Brand Establishment</h4>
+                            <p>Inception, in the context of brand establishment, refers to the initial phase of creating and introducing a brand to the market. It involves laying down the foundational elements that will define the brand's identity, values, and positioning in the minds of consumers.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 2 - imagen derecha -->
+                <div class="d-flex portfolio-item">
+                    <div class="w-50">
+                        <div class="portfolio-text">
+                            <div class="fw-7 mb-2">PROYECTO 2</div>
+                            <h4 class="mb-3">Debut Collection and Market Entry</h4>
+                            <p>Entering the market with a debut collection requires careful planning, creativity, and perseverance. By following these steps and staying true to your vision, you can increase your chances of success in the fashion industry.</p>
+                        </div>
+                    </div>
+                    <div class="w-50">
+                        <div class="wrap-lookbook lookbook-2 portfolio-image-wrap">
+                            <div class="image">
+                                <img class="lazyload" data-src="{% static 'images/slider/009furniture-banner-11.jpg' %}" alt="">
+                            </div>
+                            <div class="lookbook-item item-1">
+                                <div class="inner">
+                                    <div class="btn-group dropdown dropup dropdown-center">
+                                        <button class="tf-pin-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span></span>
+                                        </button>
+                                        <ul class="dropdown-menu p-0 border-0">
+                                            <li>
+                                                <div class="lookbook-product">
+                                                    <a href="product-detail.html" class="image">
+                                                        <img class="lazyload" data-src="{% static 'images/shop/products/lb-furniture-3.jpg' %}" alt="">
+                                                    </a>
+                                                    <div class="content-wrap">
+                                                        <div class="product-title"><a href="#">Eames Lounge Chair</a></div>
+                                                        <div class="price">$6,500.00</div>
+                                                    </div>
+                                                    <a href="#quick_view" data-bs-toggle="modal"><i class="icon-view"></i></a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 3 - imagen izquierda -->
+                <div class="d-flex portfolio-item">
+                    <div class="w-50">
+                        <div class="wrap-lookbook lookbook-3 portfolio-image-wrap">
+                            <div class="image">
+                                <img class="lazyload" data-src="{% static 'images/slider/009furniture-banner-12.jpg' %}" alt="">
+                            </div>
+                            <div class="lookbook-item item-1">
+                                <div class="inner">
+                                    <div class="btn-group dropdown dropup dropdown-center">
+                                        <button class="tf-pin-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span></span>
+                                        </button>
+                                        <ul class="dropdown-menu p-0 border-0">
+                                            <li>
+                                                <div class="lookbook-product">
+                                                    <a href="product-detail.html" class="image">
+                                                        <img class="lazyload" data-src="{% static 'images/shop/products/lb-furniture-4.jpg' %}" alt="">
+                                                    </a>
+                                                    <div class="content-wrap">
+                                                        <div class="product-title"><a href="#">MG501 Cuba Lounge Chair, Paper Cord</a></div>
+                                                        <div class="price">$1,366.00</div>
+                                                    </div>
+                                                    <a href="#quick_view" data-bs-toggle="modal"><i class="icon-view"></i></a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-50">
+                        <div class="portfolio-text">
+                            <div class="fw-7 mb-2">PROYECTO 3</div>
+                            <h4 class="mb-3">Growth and Recognition</h4>
+                            <p>During the Growth and Recognition phase of a brand's journey, several key elements come into play to propel its expansion and solidify its position in the market. Here's an outline of what typically occurs during this phase.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 4 - imagen derecha -->
+                <div class="d-flex portfolio-item">
+                    <div class="w-50">
+                        <div class="portfolio-text">
+                            <div class="fw-7 mb-2">PROYECTO 4</div>
+                            <h4 class="mb-3">Sustainable Initiatives</h4>
+                            <p>Sustainable initiatives play a crucial role in the growth and development of a brand, especially in today's environmentally conscious and socially responsible market landscape. Here are some examples of sustainable initiatives that brands may undertake.</p>
+                        </div>
+                    </div>
+                    <div class="w-50">
+                        <div class="wrap-lookbook lookbook-4 portfolio-image-wrap">
+                            <div class="image">
+                                <img class="lazyload" data-src="{% static 'images/slider/009furniture-banner-10.jpg' %}" alt="">
+                            </div>
+                            <div class="lookbook-item item-1">
+                                <div class="inner">
+                                    <div class="btn-group dropdown dropup dropdown-center">
+                                        <button class="tf-pin-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span></span>
+                                        </button>
+                                        <ul class="dropdown-menu p-0 border-0">
+                                            <li>
+                                                <div class="lookbook-product">
+                                                    <a href="product-detail.html" class="image">
+                                                        <img class="lazyload" data-src="{% static 'images/shop/products/lb-furniture-4.jpg' %}" alt="">
+                                                    </a>
+                                                    <div class="content-wrap">
+                                                        <div class="product-title"><a href="#">MG501 Cuba Lounge Chair, Paper Cord</a></div>
+                                                        <div class="price">$1,366.00</div>
+                                                    </div>
+                                                    <a href="#quick_view" data-bs-toggle="modal"><i class="icon-view"></i></a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- /Portfolio -->
+             <!-- Shop Gram -->
+        <section class="pb-0 flat-spacing-18">
+            <div class="container-full px-0">
+                <div class="flat-title wow fadeInUp" data-wow-delay="0s">
+                    <span class="title">Shop Gram</span>
+                    <p class="sub-title">Here’s some of our most popular products people are in love with.</p>
+                </div>
+                <div dir="ltr" class="swiper tf-sw-shop-gallery" data-preview="5" data-tablet="3" data-mobile="2"
+                    data-space-lg="0" data-space-md="0">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
+                                <div class="img-style">
+                                    <img class="lazyload img-hover"
+                                        data-src="{% static 'images/shop/gallery/furniture-gallery_01.jpg' %}"
+                                        src="{% static 'images/shop/gallery/furniture-gallery_01.jpg' %}" alt="image-gallery">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".1s">
+                                <div class="img-style">
+                                    <img class="lazyload img-hover"
+                                        data-src="{% static 'images/shop/gallery/furniture-gallery_02.jpg' %}"
+                                        src="{% static 'images/shop/gallery/furniture-gallery_02.jpg' %}" alt="image-gallery">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".2s">
+                                <div class="img-style">
+                                    <img class="lazyload img-hover"
+                                        data-src="{% static 'images/shop/gallery/furniture-gallery_03.jpg' %}"
+                                        src="{% static 'images/shop/gallery/furniture-gallery_03.jpg' %}" alt="image-gallery">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".3s">
+                                <div class="img-style">
+                                    <img class="lazyload img-hover"
+                                        data-src="{% static 'images/shop/gallery/furniture-gallery_04.jpg' %}"
+                                        src="{% static 'images/shop/gallery/furniture-gallery_04.jpg' %}" alt="image-gallery">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".4s">
+                                <div class="img-style">
+                                    <img class="lazyload img-hover"
+                                        data-src="{% static 'images/shop/gallery/furniture-gallery_05.jpg' %}"
+                                        src="{% static 'images/shop/gallery/furniture-gallery_05.jpg' %}" alt="image-gallery">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".4s">
+                                <div class="img-style">
+                                    <img class="lazyload img-hover"
+                                        data-src="{% static 'images/shop/gallery/furniture-gallery_06.jpg' %}"
+                                        src="{% static 'images/shop/gallery/furniture-gallery_06.jpg' %}" alt="image-gallery">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute-dots sw-dots sw-pagination-gallery justify-content-center"></div>
+                </div>
+            </div>
+        </section>
+        <!-- /Shop Gram -->
+<style>
+@media (max-width: 768px) {
+
+    .portfolio-item {
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .portfolio-item .w-50 {
+        width: 100% !important;
+    }
+
+    /* 🔥 CLAVE: detectar cuál contiene imagen y cuál texto */
+    .portfolio-item .w-50:has(.portfolio-image-wrap) {
+        order: 1;
+    }
+
+    .portfolio-item .w-50:has(.portfolio-text) {
+        order: 2;
+    }
+
+    /* Ajuste de imagen */
+    .portfolio-image-wrap {
+        height: 320px;
+    }
+
+    .portfolio-text {
+        padding: 2rem 1.5rem;
+        text-align: center;
+    }
+
+}
+</style>
+{% endblock content %}

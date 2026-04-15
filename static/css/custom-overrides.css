@@ -1,0 +1,28 @@
+/* Custom Overrides for Mobile Menu Colors */
+
+/* Force text_liven-blue color on mobile menu links */
+.nav-ul-mb .nav-mb-item .mb-menu-link.text_liven-blue,
+a.mb-menu-link.text_liven-blue,
+.mb-menu-link.text_liven-blue {
+  color: #0C2038 !important;
+}
+
+/* Additional specificity for nested links */
+.offcanvas-start .mb-menu-link.text_liven-blue {
+  color: #0C2038 !important;
+}
+
+/* Specific rule for collapsed menu items with text_liven-blue */
+.mb-menu-link.collapsed.text_liven-blue {
+  color: #0C2038 !important;
+}
+
+/* Current state with text_liven-blue */
+.mb-menu-link.current.text_liven-blue {
+  color: #0C2038 !important;
+}
+
+/* Combined classes */
+.mb-menu-link.collapsed.current.text_liven-blue {
+  color: #0C2038 !important;
+}
