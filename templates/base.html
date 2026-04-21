@@ -5,7 +5,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Ecomus - Ultimate HTML</title>
+    <title>Liven</title>
 
     <meta name="author" content="themesflat.com">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -129,7 +129,7 @@
                                             class="icon icon-search"></i></a></li>
                                 <li class="nav-account"><a href="#login" data-bs-toggle="modal"
                                         class="link  nav-icon-item text_liven-blue"><i class="icon icon-account"></i></a></li>
-                                <li class="nav-wishlist"><a href="wishlist.html" class="link nav-icon-item text_liven-blue"><i
+                                <li class="nav-wishlist"><a href="{% url 'wishlist' %}" class="link nav-icon-item text_liven-blue"><i
                                             class="icon icon-heart"></i><span class="count-box bg_liven-blue">0</span></a></li>
                                 <li class="nav-cart"><a href="#shoppingCart" data-bs-toggle="modal"
                                         class="link nav-icon-item text_liven-blue"><i class="icon icon-bag"></i><span
@@ -542,7 +542,7 @@
                 </div>
             </div>
             <div class="mb-bottom">
-                <a href="login.html" class="site-nav-icon"><i class="icon icon-account"></i>Login</a>
+                <a href="{% url 'login' %}" class="site-nav-icon"><i class="icon icon-account"></i>Login</a>
                 <div class="bottom-bar-language">
                     <div class="tf-currencies">
                         <select class="image-select center style-default type-currencies">
