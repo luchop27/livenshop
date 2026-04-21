@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import TemplateView
 
 urlpatterns = [
@@ -27,4 +27,19 @@ urlpatterns = [
     path('shop/', TemplateView.as_view(template_name='shop-fullwidth.html'), name='shop'),
     path('services/', TemplateView.as_view(template_name='services.html'), name='services'),
     path('contact/', TemplateView.as_view(template_name='contact.html'), name='contact'),
+    path('login/', TemplateView.as_view(template_name='login.html'), name='login'),
+    path('register/', TemplateView.as_view(template_name='register.html'), name='register'),
+    path('my-account/', TemplateView.as_view(template_name='my-account.html'), name='my-account'),
+    path('wishlist/', TemplateView.as_view(template_name='my-account-wishlist.html'), name='wishlist'),
+    path('my-account/orders/', TemplateView.as_view(template_name='my-account-orders.html'), name='my-account-orders'),
+    path('my-account/orders/<int:order_id>/', TemplateView.as_view(template_name='my-account-orders-details.html'), name='my-account-orders-details'),
+    path('my-account/edit/', TemplateView.as_view(template_name='my-account-edit.html'), name='my-account-edit'),
+    path('my-account/address/', TemplateView.as_view(template_name='my-account-address.html'), name='my-account-address'),
+    path('my-account/wishlist/', TemplateView.as_view(template_name='my-account-wishlist.html'), name='my-account-wishlist'),
+    
+    # Productos
+    path('productos/', include('apps.productos.urls')),
+    
+    # Usuarios
+    path('usuarios/', include('apps.usuarios.urls')),
 ]

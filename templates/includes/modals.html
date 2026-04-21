@@ -250,7 +250,7 @@
                     <span class="icon-close icon-close-popup" data-bs-dismiss="modal"></span>
                 </div>
                 <div class="tf-login-form">
-                    <form class="" action="my-account.html" accept-charset="utf-8">
+                    <form class="" action="{% url 'my-account' %}" accept-charset="utf-8">
                         <div class="tf-field style-1">
                             <input class="tf-field-input tf-input" placeholder=" " type="email" name="">
                             <label class="tf-field-label" for="">Email *</label>
@@ -340,7 +340,7 @@
                         </div>
                         <div class="bottom">
                             <div class="w-100">
-                                <a href="register.html"
+                                <a href="{% url 'register' %}"
                                     class="tf-btn btn-fill animate-hover-btn radius-3 w-100 justify-content-center"><span>Register</span></a>
                             </div>
                             <div class="w-100">

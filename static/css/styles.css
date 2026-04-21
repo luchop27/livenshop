@@ -69,6 +69,13 @@
   --bg-scrollbar-thumb: #c1c1c1;
 }
 
+/* Agregar a tu archivo de estilos */
+.card-product-horizontal-img .product-img img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
 .color-primary-2 {
   --primary:#814037;
 }
