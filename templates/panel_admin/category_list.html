@@ -1,0 +1,139 @@
+{% extends 'panel_admin/base_admin.html' %}
+
+{% block title %}Categorias | Panel Admin{% endblock %}
+{% block menu_category %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>
+                    {% if categoria_padre %}
+                        Subcategorias de: {{ categoria_padre.nombre }}
+                    {% else %}
+                        Categorias principales
+                    {% endif %}
+                </h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li>
+                        <a href="{% url 'panel_admin_demo' %}">
+                            <div class="text-tiny">Dashboard</div>
+                        </a>
+                    </li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li>
+                        <a href="{% url 'productos:panel_admin_categories' %}">
+                            <div class="text-tiny">Categorias</div>
+                        </a>
+                    </li>
+                    {% if categoria_padre %}
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">{{ categoria_padre.nombre }}</div></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            {% if categoria_padre %}
+            <div class="mb-20">
+                <a href="{% url 'productos:panel_admin_categories' %}" class="tf-button style-2">
+                    <i class="icon-arrow-left"></i> Volver a categorias principales
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="wg-box">
+                <div class="flex items-center justify-between gap10 flex-wrap">
+                    <div class="wg-filter flex-grow">
+                        <form class="form-search" method="get">
+                            {% if categoria_padre %}
+                            <input type="hidden" name="padre" value="{{ categoria_padre.id }}">
+                            {% endif %}
+                            <fieldset class="name">
+                                <input type="text" placeholder="Buscar categoria..." name="q" value="{{ search }}" aria-required="true">
+                            </fieldset>
+                            <div class="button-submit">
+                                <button type="submit"><i class="icon-search"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                    <a class="tf-button style-1" href="#">
+                        <i class="icon-plus"></i>Agregar categoria (pendiente)
+                    </a>
+                </div>
+
+                <div class="wg-table table-all-category">
+                    <ul class="table-title flex gap20 mb-14">
+                        <li><div class="body-title">Categoria</div></li>
+                        <li><div class="body-title">Coleccion</div></li>
+                        <li><div class="body-title">Slug</div></li>
+                        <li><div class="body-title">Subcategorias</div></li>
+                        <li><div class="body-title">Productos</div></li>
+                        <li><div class="body-title">Posicion</div></li>
+                        <li><div class="body-title">Estado</div></li>
+                    </ul>
+
+                    {% if categorias %}
+                    <ul class="flex flex-column">
+                        {% for categoria in categorias %}
+                        <li class="wg-product item-row gap20">
+                            <div class="name">
+                                <div class="title mb-0">
+                                    <strong class="body-text">{{ categoria.nombre }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="body-text text-main-dark mt-4">
+                                {% if categoria.coleccion %}
+                                    {{ categoria.coleccion.nombre }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="body-text text-main-dark mt-4">
+                                <code>{{ categoria.slug }}</code>
+                            </div>
+
+                            <div class="body-text text-main-dark mt-4">
+                                {% if categoria.num_subcategorias > 0 %}
+                                    <a href="{% url 'productos:panel_admin_categories' %}?padre={{ categoria.id }}" class="tf-button style-3">
+                                        {{ categoria.num_subcategorias }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="body-text text-main-dark mt-4">{{ categoria.num_productos }}</div>
+                            <div class="body-text text-main-dark mt-4">{{ categoria.posicion }}</div>
+
+                            <div class="body-text text-main-dark mt-4">
+                                {% if categoria.activo %}
+                                    <span class="block-available bg-1 fw-7">Activa</span>
+                                {% else %}
+                                    <span class="block-not-available bg-1 fw-7">Inactiva</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <p class="text-muted">
+                            {% if search %}
+                                No se encontraron categorias con "{{ search }}".
+                            {% elif categoria_padre %}
+                                Esta categoria no tiene subcategorias.
+                            {% else %}
+                                No hay categorias principales registradas.
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
 
 from .models import Producto, Categoria, Coleccion, CarritoItem
 
@@ -30,6 +32,88 @@ def home(request):
     return render(request, 'home.html', {
         'productos': productos,
         'categorias': categorias
+    })
+
+
+def panel_admin_demo(request):
+    """
+    Render de prueba del panel administrativo migrado.
+    Esta vista valida la carga de layout base y assets.
+    """
+    return render(request, 'panel_admin/dashboard_demo.html', {
+        'total_productos': Producto.objects.count(),
+        'total_productos_activos': Producto.objects.filter(activo=True).count(),
+        'total_categorias': Categoria.objects.count(),
+        'total_colecciones': Coleccion.objects.count(),
+    })
+
+
+def panel_admin_categories(request):
+    """
+    Listado de categorias para el panel administrativo.
+    Soporta filtro de busqueda y navegacion por categorias padre.
+    """
+    search = request.GET.get('q', '').strip()
+    padre_id = request.GET.get('padre')
+    categoria_padre = None
+
+    categorias = Categoria.objects.select_related('coleccion', 'padre').annotate(
+        num_subcategorias=Count('subcategorias', distinct=True),
+        num_productos=Count('productos', distinct=True),
+    )
+
+    if padre_id:
+        categoria_padre = get_object_or_404(Categoria, pk=padre_id)
+        categorias = categorias.filter(padre=categoria_padre)
+    else:
+        categorias = categorias.filter(padre__isnull=True)
+
+    if search:
+        categorias = categorias.filter(nombre__icontains=search)
+
+    categorias = categorias.order_by('posicion', 'nombre')
+
+    return render(request, 'panel_admin/category_list.html', {
+        'categorias': categorias,
+        'categoria_padre': categoria_padre,
+        'search': search,
+    })
+
+
+def panel_admin_products(request):
+    """
+    Listado de productos para el panel administrativo.
+    Incluye filtro por texto, coleccion y paginacion.
+    """
+    search = request.GET.get('q', '').strip()
+    coleccion_filtro = request.GET.get('coleccion', '').strip()
+
+    productos_qs = Producto.objects.select_related(
+        'categoria', 'coleccion'
+    ).prefetch_related('imagenes').order_by('-created_at')
+
+    if search:
+        productos_qs = productos_qs.filter(
+            Q(nombre__icontains=search) |
+            Q(marca__icontains=search) |
+            Q(slug__icontains=search)
+        )
+
+    if coleccion_filtro:
+        productos_qs = productos_qs.filter(coleccion__slug=coleccion_filtro)
+
+    paginator = Paginator(productos_qs, 12)
+    page_number = request.GET.get('page')
+    productos = paginator.get_page(page_number)
+
+    colecciones_disponibles = Coleccion.objects.filter(activo=True).order_by('nombre')
+
+    return render(request, 'panel_admin/product_list.html', {
+        'productos': productos,
+        'total_productos': paginator.count,
+        'search': search,
+        'coleccion_filtro': coleccion_filtro,
+        'colecciones_disponibles': colecciones_disponibles,
     })
 
 

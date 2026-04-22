@@ -4,6 +4,11 @@ from . import views
 app_name = 'productos'
 
 urlpatterns = [
+    # ── PANEL ADMIN (MIGRACION INICIAL) ──────────────
+    path('panel-admin/demo/', views.panel_admin_demo, name='panel_admin_demo'),
+    path('panel-admin/categorias/', views.panel_admin_categories, name='panel_admin_categories'),
+    path('panel-admin/productos/', views.panel_admin_products, name='panel_admin_products'),
+
     # ── CATÁLOGO ──────────────────────────────────────
     path('', views.ProductoListView.as_view(), name='lista_productos'),
     path('producto/<slug:slug>/', views.ProductoDetailView.as_view(), name='detalle_producto'),

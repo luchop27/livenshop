@@ -1,0 +1,57 @@
+{% extends 'panel_admin/base_admin.html' %}
+
+{% block title %}Panel Admin | Demo{% endblock %}
+{% block menu_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="mb-30">
+                <h3>Panel administrativo migrado</h3>
+                <p class="body-text">Esta vista valida la integracion inicial de templates y assets del panel_admin.</p>
+            </div>
+
+            <div class="tf-section-4 mb-30">
+                <div class="wg-chart-default">
+                    <div class="top">
+                        <div>
+                            <div class="body-text mb-4">Productos</div>
+                            <h4>{{ total_productos }}</h4>
+                            <div class="text-tiny">Activos: {{ total_productos_activos }}</div>
+                        </div>
+                    </div>
+                    <div class="wrap-chart" style="padding:20px;">
+                        <a class="tf-button style-1" href="{% url 'productos:panel_admin_products' %}">Ir al listado de productos</a>
+                    </div>
+                </div>
+
+                <div class="wg-chart-default">
+                    <div class="top">
+                        <div>
+                            <div class="body-text mb-4">Categorias</div>
+                            <h4>{{ total_categorias }}</h4>
+                            <div class="text-tiny">Colecciones: {{ total_colecciones }}</div>
+                        </div>
+                    </div>
+                    <div class="wrap-chart" style="padding:20px;">
+                        <a class="tf-button style-1" href="{% url 'productos:panel_admin_categories' %}">Ir al listado de categorias</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wg-box">
+                <div class="title-box">
+                    <div class="body-text">Estado de migracion actual</div>
+                </div>
+                <ul>
+                    <li>Base heredable lista</li>
+                    <li>Dashboard conectado a datos reales</li>
+                    <li>Pantallas de categorias y productos operativas</li>
+                    <li>Pendiente: CRUD completo (crear/editar/eliminar) en panel nuevo</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

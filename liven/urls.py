@@ -19,11 +19,12 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
-from apps.productos.views import home
+from apps.productos.views import home, panel_admin_demo
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
+    path('panel-admin/', panel_admin_demo, name='panel_admin_demo'),
     path('about/', TemplateView.as_view(template_name='about-us.html'), name='about'),
     path('portfolio/', TemplateView.as_view(template_name='portfolio.html'), name='portfolio'),
     path('brands/', TemplateView.as_view(template_name='brands.html'), name='brands'),

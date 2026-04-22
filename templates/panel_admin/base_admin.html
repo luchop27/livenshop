@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>{% block title %}Panel Admin | LivenShop{% endblock %}</title>
+    <meta name="description" content="Panel administrativo de LivenShop">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'panel_admin/css/animate.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'panel_admin/css/animation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'panel_admin/css/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'panel_admin/css/bootstrap-select.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'panel_admin/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'panel_admin/fonts/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'panel_admin/icon/style.css' %}">
+
+    <link rel="shortcut icon" href="{% static 'panel_admin/images/favicon.png' %}">
+    <link rel="apple-touch-icon-precomposed" href="{% static 'panel_admin/images/favicon.png' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="body">
+    <div id="wrapper">
+        <div id="page">
+            <div class="layout-wrap">
+                <div id="preload" class="preload-container">
+                    <div class="preloading">
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="section-menu-left">
+                    <div class="box-logo">
+                        <a href="{% url 'panel_admin_demo' %}" id="site-logo-inner" style="display:flex;align-items:center;justify-content:center;width:100%;">
+                            <img id="logo_header" alt="LivenShop" src="{% static 'images/logo/logo.svg' %}"
+                                data-light="{% static 'images/logo/logo.svg' %}"
+                                data-dark="{% static 'images/logo/logo-white.svg' %}"
+                                style="max-height:70px;width:auto;object-fit:contain;padding:0;margin:0;">
+                        </a>
+                        <div class="button-show-hide">
+                            <i class="icon-chevron-left"></i>
+                        </div>
+                    </div>
+
+                    <div class="section-menu-left-wrap">
+                        <div class="center">
+                            <div class="center-item">
+                                <ul>
+                                    <li class="menu-item {% block menu_dashboard %}{% endblock %}">
+                                        <a href="{% url 'panel_admin_demo' %}">
+                                            <div class="icon"><i class="icon-grid"></i></div>
+                                            <div class="text">Panel de Administracion</div>
+                                        </a>
+                                    </li>
+
+                                    <li class="menu-item has-children {% block menu_product %}{% endblock %}">
+                                        <a href="#" class="menu-item-button">
+                                            <div class="icon"><i class="icon-file-plus"></i></div>
+                                            <div class="text">Productos</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'productos:panel_admin_products' %}">
+                                                    <div class="text">Todos los productos</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="#">
+                                                    <div class="text">Agregar producto (pendiente)</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="menu-item has-children {% block menu_category %}{% endblock %}">
+                                        <a href="#" class="menu-item-button">
+                                            <div class="icon"><i class="icon-layers"></i></div>
+                                            <div class="text">Categorias</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item"><a href="{% url 'productos:panel_admin_categories' %}"><div class="text">Lista de categorias</div></a></li>
+                                            <li class="sub-menu-item"><a href="#"><div class="text">Gestion de categorias (pendiente)</div></a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="menu-item has-children {% block menu_orders %}{% endblock %}">
+                                        <a href="#" class="menu-item-button">
+                                            <div class="icon"><i class="icon-shopping-cart"></i></div>
+                                            <div class="text">Pedidos</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item"><a href="#"><div class="text">Lista de pedidos (pendiente)</div></a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="menu-item has-children {% block menu_users %}{% endblock %}">
+                                        <a href="#" class="menu-item-button">
+                                            <div class="icon"><i class="icon-user"></i></div>
+                                            <div class="text">Usuarios</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item"><a href="#"><div class="text">Gestion de usuarios (pendiente)</div></a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="menu-item">
+                                        <a href="{% url 'home' %}" target="_blank">
+                                            <div class="icon"><i class="icon-monitor"></i></div>
+                                            <div class="text">Ver tienda</div>
+                                        </a>
+                                    </li>
+
+                                    <li class="menu-item">
+                                        <a href="{% url 'usuarios:logout' %}">
+                                            <div class="icon"><i class="icon-log-out"></i></div>
+                                            <div class="text">Cerrar sesion</div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-content-right">
+                    {% block header %}
+                    <div class="header-dashboard">
+                        <div class="wrap">
+                            <div class="header-left">
+                                <a href="{% url 'panel_admin_demo' %}">
+                                    <img id="logo_header_mobile" alt="LivenShop" src="{% static 'images/logo/logo.svg' %}"
+                                        data-light="{% static 'images/logo/logo.svg' %}"
+                                        data-dark="{% static 'images/logo/logo-white.svg' %}">
+                                </a>
+                                <div class="button-show-hide">
+                                    <i class="icon-chevron-left"></i>
+                                </div>
+                            </div>
+                            <div class="header-grid">
+                                <div class="popup-wrap user type-header">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="header-user wg-user">
+                                                <span class="image">
+                                                    <img src="{% static 'panel_admin/images/avatar/useradmin.png' %}" alt="Usuario">
+                                                </span>
+                                                <span class="flex flex-column">
+                                                    {% if user.is_authenticated %}
+                                                    <span class="body-text text-main-dark">{{ user.get_full_name|default:user.email }}</span>
+                                                    <span class="text-tiny">{{ user.get_rol_display|default:'Administrador' }}</span>
+                                                    {% else %}
+                                                    <span class="body-text text-main-dark">Invitado</span>
+                                                    <span class="text-tiny">Sin autenticacion</span>
+                                                    {% endif %}
+                                                </span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endblock %}
+
+                    {% block content %}{% endblock %}
+
+                    {% block footer %}
+                    <div class="bottom-page">
+                        <div class="body-text">Panel administrativo LivenShop.</div>
+                    </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'panel_admin/js/jquery.min.js' %}"></script>
+    <script src="{% static 'panel_admin/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'panel_admin/js/bootstrap-select.min.js' %}"></script>
+    <script src="{% static 'panel_admin/js/zoom.js' %}"></script>
+    <script src="{% static 'panel_admin/js/switcher.js' %}"></script>
+    <script defer src="{% static 'panel_admin/js/theme-settings.js' %}"></script>
+    <script src="{% static 'panel_admin/js/main.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

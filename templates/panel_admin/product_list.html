@@ -1,0 +1,186 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Productos | Panel Admin{% endblock %}
+{% block menu_product %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Todos los productos</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li>
+                        <a href="{% url 'panel_admin_demo' %}">
+                            <div class="text-tiny">Dashboard</div>
+                        </a>
+                    </li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Productos</div></li>
+                </ul>
+            </div>
+
+            <div class="wg-box">
+                <div class="flex items-center justify-between gap10 flex-wrap">
+                    <div class="wg-filter flex-grow" style="display:flex;gap:15px;align-items:center;">
+                        <form class="form-search" method="get" style="display:flex;gap:10px;align-items:center;">
+                            <fieldset class="name">
+                                <input type="text" placeholder="Buscar por nombre, marca o slug..." name="q" value="{{ search }}" aria-required="true">
+                            </fieldset>
+                            <div class="button-submit">
+                                <button type="submit"><i class="icon-search"></i></button>
+                            </div>
+
+                            <select name="coleccion" class="tf-input" style="width:220px;padding:10px;" onchange="this.form.submit()">
+                                <option value="">Todas las colecciones</option>
+                                {% for col in colecciones_disponibles %}
+                                <option value="{{ col.slug }}" {% if coleccion_filtro == col.slug %}selected{% endif %}>{{ col.nombre }}</option>
+                                {% endfor %}
+                            </select>
+
+                            {% if search or coleccion_filtro %}
+                            <a href="{% url 'productos:panel_admin_products' %}" class="tf-button style-3" style="padding:8px 12px;">
+                                <i class="icon-refresh"></i>
+                            </a>
+                            {% endif %}
+                        </form>
+                    </div>
+
+                    <a class="tf-button style-1" href="#">
+                        <i class="icon-plus"></i>Agregar producto (pendiente)
+                    </a>
+                </div>
+
+                <div class="wg-table table-product-list">
+                    <ul class="table-title flex gap20 mb-14">
+                        <li><div class="body-title">Producto</div></li>
+                        <li><div class="body-title">ID</div></li>
+                        <li><div class="body-title">Coleccion</div></li>
+                        <li><div class="body-title">Precio</div></li>
+                        <li><div class="body-title">Stock</div></li>
+                        <li><div class="body-title">Estado</div></li>
+                        <li><div class="body-title">Fecha</div></li>
+                        <li><div class="body-title">Acciones</div></li>
+                    </ul>
+
+                    <ul class="flex flex-column">
+                        {% for producto in productos %}
+                        <li class="wg-product item-row gap20">
+                            <div class="name">
+                                <div class="image">
+                                    {% with img=producto.imagenes.first %}
+                                        {% if img and img.imagen %}
+                                            <img src="{{ img.imagen.url }}" alt="{{ producto.nombre }}" style="width:60px;height:60px;object-fit:cover;">
+                                        {% elif img and img.url %}
+                                            <img src="{{ img.url }}" alt="{{ producto.nombre }}" style="width:60px;height:60px;object-fit:cover;">
+                                        {% else %}
+                                            <img src="{% static 'panel_admin/images/products/product-1.jpg' %}" alt="{{ producto.nombre }}" style="width:60px;height:60px;object-fit:cover;">
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                                <div class="title line-clamp-2 mb-0">
+                                    <a href="{{ producto.get_absolute_url }}" class="body-text" target="_blank">{{ producto.nombre }}</a>
+                                    <div class="text-tiny">
+                                        {% if producto.categoria %}
+                                            {{ producto.categoria.nombre }}
+                                        {% else %}
+                                            Sin categoria
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="body-text text-main-dark mt-4">#{{ producto.id }}</div>
+
+                            <div class="body-text text-main-dark mt-4">
+                                {% if producto.coleccion %}
+                                    <span class="badge" style="background:#17a2b8;color:white;padding:3px 8px;border-radius:3px;font-size:11px;">
+                                        {{ producto.coleccion.nombre }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="body-text text-main-dark mt-4">${{ producto.precio_final|floatformat:2 }}</div>
+
+                            <div class="body-text text-main-dark mt-4">
+                                {% if producto.stock > 0 %}
+                                    <span class="text-success fw-7">{{ producto.stock }}</span>
+                                {% else %}
+                                    <span class="text-danger fw-7">0</span>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {% if producto.activo %}
+                                    <div class="block-available bg-1 fw-7">Activo</div>
+                                {% else %}
+                                    <div class="block-not-available bg-1 fw-7">Inactivo</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="body-text text-main-dark mt-4">{{ producto.created_at|date:"d/m/Y" }}</div>
+
+                            <div class="list-icon-function">
+                                <div class="item eye" title="Ver en tienda">
+                                    <a href="{{ producto.get_absolute_url }}" target="_blank"><i class="icon-eye"></i></a>
+                                </div>
+                                <div class="item edit" title="Edicion pendiente">
+                                    <a href="#"><i class="icon-edit-3"></i></a>
+                                </div>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="item-row gap20">
+                            <div class="body-text">
+                                {% if search %}
+                                    No se encontraron productos para tu busqueda.
+                                {% elif coleccion_filtro %}
+                                    No hay productos para esta coleccion.
+                                {% else %}
+                                    No hay productos registrados todavia.
+                                {% endif %}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                {% if productos.has_other_pages %}
+                <div class="divider"></div>
+                <div class="flex items-center justify-between flex-wrap gap10">
+                    <div class="text-tiny">
+                        Mostrando {{ productos.start_index }}-{{ productos.end_index }} de {{ total_productos }} productos
+                    </div>
+                    <ul class="wg-pagination">
+                        {% if productos.has_previous %}
+                        <li>
+                            <a href="?page={{ productos.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if coleccion_filtro %}&coleccion={{ coleccion_filtro }}{% endif %}"><i class="icon-chevron-left"></i></a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in productos.paginator.page_range %}
+                            {% if productos.number == num %}
+                            <li class="active"><a href="#">{{ num }}</a></li>
+                            {% elif num > productos.number|add:'-3' and num < productos.number|add:'3' %}
+                            <li>
+                                <a href="?page={{ num }}{% if search %}&q={{ search }}{% endif %}{% if coleccion_filtro %}&coleccion={{ coleccion_filtro }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if productos.has_next %}
+                        <li>
+                            <a href="?page={{ productos.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if coleccion_filtro %}&coleccion={{ coleccion_filtro }}{% endif %}"><i class="icon-chevron-right"></i></a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
