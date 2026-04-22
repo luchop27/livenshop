@@ -115,17 +115,23 @@
                 <div class="wrap-carousel wrap-mobile">
                     <div dir="ltr" class="swiper tf-sw-mobile" data-preview="1.3" data-space="15">
                         <div class="swiper-wrapper grid-mobile-1">
+                            {% for categoria in categorias %}
                             <div class="swiper-slide">
                                 <div class="collection-item-v2 hover-img">
-                                    <a href="shop-collection-sub.html" class="collection-inner">
+                                    <a href="{{ categoria.get_absolute_url }}" class="collection-inner">
                                         <div class="collection-image img-style">
-                                            <img class="lazyload" data-src="{% static 'images/collections/furniture_cate1.jpg' %}"
-                                                src="{% static 'images/collections/furniture_cate1.jpg' %}" alt="collection-img">
+                                            {% if categoria.imagen %}
+                                                <img class="lazyload" data-src="{{ categoria.imagen.url }}"
+                                                    src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}">
+                                            {% else %}
+                                                <img class="lazyload" data-src="{% static 'images/placeholder.jpg' %}"
+                                                    src="{% static 'images/placeholder.jpg' %}" alt="{{ categoria.nombre }}">
+                                            {% endif %}
                                         </div>
                                         <div class="collection-content">
                                             <div class="top wow fadeInUp" data-wow-delay="0s">
-                                                <h5 class="heading">Living</h5>
-                                                <p class="subheading">Up to 60% off clothes</p>
+                                                <h5 class="heading">{{ categoria.nombre }}</h5>
+                                                <p class="subheading">{{ categoria.descripcion|truncatewords:5 }}</p>
                                             </div>
                                             <div class="bottom wow fadeInUp" data-wow-delay="0s">
                                                 <button class="tf-btn btn-line collection-other-link fw-6"><span>Shop
@@ -135,106 +141,7 @@
                                     </a>
                                 </div>
                             </div>
-                            <div class="swiper-slide">
-                                <div class="collection-item-v2 hover-img">
-                                    <div class="collection-inner">
-                                        <div class="collection-image img-style">
-                                            <img class="lazyload" data-src="{% static 'images/collections/furniture_cate2.jpg' %}"
-                                                src="{% static 'images/collections/furniture_cate2.jpg' %}" alt="collection-img">
-                                        </div>
-                                        <div class="collection-content">
-                                            <div class="top wow fadeInUp" data-wow-delay="0s">
-                                                <h5 class="heading">Lighting</h5>
-                                                <p class="subheading">Modern lighting is poised</p>
-                                            </div>
-                                            <div class="bottom wow fadeInUp" data-wow-delay="0s">
-                                                <button class="tf-btn btn-line collection-other-link fw-6"><span>Shop
-                                                        now</span><i class="icon icon-arrow1-top-left"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="collection-item-v2 hover-img">
-                                    <a href="shop-collection-sub.html" class="collection-inner">
-                                        <div class="collection-image img-style">
-                                            <img class="lazyload" data-src="{% static 'images/collections/furniture_cate3.jpg' %}"
-                                                src="{% static 'images/collections/furniture_cate3.jpg' %}" alt="collection-img">
-                                        </div>
-                                        <div class="collection-content">
-                                            <div class="top wow fadeInUp" data-wow-delay="0s">
-                                                <h5 class="heading">Season Collection</h5>
-                                                <p class="subheading">Free shipping</p>
-                                            </div>
-                                            <div class="bottom wow fadeInUp" data-wow-delay="0s">
-                                                <button class="tf-btn btn-line collection-other-link fw-6"><span>Shop
-                                                        now</span><i class="icon icon-arrow1-top-left"></i></button>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="collection-item-v2 hover-img">
-                                    <a href="shop-collection-sub.html" class="collection-inner">
-                                        <div class="collection-image img-style">
-                                            <img class="lazyload" data-src="{% static 'images/collections/furniture_cate4.jpg' %}"
-                                                src="{% static 'images/collections/furniture_cate4.jpg' %}" alt="collection-img">
-                                        </div>
-                                        <div class="collection-content">
-                                            <div class="top wow fadeInUp" data-wow-delay="0s">
-                                                <h5 class="heading">Outdoor Patio Sets</h5>
-                                                <p class="subheading">Up to 60% off sofa</p>
-                                            </div>
-                                            <div class="bottom wow fadeInUp" data-wow-delay="0s">
-                                                <button class="tf-btn btn-line collection-other-link fw-6"><span>Shop
-                                                        now</span><i class="icon icon-arrow1-top-left"></i></button>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="collection-item-v2 hover-img">
-                                    <a href="shop-collection-sub.html" class="collection-inner">
-                                        <div class="collection-image img-style">
-                                            <img class="lazyload" data-src="{% static 'images/collections/furniture_cate5.jpg' %}"
-                                                src="{% static 'images/collections/furniture_cate5.jpg' %}" alt="collection-img">
-                                        </div>
-                                        <div class="collection-content">
-                                            <div class="top wow fadeInUp" data-wow-delay="0s">
-                                                <h5 class="heading">Dining</h5>
-                                                <p class="subheading">Up to 60% off table</p>
-                                            </div>
-                                            <div class="bottom wow fadeInUp" data-wow-delay="0s">
-                                                <button class="tf-btn btn-line collection-other-link fw-6"><span>Shop
-                                                        now</span><i class="icon icon-arrow1-top-left"></i></button>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="collection-item-v2 hover-img">
-                                    <a href="shop-collection-sub.html" class="collection-inner">
-                                        <div class="collection-image img-style">
-                                            <img class="lazyload" data-src="{% static 'images/collections/furniture_cate6.jpg' %}"
-                                                src="{% static 'images/collections/furniture_cate6.jpg' %}" alt="collection-img">
-                                        </div>
-                                        <div class="collection-content">
-                                            <div class="top wow fadeInUp" data-wow-delay="0s">
-                                                <h5 class="heading">Bedroom</h5>
-                                                <p class="subheading">Snoozy and snazzy</p>
-                                            </div>
-                                            <div class="bottom wow fadeInUp" data-wow-delay="0s">
-                                                <button class="tf-btn btn-line collection-other-link fw-6"><span>Shop
-                                                        now</span><i class="icon icon-arrow1-top-left"></i></button>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
+                            {% endfor %}
                         </div>
 
                     </div>
@@ -263,15 +170,63 @@
                         data-mobile="2" data-space-lg="30" data-space-md="15" data-pagination="2" data-pagination-md="3"
                         data-pagination-lg="3">
                         <div class="swiper-wrapper">
+                            {% for producto in productos %}
                             <div class="swiper-slide" lazy="true">
                                 <div class="card-product">
                                     <div class="card-product-wrapper">
+                                        <a href="{{ producto.get_absolute_url }}" class="product-img">
+                                            {% with producto.imagenes.first as img %}
+                                                {% if img %}
+                                                    <img class="lazyload img-product" data-src="{{ img.src }}" src="{{ img.src }}" alt="{{ producto.nombre }}">
+                                                {% endif %}
+                                            {% endwith %}
+                                        </a>
+                                        <div class="list-product-btn absolute-2">
+                                            <a href="#quick_add" data-bs-toggle="modal" class="box-icon bg_white quick-add tf-btn-loading">
+                                                <span class="icon icon-bag"></span>
+                                                <span class="tooltip">Quick Add</span>
+                                            </a>
+                                            <a href="#" class="box-icon bg_white wishlist btn-icon-action">
+                                                <span class="icon icon-heart"></span>
+                                                <span class="tooltip">Add to Wishlist</span>
+                                                <span class="icon icon-delete"></span>
+                                            </a>
+                                            <a href="#quick_view" data-bs-toggle="modal"
+                                             data-product-id="{{ producto.id }}"
+                                                class="box-icon bg_white quickview tf-btn-loading">
+                                                <span class="icon icon-view"></span>
+                                                <span class="tooltip">Quick View</span>
+                                            </a>
+                                        </div>
+                                        {% if producto.tiene_oferta %}
+                                            <div class="on-sale-wrap text-end">
+                                                <div class="on-sale-item">-{{ producto.porcentaje_descuento }}%</div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-product-info">
+                                        <a href="{{ producto.get_absolute_url }}" class="title link">{{ producto.nombre }}</a>
+                                        <span class="price">
+                                            {% if producto.tiene_oferta %}
+                                                <span class="old-price">${{ producto.precio }}</span>
+                                                <span class="new-price">${{ producto.precio_oferta }}</span>
+                                            {% else %}
+                                                <span class="new-price">${{ producto.precio }}</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <div class="swiper-slide" lazy="true">
+                                <div class="card-product">
+                                    <div class="card-product-wrapper card-product-horizontal-img">
                                         <a href="product-detail.html" class="product-img">
                                             <img class="lazyload img-product"
-                                                data-src="{% static 'images/products/furniture-10.jpg' %}"
-                                                src="{% static 'images/products/furniture-10.jpg' %}" alt="image-product">
-                                            <img class="lazyload img-hover" data-src="{% static 'images/products/furniture-11.jpg' %}"
-                                                src="{% static 'images/products/furniture-11.jpg' %}" alt="image-product">
+                                                data-src="{% static 'images/products/ejemplo.jpg' %}"
+                                                src="{% static 'images/products/ejemplo.jpg' %}" alt="image-product">
+                                            <img class="lazyload img-hover" data-src="{% static 'images/products/ejemplo2.jpg' %}"
+                                                src="{% static 'images/products/ejemplo2.jpg' %}" alt="image-product">
                                         </a>
                                         <div class="list-product-btn absolute-2">
                                             <a href="#quick_add" data-bs-toggle="modal"
@@ -297,65 +252,16 @@
                                                 <span class="tooltip">Quick View</span>
                                             </a>
                                         </div>
-                                        <div class="on-sale-wrap text-end">
-                                            <div class="on-sale-item pre-order">Pre-Oder</div>
-                                        </div>
                                     </div>
                                     <div class="card-product-info">
-                                        <a href="product-detail.html" class="title link">Soborg Model 3052 Dining
-                                            Chair</a>
+                                        <a href="product-detail.html" class="title link">Womb Ottoman</a>
                                         <span class="price">
                                             <span class="old-price">$1,695.00</span>
                                             <span class="new-price">$1,356.00</span>
                                         </span>
-                                        
                                     </div>
                                 </div>
                             </div>
-                           <div class="swiper-slide" lazy="true">
-    <div class="card-product">
-        <div class="card-product-wrapper card-product-horizontal-img">
-            <a href="product-detail.html" class="product-img">
-                <img class="lazyload img-product"
-                    data-src="{% static 'images/products/ejemplo.jpg' %}"
-                    src="{% static 'images/products/ejemplo.jpg' %}" alt="image-product">
-                <img class="lazyload img-hover" data-src="{% static 'images/products/ejemplo2.jpg' %}"
-                    src="{% static 'images/products/ejemplo2.jpg' %}" alt="image-product">
-            </a>
-            <div class="list-product-btn absolute-2">
-                <a href="#quick_add" data-bs-toggle="modal"
-                    class="box-icon bg_white quick-add tf-btn-loading">
-                    <span class="icon icon-bag"></span>
-                    <span class="tooltip">Quick Add</span>
-                </a>
-                <a href="#"
-                    class="box-icon bg_white wishlist btn-icon-action">
-                    <span class="icon icon-heart"></span>
-                    <span class="tooltip">Add to Wishlist</span>
-                    <span class="icon icon-delete"></span>
-                </a>
-                <a href="#compare" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft"
-                    class="box-icon bg_white compare btn-icon-action">
-                    <span class="icon icon-compare"></span>
-                    <span class="tooltip">Add to Compare</span>
-                    <span class="icon icon-check"></span>
-                </a>
-                <a href="#quick_view" data-bs-toggle="modal"
-                    class="box-icon bg_white quickview tf-btn-loading">
-                    <span class="icon icon-view"></span>
-                    <span class="tooltip">Quick View</span>
-                </a>
-            </div>
-        </div>
-        <div class="card-product-info">
-            <a href="product-detail.html" class="title link">Womb Ottoman</a>
-            <span class="price">
-                <span class="old-price">$1,695.00</span>
-                <span class="new-price">$1,356.00</span>
-            </span>
-        </div>
-    </div>
-</div>
                         </div>
                     </div>
                     <div class="nav-sw nav-next-slider nav-next-product box-icon w_46 round"><span

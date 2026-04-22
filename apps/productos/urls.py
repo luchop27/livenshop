@@ -17,5 +17,6 @@ urlpatterns = [
     path('carrito/actualizar/', views.actualizar_cantidad, name='actualizar_cantidad'),
 
     # ── API ────────────────────────────────────────────
+
     path('api/producto/<int:producto_id>/quick-view/', views.producto_quick_view, name='producto_quick_view'),
 ]
