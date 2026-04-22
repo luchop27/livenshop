@@ -9,6 +9,31 @@ from .models import Producto, Categoria, Coleccion, CarritoItem
 
 
 # ══════════════════════════════════════════════════════
+# HOME - FUNCTION BASED VIEW
+# ══════════════════════════════════════════════════════
+
+def home(request):
+    """
+    Vista de la página de inicio.
+    Muestra productos destacados/trending y categorías principales.
+    """
+    productos = Producto.objects.filter(
+        activo=True
+    ).prefetch_related('imagenes')[:12]
+    
+    # Categorías principales (sin padre)
+    categorias = Categoria.objects.filter(
+        activo=True,
+        padre=None
+    ).order_by('posicion', 'nombre')[:6]
+    
+    return render(request, 'home.html', {
+        'productos': productos,
+        'categorias': categorias
+    })
+
+
+# ══════════════════════════════════════════════════════
 # CATÁLOGO - CLASS BASED VIEWS
 # ══════════════════════════════════════════════════════
 
@@ -240,10 +265,22 @@ def producto_quick_view(request, producto_id):
     """
     producto = get_object_or_404(Producto, pk=producto_id, activo=True)
     
-    # Obtiene imagen principal
-    imagen_principal = producto.imagenes.filter(es_principal=True).first()
-    if not imagen_principal:
-        imagen_principal = producto.imagenes.first()
+    # Obtiene todas las imágenes
+    imagenes = []
+    for img in producto.imagenes.all():
+        imagenes.append({
+            'src': img.src,
+            'alt': producto.nombre,
+            'es_principal': img.es_principal
+        })
+    
+    # Atributos
+    atributos = []
+    for attr in producto.atributos.select_related('atributo'):
+        atributos.append({
+            'nombre': attr.atributo.nombre,
+            'valor': attr.valor
+        })
     
     data = {
         'id': producto.id,
@@ -257,7 +294,9 @@ def producto_quick_view(request, producto_id):
         'tiene_oferta': producto.tiene_oferta(),
         'porcentaje_descuento': producto.porcentaje_descuento(),
         'descripcion_corta': producto.descripcion_corta or '',
-        'imagen': imagen_principal.src if imagen_principal else '',
+        'descripcion_larga': producto.descripcion_larga or '',
+        'imagenes': imagenes,
+        'atributos': atributos,
         'categoria': producto.categoria.nombre if producto.categoria else '',
         'url_detalle': producto.get_absolute_url(),
     }
