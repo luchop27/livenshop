@@ -1,0 +1,221 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Dashboard | Panel Admin LivenShop{% endblock %}
+{% block menu_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Panel de Administración</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><div class="text-tiny">Dashboard</div></li>
+                </ul>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- KPIs principales -->
+            <div class="tf-section-4 mb-30">
+
+                <!-- Productos -->
+                <div class="wg-chart-default">
+                    <div class="top">
+                        <div class="flex items-center gap14">
+                            <div class="image type-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 48 52" fill="none">
+                                    <path d="M19.1094 2.12943C22.2034 0.343099 26.0154 0.343099 29.1094 2.12943L42.4921 9.85592C45.5861 11.6423 47.4921 14.9435 47.4921 18.5162V33.9692C47.4921 37.5418 45.5861 40.8431 42.4921 42.6294L29.1094 50.3559C26.0154 52.1423 22.2034 52.1423 19.1094 50.3559L5.72669 42.6294C2.63268 40.8431 0.726688 37.5418 0.726688 33.9692V18.5162C0.726688 14.9435 2.63268 11.6423 5.72669 9.85592L19.1094 2.12943Z" fill="#22C55E"/>
+                                </svg>
+                                <span class="icon"><i class="icon-file-plus" style="color:white;font-size:20px;"></i></span>
+                            </div>
+                            <div>
+                                <div class="body-text mb-4">Productos</div>
+                                <h4>{{ total_productos }}</h4>
+                                <div class="text-tiny">Activos: {{ total_activos }} &nbsp;|&nbsp; Inactivos: {{ total_inactivos }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrap-chart" style="padding:16px 20px;">
+                        <a class="tf-button style-1 w-full" href="{% url 'productos:panel_admin_products' %}">Ver productos</a>
+                    </div>
+                </div>
+
+                <!-- Categorías -->
+                <div class="wg-chart-default">
+                    <div class="top">
+                        <div class="flex items-center gap14">
+                            <div class="image type-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 48 52" fill="none">
+                                    <path d="M19.1094 2.12943C22.2034 0.343099 26.0154 0.343099 29.1094 2.12943L42.4921 9.85592C45.5861 11.6423 47.4921 14.9435 47.4921 18.5162V33.9692C47.4921 37.5418 45.5861 40.8431 42.4921 42.6294L29.1094 50.3559C26.0154 52.1423 22.2034 52.1423 19.1094 50.3559L5.72669 42.6294C2.63268 40.8431 0.726688 37.5418 0.726688 33.9692V18.5162C0.726688 14.9435 2.63268 11.6423 5.72669 9.85592L19.1094 2.12943Z" fill="#8F77F3"/>
+                                </svg>
+                                <span class="icon"><i class="icon-layers" style="color:white;font-size:20px;"></i></span>
+                            </div>
+                            <div>
+                                <div class="body-text mb-4">Categorías</div>
+                                <h4>{{ total_categorias }}</h4>
+                                <div class="text-tiny">Colecciones: {{ total_colecciones }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrap-chart" style="padding:16px 20px;">
+                        <a class="tf-button style-1 w-full" href="{% url 'productos:panel_admin_categories' %}">Ver categorías</a>
+                    </div>
+                </div>
+
+                <!-- Usuarios -->
+                <div class="wg-chart-default">
+                    <div class="top">
+                        <div class="flex items-center gap14">
+                            <div class="image type-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 48 52" fill="none">
+                                    <path d="M19.1094 2.12943C22.2034 0.343099 26.0154 0.343099 29.1094 2.12943L42.4921 9.85592C45.5861 11.6423 47.4921 14.9435 47.4921 18.5162V33.9692C47.4921 37.5418 45.5861 40.8431 42.4921 42.6294L29.1094 50.3559C26.0154 52.1423 22.2034 52.1423 19.1094 50.3559L5.72669 42.6294C2.63268 40.8431 0.726688 37.5418 0.726688 33.9692V18.5162C0.726688 14.9435 2.63268 11.6423 5.72669 9.85592L19.1094 2.12943Z" fill="#2377FC"/>
+                                </svg>
+                                <span class="icon"><i class="icon-user" style="color:white;font-size:20px;"></i></span>
+                            </div>
+                            <div>
+                                <div class="body-text mb-4">Usuarios Activos</div>
+                                <h4>{{ total_usuarios }}</h4>
+                                <div class="text-tiny">Registrados en la plataforma</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrap-chart" style="padding:16px 20px;">
+                        <a class="tf-button style-1 w-full" href="{% url 'usuarios:panel_admin_users' %}">Ver usuarios</a>
+                    </div>
+                </div>
+
+                <!-- Acciones rápidas -->
+                <div class="wg-chart-default">
+                    <div class="top">
+                        <div class="flex items-center gap14">
+                            <div class="image type-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 48 52" fill="none">
+                                    <path d="M19.1094 2.12943C22.2034 0.343099 26.0154 0.343099 29.1094 2.12943L42.4921 9.85592C45.5861 11.6423 47.4921 14.9435 47.4921 18.5162V33.9692C47.4921 37.5418 45.5861 40.8431 42.4921 42.6294L29.1094 50.3559C26.0154 52.1423 22.2034 52.1423 19.1094 50.3559L5.72669 42.6294C2.63268 40.8431 0.726688 37.5418 0.726688 33.9692V18.5162C0.726688 14.9435 2.63268 11.6423 5.72669 9.85592L19.1094 2.12943Z" fill="#FF5200"/>
+                                </svg>
+                                <span class="icon"><i class="icon-plus" style="color:white;font-size:20px;"></i></span>
+                            </div>
+                            <div>
+                                <div class="body-text mb-4">Acciones Rápidas</div>
+                                <div class="text-tiny">Crear contenido nuevo</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrap-chart" style="padding:16px 20px; display:flex; flex-direction:column; gap:8px;">
+                        <a class="tf-button w-full" href="{% url 'productos:panel_admin_product_add' %}">
+                            <i class="icon-plus"></i> Nuevo Producto
+                        </a>
+                        <a class="tf-button style-3 w-full" href="{% url 'productos:panel_admin_category_add' %}">
+                            <i class="icon-plus"></i> Nueva Categoría
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Sección inferior: Productos recientes + Top Categorías -->
+            <div class="tf-section-2 mb-30">
+
+                <!-- Productos recientes -->
+                <div class="wg-box">
+                    <div class="flex items-center justify-between mb-20">
+                        <h5>Productos Recientes</h5>
+                        <a href="{% url 'productos:panel_admin_products' %}" class="view-all body-text">Ver todos <i class="icon-chevron-right"></i></a>
+                    </div>
+                    <ul class="flex flex-column has-divider-line">
+                        {% for producto in productos_recientes %}
+                        <li class="wg-product item-row gap20" style="padding: 12px 0;">
+                            <div class="name flex-grow">
+                                <div class="image" style="width:48px;height:48px;border-radius:6px;overflow:hidden;flex-shrink:0;">
+                                    {% with producto.imagenes.first as img %}
+                                        {% if img %}
+                                        <img src="{{ img.src }}" alt="{{ producto.nombre }}" style="width:100%;height:100%;object-fit:cover;">
+                                        {% else %}
+                                        <div style="width:48px;height:48px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;">
+                                            <i class="icon-image" style="color:#aaa;"></i>
+                                        </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                                <div>
+                                    <div class="body-title-2">{{ producto.nombre }}</div>
+                                    <div class="text-tiny text-secondary">{{ producto.categoria.nombre|default:"Sin categoría" }}</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="body-text">${{ producto.precio_final }}</div>
+                                {% if producto.activo %}
+                                <span class="badge bg-success" style="font-size:10px;">Activo</span>
+                                {% else %}
+                                <span class="badge bg-secondary" style="font-size:10px;">Inactivo</span>
+                                {% endif %}
+                            </div>
+                            <div class="list-icon-function">
+                                <a href="{% url 'productos:panel_admin_product_edit' producto.pk %}" class="item edit" title="Editar">
+                                    <i class="icon-edit-2"></i>
+                                </a>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="text-center py-4">
+                            <div class="body-text text-secondary">No hay productos registrados aún.</div>
+                            <a href="{% url 'productos:panel_admin_product_add' %}" class="tf-button mt-10">Agregar primer producto</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Top Categorías -->
+                <div class="wg-box">
+                    <div class="flex items-center justify-between mb-20">
+                        <h5>Categorías con más Productos</h5>
+                        <a href="{% url 'productos:panel_admin_categories' %}" class="view-all body-text">Ver todas <i class="icon-chevron-right"></i></a>
+                    </div>
+                    <ul class="flex flex-column has-divider-line">
+                        {% for cat in top_categorias %}
+                        <li class="wg-product item-row gap20" style="padding: 12px 0;">
+                            <div class="name flex-grow">
+                                <div class="image" style="width:40px;height:40px;border-radius:50%;overflow:hidden;background:#f5f5f5;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    {% if cat.imagen %}
+                                    <img src="{{ cat.imagen.url }}" alt="{{ cat.nombre }}" style="width:100%;height:100%;object-fit:cover;">
+                                    {% else %}
+                                    <i class="icon-layers" style="color:#aaa;"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="body-title-2">{{ cat.nombre }}</div>
+                                    <div class="text-tiny text-secondary">
+                                        {% if cat.padre %}Sub de: {{ cat.padre.nombre }}{% else %}Categoría principal{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="body-text">{{ cat.num_productos }} producto{{ cat.num_productos|pluralize }}</div>
+                            </div>
+                            <div class="list-icon-function">
+                                <a href="{% url 'productos:panel_admin_category_edit' cat.pk %}" class="item edit" title="Editar">
+                                    <i class="icon-edit-2"></i>
+                                </a>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="text-center py-4">
+                            <div class="body-text text-secondary">No hay categorías registradas.</div>
+                            <a href="{% url 'productos:panel_admin_category_add' %}" class="tf-button mt-10">Agregar categoría</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

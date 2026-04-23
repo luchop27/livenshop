@@ -4,10 +4,15 @@ from . import views
 app_name = 'productos'
 
 urlpatterns = [
-    # ── PANEL ADMIN (MIGRACION INICIAL) ──────────────
-    path('panel-admin/demo/', views.panel_admin_demo, name='panel_admin_demo'),
+    # ── PANEL ADMIN ───────────────────────────────────
     path('panel-admin/categorias/', views.panel_admin_categories, name='panel_admin_categories'),
+    path('panel-admin/categorias/nueva/', views.panel_admin_category_add, name='panel_admin_category_add'),
+    path('panel-admin/categorias/<int:categoria_id>/editar/', views.panel_admin_category_edit, name='panel_admin_category_edit'),
+    path('panel-admin/categorias/<int:categoria_id>/eliminar/', views.panel_admin_category_delete, name='panel_admin_category_delete'),
     path('panel-admin/productos/', views.panel_admin_products, name='panel_admin_products'),
+    path('panel-admin/productos/nuevo/', views.panel_admin_product_add, name='panel_admin_product_add'),
+    path('panel-admin/productos/<int:producto_id>/editar/', views.panel_admin_product_edit, name='panel_admin_product_edit'),
+    path('panel-admin/productos/<int:producto_id>/eliminar/', views.panel_admin_product_delete, name='panel_admin_product_delete'),
 
     # ── CATÁLOGO ──────────────────────────────────────
     path('', views.ProductoListView.as_view(), name='lista_productos'),

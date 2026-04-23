@@ -127,14 +127,86 @@
                                 <li class="nav-search"><a href="#canvasSearch" data-bs-toggle="offcanvas"
                                         aria-controls="offcanvasLeft" class="link nav-icon-item text_liven-blue"><i
                                             class="icon icon-search"></i></a></li>
-                                <li class="nav-account"><a href="#login" data-bs-toggle="modal"
-                                        class="link  nav-icon-item text_liven-blue"><i class="icon icon-account"></i></a></li>
+
+                                {% if user.is_authenticated %}
+                                <!-- Usuario autenticado: dropdown -->
+                                <li class="nav-account" style="position:relative;">
+                                    <a href="javascript:void(0)" class="link nav-icon-item text_liven-blue"
+                                        id="accountDropdownToggle"
+                                        onclick="toggleAccountDropdown(event)"
+                                        style="position:relative;">
+                                        <i class="icon icon-account"></i>
+                                        <!-- Punto verde: sesión activa -->
+                                        <span style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#22c55e;border-radius:50%;border:1.5px solid #fff;"></span>
+                                    </a>
+                                    <div id="accountDropdown" style="
+                                        display:none;
+                                        position:absolute;
+                                        top:calc(100% + 12px);
+                                        right:0;
+                                        background:#fff;
+                                        border:1px solid #e5e7eb;
+                                        border-radius:12px;
+                                        box-shadow:0 12px 32px rgba(0,0,0,0.12);
+                                        min-width:210px;
+                                        z-index:9999;
+                                        padding:8px 0;
+                                        animation:fadeInDown .15s ease;
+                                    ">
+                                        <div style="padding:12px 16px 10px;border-bottom:1px solid #f3f4f6;">
+                                            <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;">Hola,</div>
+                                            <div style="font-weight:700;color:#111827;font-size:14px;margin-top:2px;">
+                                                {{ user.get_short_name|default:user.email }}
+                                            </div>
+                                            {% if user.is_staff %}
+                                            <div style="font-size:11px;color:#7c3aed;font-weight:600;margin-top:3px;">⚡ Administrador</div>
+                                            {% else %}
+                                            <div style="font-size:11px;color:#6b7280;margin-top:3px;">{{ user.email }}</div>
+                                            {% endif %}
+                                        </div>
+                                        {% if user.is_staff %}
+                                        <a href="{% url 'panel_admin_demo' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;transition:background .15s;" onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='transparent'">
+                                            <i class="icon icon-grid" style="font-size:15px;color:#7c3aed;"></i>
+                                            Panel Admin
+                                        </a>
+                                        <a href="{% url 'usuarios:panel_admin_users' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='transparent'">
+                                            <i class="icon icon-user" style="font-size:15px;color:#7c3aed;"></i>
+                                            Gestión Usuarios
+                                        </a>
+                                        {% else %}
+                                        <a href="{% url 'my-account' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
+                                            <i class="icon icon-account" style="font-size:15px;color:#6b7280;"></i>
+                                            Mi Cuenta
+                                        </a>
+                                        <a href="{% url 'my-account-orders' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
+                                            <i class="icon icon-box" style="font-size:15px;color:#6b7280;"></i>
+                                            Mis Pedidos
+                                        </a>
+                                        {% endif %}
+                                        <div style="height:1px;background:#f3f4f6;margin:4px 0;"></div>
+                                        <a href="{% url 'logout' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#dc2626;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
+                                            <i class="icon icon-log-out" style="font-size:15px;"></i>
+                                            Cerrar Sesión
+                                        </a>
+                                    </div>
+                                </li>
+                                {% else %}
+                                <!-- Anónimo: abre modal de login -->
+                                <li class="nav-account">
+                                    <a href="#login" data-bs-toggle="modal"
+                                        class="link nav-icon-item text_liven-blue">
+                                        <i class="icon icon-account"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+
                                 <li class="nav-wishlist"><a href="{% url 'wishlist' %}" class="link nav-icon-item text_liven-blue"><i
                                             class="icon icon-heart"></i><span class="count-box bg_liven-blue">0</span></a></li>
                                 <li class="nav-cart"><a href="#shoppingCart" data-bs-toggle="modal"
                                         class="link nav-icon-item text_liven-blue"><i class="icon icon-bag"></i><span
                                             class="count-box bg_liven-blue">0</span></a></li>
                             </ul>
+
                         </div>
                     </div>
                 </div>
@@ -542,7 +614,24 @@
                 </div>
             </div>
             <div class="mb-bottom">
-                <a href="{% url 'login' %}" class="site-nav-icon"><i class="icon icon-account"></i>Login</a>
+                {% if user.is_authenticated %}
+                    {% if user.is_staff %}
+                    <a href="{% url 'panel_admin_demo' %}" class="site-nav-icon" style="color:#8b5cf6;font-weight:600;">
+                        <i class="icon icon-grid"></i>Panel Admin
+                    </a>
+                    {% else %}
+                    <a href="{% url 'my-account' %}" class="site-nav-icon">
+                        <i class="icon icon-account"></i>Mi Cuenta
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}" class="site-nav-icon" style="color:#dc2626;">
+                        <i class="icon icon-log-out"></i>Salir
+                    </a>
+                {% else %}
+                    <a href="#login" data-bs-toggle="modal" class="site-nav-icon">
+                        <i class="icon icon-account"></i>Login / Registro
+                    </a>
+                {% endif %}
                 <div class="bottom-bar-language">
                     <div class="tf-currencies">
                         <select class="image-select center style-default type-currencies">
@@ -749,9 +838,44 @@
     <script src="{% static 'js/nouislider.min.js' %}"></script>
     <script src="{% static 'js/shop.js' %}"></script>
 
+    <script>
+    // ── Dropdown de cuenta ──────────────────────────────
+    function toggleAccountDropdown(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const dropdown = document.getElementById('accountDropdown');
+        if (!dropdown) return;
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+    // Cerrar al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('accountDropdown');
+        const toggle = document.getElementById('accountDropdownToggle');
+        if (dropdown && toggle && !toggle.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+    </script>
 
 </body>
 <style>
+/* Dropdown de cuenta */
+#accountDropdown {
+    display: none;
+    z-index: 10000;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* 🔥 Forzar color en menú móvil */
 .sub-nav-link,
 .mb-menu-link {

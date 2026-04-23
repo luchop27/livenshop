@@ -1,0 +1,154 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Gestión de Usuarios | Panel Admin LivenShop{% endblock %}
+{% block menu_users %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Gestión de Usuarios</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Usuarios</div></li>
+                </ul>
+            </div>
+
+            <!-- Filtros -->
+            <div class="wg-box mb-20">
+                <form class="form-search" method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <fieldset class="name flex-grow">
+                        <input type="text" placeholder="Buscar por email o nombre..." name="q" value="{{ search }}" class="tf-input">
+                    </fieldset>
+                    <select name="rol" class="tf-input" style="width:180px;" onchange="this.form.submit()">
+                        <option value="">Todos los roles</option>
+                        <option value="cliente" {% if rol_filtro == 'cliente' %}selected{% endif %}>Clientes</option>
+                        <option value="admin_tienda" {% if rol_filtro == 'admin_tienda' %}selected{% endif %}>Administradores</option>
+                    </select>
+                    <select name="estado" class="tf-input" style="width:150px;" onchange="this.form.submit()">
+                        <option value="">Todos los estados</option>
+                        <option value="activo" {% if estado_filtro == 'activo' %}selected{% endif %}>Activos</option>
+                        <option value="inactivo" {% if estado_filtro == 'inactivo' %}selected{% endif %}>Inactivos</option>
+                    </select>
+                    <button class="tf-button" type="submit"><i class="icon-search"></i></button>
+                    {% if search or rol_filtro or estado_filtro %}
+                    <a href="{% url 'usuarios:panel_admin_users' %}" class="tf-button style-3"><i class="icon-refresh-cw"></i></a>
+                    {% endif %}
+                </form>
+                <div class="body-text mt-10">Total: {{ total_usuarios }} usuario{{ total_usuarios|pluralize }}</div>
+            </div>
+
+            <!-- Tabla de usuarios -->
+            <div class="wg-box">
+                <div class="wg-table table-all-user">
+                    <ul class="table-title flex gap20 mb-14">
+                        <li><div class="body-title">Usuario</div></li>
+                        <li><div class="body-title">Email</div></li>
+                        <li><div class="body-title">Teléfono</div></li>
+                        <li><div class="body-title">Ciudad</div></li>
+                        <li><div class="body-title">Rol</div></li>
+                        <li><div class="body-title">Estado</div></li>
+                        <li><div class="body-title">Registro</div></li>
+                        <li><div class="body-title">Acciones</div></li>
+                    </ul>
+
+                    {% if usuarios %}
+                    <ul class="flex flex-column">
+                        {% for usuario in usuarios %}
+                        <li class="wg-product item-row gap20" id="user-row-{{ usuario.id }}">
+                            <div class="name">
+                                <div class="body-title-2">{{ usuario.get_full_name }}</div>
+                                {% if not usuario.nombre %}
+                                <div class="text-tiny text-secondary">Sin nombre</div>
+                                {% endif %}
+                            </div>
+                            <div><div class="body-text">{{ usuario.email }}</div></div>
+                            <div><div class="body-text">{{ usuario.telefono|default:"—" }}</div></div>
+                            <div><div class="body-text">{{ usuario.ciudad|default:"—" }}</div></div>
+                            <div>
+                                {% if usuario.rol == 'admin_tienda' %}
+                                <span class="badge bg-primary">{{ usuario.get_rol_display }}</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ usuario.get_rol_display }}</span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% if usuario.is_active %}
+                                <span class="badge bg-success">✓ Activo</span>
+                                {% else %}
+                                <span class="badge bg-danger">✗ Inactivo</span>
+                                {% endif %}
+                            </div>
+                            <div><div class="body-text">{{ usuario.fecha_registro|date:"d M Y" }}</div></div>
+                            <div class="list-icon-function">
+                                {% if usuario.id != request.user.id %}
+                                <button type="button" class="item text-danger"
+                                    onclick="toggleUserStatus('{{ usuario.id }}', '{{ usuario.email|escapejs }}', {{ usuario.is_active|yesno:'true,false' }})"
+                                    title="{% if usuario.is_active %}Desactivar{% else %}Activar{% endif %}">
+                                    <i class="icon-{% if usuario.is_active %}user-x{% else %}user-check{% endif %}"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    {% else %}
+                    <div class="text-center py-4">
+                        <div class="body-text text-secondary">No se encontraron usuarios.</div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Paginación -->
+                    {% if usuarios.has_other_pages %}
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">
+                        <div class="wg-pagination"><ul>
+                            {% if usuarios.has_previous %}
+                            <li><a href="?page={{ usuarios.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if rol_filtro %}&rol={{ rol_filtro }}{% endif %}{% if estado_filtro %}&estado={{ estado_filtro }}{% endif %}"><i class="icon-chevron-left"></i></a></li>
+                            {% endif %}
+                            {% for num in usuarios.paginator.page_range %}
+                                {% if usuarios.number == num %}
+                                <li class="active"><a href="#">{{ num }}</a></li>
+                                {% elif num > usuarios.number|add:'-3' and num < usuarios.number|add:'3' %}
+                                <li><a href="?page={{ num }}{% if search %}&q={{ search }}{% endif %}{% if rol_filtro %}&rol={{ rol_filtro }}{% endif %}{% if estado_filtro %}&estado={{ estado_filtro }}{% endif %}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if usuarios.has_next %}
+                            <li><a href="?page={{ usuarios.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if rol_filtro %}&rol={{ rol_filtro }}{% endif %}{% if estado_filtro %}&estado={{ estado_filtro }}{% endif %}"><i class="icon-chevron-right"></i></a></li>
+                            {% endif %}
+                        </ul></div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCsrf() {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : '';
+}
+function toggleUserStatus(userId, email, isActive) {
+    const action = isActive ? 'desactivar' : 'activar';
+    if (!confirm(`¿${action.charAt(0).toUpperCase() + action.slice(1)} al usuario "${email}"?`)) return;
+    fetch(`/usuarios/panel-admin/usuarios/${userId}/toggle-status/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCsrf(), 'Content-Type': 'application/json' },
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) location.reload();
+        else alert('Error: ' + data.message);
+    })
+    .catch(err => alert('Error de conexión.'));
+}
+</script>
+{% endblock %}

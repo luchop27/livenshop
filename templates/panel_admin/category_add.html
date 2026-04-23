@@ -1,0 +1,158 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Nueva Categoría | Panel Admin LivenShop{% endblock %}
+{% block menu_category %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Nueva Categoría</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><a href="{% url 'productos:panel_admin_categories' %}"><div class="text-tiny">Categorías</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Nueva</div></li>
+                </ul>
+            </div>
+
+            {% if messages %}{% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+            {% endfor %}{% endif %}
+
+            <div class="wg-box">
+                <form class="form-new-product form-style-1" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Nombre de la Categoría <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow tf-input" type="text" name="nombre" id="id_nombre" placeholder="Ej: Jarrones, Cuadros, Espejos" required>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Slug <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow tf-input" type="text" name="slug" id="id_slug" placeholder="Ej: jarrones">
+                        <small class="text-muted">URL amigable — se auto-genera desde el nombre</small>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Descripción</div>
+                        <textarea class="flex-grow tf-input" name="descripcion" rows="3" placeholder="Descripción de la categoría (opcional)"></textarea>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Imagen de la Categoría</div>
+                        <div class="up-load" id="upload-area-categoria" style="min-height:140px;border:2px dashed #ddd;border-radius:8px;padding:16px;text-align:center;">
+                            <label for="categoriaImagen" style="cursor:pointer;display:block;">
+                                <i class="icon-upload-cloud" style="font-size:1.8rem;"></i>
+                                <div class="text-tiny mt-6">Haz clic o arrastra la imagen aquí</div>
+                                <input type="file" id="categoriaImagen" name="imagen" accept="image/*" style="display:none;">
+                            </label>
+                        </div>
+                        <div id="imagen-preview-categoria" style="display:none;margin-top:12px;"></div>
+                    </fieldset>
+
+                    <div class="cols-lg gap22 mb-20">
+                        <fieldset class="category">
+                            <div class="body-title mb-10">Colección</div>
+                            <div class="select flex-grow">
+                                <select name="coleccion" class="tf-input">
+                                    <option value="">Sin colección</option>
+                                    {% for col in colecciones %}
+                                    <option value="{{ col.id }}">{{ col.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="category">
+                            <div class="body-title mb-10">Categoría Padre</div>
+                            <div class="select flex-grow">
+                                <select name="padre" class="tf-input">
+                                    <option value="">Ninguna (categoría principal)</option>
+                                    {% for cat in categorias %}
+                                    <option value="{{ cat.id }}">{{ cat.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <small class="text-muted">Selecciona si es una subcategoría</small>
+                        </fieldset>
+                    </div>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Posición en menú</div>
+                        <input class="flex-grow tf-input" type="number" name="posicion" min="0" value="0" style="max-width:150px;">
+                        <small class="text-muted">Número más bajo = aparece primero</small>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Estado</div>
+                        <div class="radio-buttons">
+                            <div class="item">
+                                <input type="radio" name="estado" value="True" id="estado-activo" checked>
+                                <label for="estado-activo"><span class="body-title-2">Activo</span></label>
+                            </div>
+                            <div class="item">
+                                <input type="radio" name="estado" value="False" id="estado-inactivo">
+                                <label for="estado-inactivo"><span class="body-title-2">Inactivo</span></label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="bot">
+                        <a href="{% url 'productos:panel_admin_categories' %}" class="tf-button style-1 w208">Cancelar</a>
+                        <button class="tf-button w208" type="submit">Guardar Categoría</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function generateSlug(text) {
+    return text.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'');
+}
+const nombreInput = document.getElementById('id_nombre');
+const slugInput = document.getElementById('id_slug');
+nombreInput.addEventListener('input', function() {
+    if (!slugInput.dataset.manuallyEdited) slugInput.value = generateSlug(this.value);
+});
+slugInput.addEventListener('input', function() { this.dataset.manuallyEdited = 'true'; });
+
+// Preview imagen
+const categoriaImageInput = document.getElementById('categoriaImagen');
+const categoriaImagePreview = document.getElementById('imagen-preview-categoria');
+const uploadAreaCategoria = document.getElementById('upload-area-categoria');
+
+categoriaImageInput.addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) handleCategoriaImage(e.target.files[0]);
+});
+
+function handleCategoriaImage(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        uploadAreaCategoria.style.display = 'none';
+        categoriaImagePreview.style.display = 'block';
+        categoriaImagePreview.innerHTML = `
+            <div style="position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;max-width:250px;">
+                <img src="${e.target.result}" style="width:100%;height:auto;display:block;">
+                <button type="button" onclick="removeCategoriaImage()"
+                    style="position:absolute;top:8px;right:8px;background:rgba(220,53,69,.9);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+            </div>`;
+    };
+    reader.readAsDataURL(file);
+}
+function removeCategoriaImage() {
+    categoriaImageInput.value = '';
+    categoriaImagePreview.style.display = 'none';
+    categoriaImagePreview.innerHTML = '';
+    uploadAreaCategoria.style.display = 'block';
+}
+</script>
+{% endblock %}

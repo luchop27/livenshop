@@ -1,0 +1,184 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Agregar Producto | Panel Admin LivenShop{% endblock %}
+{% block menu_product %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Agregar Producto</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><a href="{% url 'productos:panel_admin_products' %}"><div class="text-tiny">Productos</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Nuevo</div></li>
+                </ul>
+            </div>
+
+            {% if messages %}{% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+            {% endfor %}{% endif %}
+
+            <form class="form-add-product" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Imágenes -->
+                <div class="wg-box mb-30">
+                    <div class="body-title mb-10">Imágenes del Producto</div>
+                    <div class="up-load" id="upload-area" style="min-height:160px;border:2px dashed #ddd;border-radius:8px;padding:20px;text-align:center;cursor:pointer;">
+                        <label for="imageFiles" style="cursor:pointer;display:block;">
+                            <i class="icon-upload-cloud" style="font-size:2rem;"></i>
+                            <div class="text-tiny mt-8">Arrastra imágenes aquí o <span class="text-secondary">haz clic</span></div>
+                            <div class="text-tiny text-surface-2">JPG, PNG, WebP — múltiples archivos</div>
+                            <input type="file" id="imageFiles" name="imagenes" multiple accept="image/*" style="display:none;">
+                        </label>
+                    </div>
+                    <div id="images-preview" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:14px;"></div>
+                </div>
+
+                <!-- Info básica -->
+                <div class="wg-box mb-30">
+                    <div class="body-title mb-20">Información del Producto</div>
+                    <div class="cols-lg gap22 mb-20">
+                        <fieldset class="name">
+                            <div class="body-title mb-10">Nombre <span class="tf-color-1">*</span></div>
+                            <input class="flex-grow tf-input" type="text" name="nombre" placeholder="Ej: Jarrón Nórdico de Cerámica" required>
+                        </fieldset>
+                        <fieldset class="price">
+                            <div class="body-title mb-10">Precio <span class="tf-color-1">*</span></div>
+                            <input class="flex-grow tf-input" type="number" name="precio" step="0.01" min="0" placeholder="0.00" required>
+                        </fieldset>
+                    </div>
+                    <div class="cols-lg gap22 mb-20">
+                        <fieldset>
+                            <div class="body-title mb-10">Precio de Oferta</div>
+                            <input class="flex-grow tf-input" type="number" name="precio_oferta" step="0.01" min="0" placeholder="Vacío si no hay oferta">
+                        </fieldset>
+                        <fieldset>
+                            <div class="body-title mb-10">Stock <span class="tf-color-1">*</span></div>
+                            <input class="flex-grow tf-input" type="number" name="stock" min="0" value="0" required>
+                        </fieldset>
+                    </div>
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Marca</div>
+                        <input class="flex-grow tf-input" type="text" name="marca" placeholder="Ej: LivenDecor, Artesanal">
+                    </fieldset>
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Descripción Corta</div>
+                        <textarea class="flex-grow tf-input" name="descripcion_corta" rows="2" placeholder="Resumen breve (máx 150 caracteres)"></textarea>
+                    </fieldset>
+                    <fieldset>
+                        <div class="body-title mb-10">Descripción Completa</div>
+                        <textarea class="flex-grow tf-input" name="descripcion_larga" rows="5" placeholder="Descripción detallada del artículo decorativo..."></textarea>
+                    </fieldset>
+                </div>
+
+                <!-- Detalles decorativos -->
+                <div class="wg-box mb-30">
+                    <div class="body-title mb-20">Características Decorativas</div>
+                    <div class="cols-lg gap22">
+                        <fieldset>
+                            <div class="body-title mb-10">Material</div>
+                            <input class="flex-grow tf-input" type="text" name="material" placeholder="Ej: Cerámica, Madera, Vidrio">
+                        </fieldset>
+                        <fieldset>
+                            <div class="body-title mb-10">Dimensiones</div>
+                            <input class="flex-grow tf-input" type="text" name="dimensiones" placeholder="Ej: 30cm x 20cm x 10cm">
+                        </fieldset>
+                    </div>
+                </div>
+
+                <!-- Clasificación -->
+                <div class="wg-box mb-30">
+                    <div class="body-title mb-20">Clasificación</div>
+                    <div class="cols-lg gap22">
+                        <fieldset class="category">
+                            <div class="body-title mb-10">Categoría</div>
+                            <div class="select flex-grow">
+                                <select name="categoria" class="tf-input">
+                                    <option value="">-- Sin categoría --</option>
+                                    {% for cat in categorias %}
+                                    <option value="{{ cat.id }}">{{ cat }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </fieldset>
+                        <fieldset class="category">
+                            <div class="body-title mb-10">Colección</div>
+                            <div class="select flex-grow">
+                                <select name="coleccion" class="tf-input">
+                                    <option value="">-- Sin colección --</option>
+                                    {% for col in colecciones %}
+                                    <option value="{{ col.id }}">{{ col.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <!-- Configuración -->
+                <div class="wg-box mb-30">
+                    <div class="body-title mb-20">Configuración</div>
+                    <div class="flex gap20 flex-wrap">
+                        <label class="flex gap10 items-center" style="cursor:pointer;">
+                            <input type="checkbox" name="activo" id="id_activo" checked style="width:18px;height:18px;">
+                            <span class="body-title-2">Producto activo <span class="text-tiny">(visible en tienda)</span></span>
+                        </label>
+                        <label class="flex gap10 items-center" style="cursor:pointer;">
+                            <input type="checkbox" name="destacado" id="id_destacado" style="width:18px;height:18px;">
+                            <span class="body-title-2">Destacado <span class="text-tiny">(en página principal)</span></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="cols gap10">
+                    <button class="tf-button w380" type="submit"><i class="icon-plus"></i> Crear Producto</button>
+                    <a href="{% url 'productos:panel_admin_products' %}" class="tf-button style-3 w380"><i class="icon-x"></i> Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const imageFiles = [];
+const imageFilesInput = document.getElementById('imageFiles');
+const imagesPreview = document.getElementById('images-preview');
+const uploadArea = document.getElementById('upload-area');
+
+imageFilesInput.addEventListener('change', function(e) { handleFiles(e.target.files); this.value = ''; });
+uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.style.borderColor = '#007bff'; });
+uploadArea.addEventListener('dragleave', e => { uploadArea.style.borderColor = '#ddd'; });
+uploadArea.addEventListener('drop', e => { e.preventDefault(); uploadArea.style.borderColor = '#ddd'; handleFiles(e.dataTransfer.files); });
+
+function handleFiles(files) {
+    Array.from(files).forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        if (imageFiles.some(f => f.name === file.name && f.size === file.size)) return;
+        const idx = imageFiles.length;
+        imageFiles.push(file);
+        const reader = new FileReader();
+        reader.onload = e => {
+            const div = document.createElement('div');
+            div.style.cssText = 'position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;aspect-ratio:1;';
+            div.dataset.index = idx;
+            div.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">
+                <button type="button" onclick="removeImage(${idx})" style="position:absolute;top:4px;right:4px;background:rgba(220,53,69,.9);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;">×</button>
+                ${idx === 0 ? '<div style="position:absolute;bottom:4px;left:4px;background:rgba(34,197,94,.9);color:white;font-size:9px;padding:2px 5px;border-radius:4px;">Principal</div>' : ''}`;
+            imagesPreview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
+    syncInput();
+}
+function removeImage(idx) { imageFiles.splice(idx, 1); const el = document.querySelector(`[data-index="${idx}"]`); if (el) el.remove(); syncInput(); }
+function syncInput() { const dt = new DataTransfer(); imageFiles.forEach(f => dt.items.add(f)); imageFilesInput.files = dt.files; }
+</script>
+{% endblock %}

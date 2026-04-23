@@ -67,8 +67,8 @@
                                                 </a>
                                             </li>
                                             <li class="sub-menu-item">
-                                                <a href="#">
-                                                    <div class="text">Agregar producto (pendiente)</div>
+                                                <a href="{% url 'productos:panel_admin_product_add' %}">
+                                                    <div class="text">Agregar producto</div>
                                                 </a>
                                             </li>
                                         </ul>
@@ -81,7 +81,7 @@
                                         </a>
                                         <ul class="sub-menu">
                                             <li class="sub-menu-item"><a href="{% url 'productos:panel_admin_categories' %}"><div class="text">Lista de categorias</div></a></li>
-                                            <li class="sub-menu-item"><a href="#"><div class="text">Gestion de categorias (pendiente)</div></a></li>
+                                            <li class="sub-menu-item"><a href="{% url 'productos:panel_admin_category_add' %}"><div class="text">Nueva categoría</div></a></li>
                                         </ul>
                                     </li>
 
@@ -101,7 +101,7 @@
                                             <div class="text">Usuarios</div>
                                         </a>
                                         <ul class="sub-menu">
-                                            <li class="sub-menu-item"><a href="#"><div class="text">Gestion de usuarios (pendiente)</div></a></li>
+                                            <li class="sub-menu-item"><a href="{% url 'usuarios:panel_admin_users' %}"><div class="text">Gestión de usuarios</div></a></li>
                                         </ul>
                                     </li>
 

@@ -189,13 +189,14 @@
                     <span class="icon-close icon-close-popup" data-bs-dismiss="modal"></span>
                 </div>
                 <div class="tf-login-form">
-                    <form class="" action="{% url 'my-account' %}" accept-charset="utf-8">
+                    <form class="" action="{% url 'login' %}" method="post" accept-charset="utf-8">
+                        {% csrf_token %}
                         <div class="tf-field style-1">
-                            <input class="tf-field-input tf-input" placeholder=" " type="email" name="">
+                            <input class="tf-field-input tf-input" placeholder=" " type="email" name="email" required>
                             <label class="tf-field-label" for="">Email *</label>
                         </div>
                         <div class="tf-field style-1">
-                            <input class="tf-field-input tf-input" placeholder=" " type="password" name="">
+                            <input class="tf-field-input tf-input" placeholder=" " type="password" name="password" required>
                             <label class="tf-field-label" for="">Password *</label>
                         </div>
                         <div>
@@ -209,7 +210,7 @@
                                         in</span></button>
                             </div>
                             <div class="w-100">
-                                <a href="#register" data-bs-toggle="modal" class="btn-link fw-6 w-100 link">
+                                <a href="{% url 'register' %}" class="btn-link fw-6 w-100 link">
                                     New customer? Create your account
                                     <i class="icon icon-arrow1-top-left"></i>
                                 </a>
@@ -648,12 +649,30 @@
             </a>
         </div>
         <div class="toolbar-item">
+            {% if user.is_authenticated %}
+                {% if user.is_staff %}
+                <a href="{% url 'panel_admin_demo' %}" style="color:#7c3aed;">
+                    <div class="toolbar-icon">
+                        <i class="icon-grid"></i>
+                    </div>
+                    <div class="toolbar-label">Admin</div>
+                </a>
+                {% else %}
+                <a href="{% url 'my-account' %}">
+                    <div class="toolbar-icon">
+                        <i class="icon-account"></i>
+                    </div>
+                    <div class="toolbar-label">Cuenta</div>
+                </a>
+                {% endif %}
+            {% else %}
             <a href="#login" data-bs-toggle="modal">
                 <div class="toolbar-icon">
                     <i class="icon-account"></i>
                 </div>
-                <div class="toolbar-label">Account</div>
+                <div class="toolbar-label">Login</div>
             </a>
+            {% endif %}
         </div>
         <div class="toolbar-item">
             <a href="wishlist.html">

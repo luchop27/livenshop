@@ -1,13 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
+from django.contrib import messages
+from django.utils.text import slugify
 
-from .models import Producto, Categoria, Coleccion, CarritoItem
+from .models import Producto, Categoria, Coleccion, CarritoItem, Imagen
 
 
 # ══════════════════════════════════════════════════════
@@ -35,19 +38,264 @@ def home(request):
     })
 
 
-def panel_admin_demo(request):
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_dashboard(request):
     """
-    Render de prueba del panel administrativo migrado.
-    Esta vista valida la carga de layout base y assets.
+    Dashboard principal del panel administrativo.
+    Muestra métricas globales de la tienda.
     """
-    return render(request, 'panel_admin/dashboard_demo.html', {
-        'total_productos': Producto.objects.count(),
-        'total_productos_activos': Producto.objects.filter(activo=True).count(),
-        'total_categorias': Categoria.objects.count(),
-        'total_colecciones': Coleccion.objects.count(),
+    from apps.usuarios.models import Usuario
+    total_productos = Producto.objects.count()
+    total_activos = Producto.objects.filter(activo=True).count()
+    total_categorias = Categoria.objects.count()
+    total_colecciones = Coleccion.objects.count()
+    total_usuarios = Usuario.objects.filter(is_active=True).count()
+
+    # Productos más recientes
+    productos_recientes = Producto.objects.select_related(
+        'categoria'
+    ).prefetch_related('imagenes').order_by('-created_at')[:5]
+
+    # Categorías con más productos
+    top_categorias = Categoria.objects.annotate(
+        num_productos=Count('productos', distinct=True)
+    ).order_by('-num_productos')[:5]
+
+    return render(request, 'panel_admin/dashboard.html', {
+        'total_productos': total_productos,
+        'total_activos': total_activos,
+        'total_inactivos': total_productos - total_activos,
+        'total_categorias': total_categorias,
+        'total_colecciones': total_colecciones,
+        'total_usuarios': total_usuarios,
+        'productos_recientes': productos_recientes,
+        'top_categorias': top_categorias,
     })
 
 
+# Alias para compatibilidad con url existente en liven/urls.py
+panel_admin_demo = panel_admin_dashboard
+
+
+# ══════════════════════════════════════════════════════
+# PANEL ADMIN — PRODUCTOS
+# ══════════════════════════════════════════════════════
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_products(request):
+    """
+    Listado de productos para el panel administrativo.
+    Incluye filtro por texto, coleccion y paginacion.
+    """
+    search = request.GET.get('q', '').strip()
+    coleccion_filtro = request.GET.get('coleccion', '').strip()
+    estado_filtro = request.GET.get('estado', '').strip()
+
+    productos_qs = Producto.objects.select_related(
+        'categoria', 'coleccion'
+    ).prefetch_related('imagenes').order_by('-created_at')
+
+    if search:
+        productos_qs = productos_qs.filter(
+            Q(nombre__icontains=search) |
+            Q(marca__icontains=search) |
+            Q(slug__icontains=search)
+        )
+
+    if coleccion_filtro:
+        productos_qs = productos_qs.filter(coleccion__slug=coleccion_filtro)
+
+    if estado_filtro == 'activo':
+        productos_qs = productos_qs.filter(activo=True)
+    elif estado_filtro == 'inactivo':
+        productos_qs = productos_qs.filter(activo=False)
+
+    paginator = Paginator(productos_qs, 15)
+    page_number = request.GET.get('page')
+    productos = paginator.get_page(page_number)
+
+    colecciones_disponibles = Coleccion.objects.filter(activo=True).order_by('nombre')
+
+    return render(request, 'panel_admin/product_list.html', {
+        'productos': productos,
+        'total_productos': paginator.count,
+        'search': search,
+        'coleccion_filtro': coleccion_filtro,
+        'estado_filtro': estado_filtro,
+        'colecciones_disponibles': colecciones_disponibles,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_product_add(request):
+    """
+    Formulario para crear un nuevo producto decorativo.
+    Sin variantes de talla/color — stock y precio directos.
+    """
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        precio = request.POST.get('precio', '0')
+        precio_oferta = request.POST.get('precio_oferta', '').strip() or None
+        stock = request.POST.get('stock', '0')
+        categoria_id = request.POST.get('categoria') or None
+        coleccion_id = request.POST.get('coleccion') or None
+        descripcion_corta = request.POST.get('descripcion_corta', '').strip()
+        descripcion_larga = request.POST.get('descripcion_larga', '').strip()
+        marca = request.POST.get('marca', '').strip()
+        material = request.POST.get('material', '').strip()
+        dimensiones = request.POST.get('dimensiones', '').strip()
+        destacado = request.POST.get('destacado') == 'on'
+        activo = request.POST.get('activo') == 'on'
+
+        if not nombre:
+            messages.error(request, 'El nombre del producto es obligatorio.')
+        else:
+            # Generar slug único
+            base_slug = slugify(nombre)
+            slug = base_slug
+            counter = 1
+            while Producto.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            producto = Producto.objects.create(
+                nombre=nombre,
+                slug=slug,
+                precio=precio,
+                precio_oferta=precio_oferta,
+                stock=stock,
+                categoria_id=categoria_id,
+                coleccion_id=coleccion_id,
+                descripcion_corta=descripcion_corta,
+                descripcion_larga=descripcion_larga,
+                marca=marca,
+                material=material,
+                dimensiones=dimensiones,
+                destacado=destacado,
+                activo=activo,
+            )
+
+            # Guardar imágenes subidas
+            imagenes = request.FILES.getlist('imagenes')
+            for i, img in enumerate(imagenes):
+                Imagen.objects.create(
+                    producto=producto,
+                    imagen=img,
+                    tipo_medio='imagen',
+                    es_principal=(i == 0),
+                    posicion=i,
+                )
+
+            messages.success(request, f'Producto "{nombre}" creado exitosamente.')
+            return redirect('productos:panel_admin_products')
+
+    categorias = Categoria.objects.filter(activo=True).order_by('padre__nombre', 'nombre')
+    colecciones = Coleccion.objects.filter(activo=True).order_by('nombre')
+
+    return render(request, 'panel_admin/product_add.html', {
+        'categorias': categorias,
+        'colecciones': colecciones,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_product_edit(request, producto_id):
+    """
+    Formulario para editar un producto existente.
+    """
+    producto = get_object_or_404(Producto, pk=producto_id)
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        precio = request.POST.get('precio', '0')
+        precio_oferta = request.POST.get('precio_oferta', '').strip() or None
+        stock = request.POST.get('stock', '0')
+        categoria_id = request.POST.get('categoria') or None
+        coleccion_id = request.POST.get('coleccion') or None
+        descripcion_corta = request.POST.get('descripcion_corta', '').strip()
+        descripcion_larga = request.POST.get('descripcion_larga', '').strip()
+        marca = request.POST.get('marca', '').strip()
+        material = request.POST.get('material', '').strip()
+        dimensiones = request.POST.get('dimensiones', '').strip()
+        destacado = request.POST.get('destacado') == 'on'
+        activo = request.POST.get('activo') == 'on'
+
+        if not nombre:
+            messages.error(request, 'El nombre del producto es obligatorio.')
+        else:
+            # Actualizar slug solo si el nombre cambió
+            if nombre != producto.nombre:
+                base_slug = slugify(nombre)
+                slug = base_slug
+                counter = 1
+                while Producto.objects.filter(slug=slug).exclude(pk=producto.pk).exists():
+                    slug = f"{base_slug}-{counter}"
+                    counter += 1
+                producto.slug = slug
+
+            producto.nombre = nombre
+            producto.precio = precio
+            producto.precio_oferta = precio_oferta
+            producto.stock = stock
+            producto.categoria_id = categoria_id
+            producto.coleccion_id = coleccion_id
+            producto.descripcion_corta = descripcion_corta
+            producto.descripcion_larga = descripcion_larga
+            producto.marca = marca
+            producto.material = material
+            producto.dimensiones = dimensiones
+            producto.destacado = destacado
+            producto.activo = activo
+            producto.save()
+
+            # Añadir nuevas imágenes si se subieron
+            imagenes_nuevas = request.FILES.getlist('imagenes')
+            posicion_base = producto.imagenes.count()
+            for i, img in enumerate(imagenes_nuevas):
+                Imagen.objects.create(
+                    producto=producto,
+                    imagen=img,
+                    tipo_medio='imagen',
+                    es_principal=False,
+                    posicion=posicion_base + i,
+                )
+
+            # Eliminar imágenes marcadas
+            ids_eliminar = request.POST.getlist('eliminar_imagen')
+            if ids_eliminar:
+                Imagen.objects.filter(pk__in=ids_eliminar, producto=producto).delete()
+
+            messages.success(request, f'Producto "{nombre}" actualizado exitosamente.')
+            return redirect('productos:panel_admin_products')
+
+    categorias = Categoria.objects.filter(activo=True).order_by('padre__nombre', 'nombre')
+    colecciones = Coleccion.objects.filter(activo=True).order_by('nombre')
+
+    return render(request, 'panel_admin/product_edit.html', {
+        'producto': producto,
+        'categorias': categorias,
+        'colecciones': colecciones,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
+@require_POST
+def panel_admin_product_delete(request, producto_id):
+    """
+    Elimina un producto. Solo acepta POST.
+    """
+    producto = get_object_or_404(Producto, pk=producto_id)
+    nombre = producto.nombre
+    producto.delete()
+    messages.success(request, f'Producto "{nombre}" eliminado correctamente.')
+    return redirect('productos:panel_admin_products')
+
+
+# ══════════════════════════════════════════════════════
+# PANEL ADMIN — CATEGORÍAS
+# ══════════════════════════════════════════════════════
+
+@staff_member_required(login_url='usuarios:login')
 def panel_admin_categories(request):
     """
     Listado de categorias para el panel administrativo.
@@ -80,41 +328,124 @@ def panel_admin_categories(request):
     })
 
 
-def panel_admin_products(request):
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_category_add(request):
     """
-    Listado de productos para el panel administrativo.
-    Incluye filtro por texto, coleccion y paginacion.
+    Formulario para crear una nueva categoría.
     """
-    search = request.GET.get('q', '').strip()
-    coleccion_filtro = request.GET.get('coleccion', '').strip()
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        slug_manual = request.POST.get('slug', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        padre_id = request.POST.get('padre') or None
+        coleccion_id = request.POST.get('coleccion') or None
+        activo = request.POST.get('estado', 'True') == 'True'
+        posicion = request.POST.get('posicion', 0)
 
-    productos_qs = Producto.objects.select_related(
-        'categoria', 'coleccion'
-    ).prefetch_related('imagenes').order_by('-created_at')
+        if not nombre:
+            messages.error(request, 'El nombre de la categoría es obligatorio.')
+        else:
+            slug = slug_manual if slug_manual else slugify(nombre)
+            counter = 1
+            base_slug = slug
+            while Categoria.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
 
-    if search:
-        productos_qs = productos_qs.filter(
-            Q(nombre__icontains=search) |
-            Q(marca__icontains=search) |
-            Q(slug__icontains=search)
-        )
+            imagen = request.FILES.get('imagen') or None
 
-    if coleccion_filtro:
-        productos_qs = productos_qs.filter(coleccion__slug=coleccion_filtro)
+            categoria = Categoria.objects.create(
+                nombre=nombre,
+                slug=slug,
+                descripcion=descripcion,
+                padre_id=padre_id,
+                coleccion_id=coleccion_id,
+                activo=activo,
+                posicion=posicion,
+                imagen=imagen,
+            )
+            messages.success(request, f'Categoría "{nombre}" creada exitosamente.')
+            return redirect('productos:panel_admin_categories')
 
-    paginator = Paginator(productos_qs, 12)
-    page_number = request.GET.get('page')
-    productos = paginator.get_page(page_number)
+    categorias = Categoria.objects.filter(activo=True, padre__isnull=True).order_by('nombre')
+    colecciones = Coleccion.objects.filter(activo=True).order_by('nombre')
 
-    colecciones_disponibles = Coleccion.objects.filter(activo=True).order_by('nombre')
-
-    return render(request, 'panel_admin/product_list.html', {
-        'productos': productos,
-        'total_productos': paginator.count,
-        'search': search,
-        'coleccion_filtro': coleccion_filtro,
-        'colecciones_disponibles': colecciones_disponibles,
+    return render(request, 'panel_admin/category_add.html', {
+        'categorias': categorias,
+        'colecciones': colecciones,
     })
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_category_edit(request, categoria_id):
+    """
+    Formulario para editar una categoría existente.
+    """
+    categoria = get_object_or_404(Categoria, pk=categoria_id)
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        slug_manual = request.POST.get('slug', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        padre_id = request.POST.get('padre') or None
+        coleccion_id = request.POST.get('coleccion') or None
+        activo = request.POST.get('estado', 'True') == 'True'
+        posicion = request.POST.get('posicion', categoria.posicion)
+        remove_imagen = request.POST.get('remove_imagen')
+
+        if not nombre:
+            messages.error(request, 'El nombre de la categoría es obligatorio.')
+        else:
+            slug = slug_manual if slug_manual else categoria.slug
+            if slug != categoria.slug:
+                counter = 1
+                base_slug = slug
+                while Categoria.objects.filter(slug=slug).exclude(pk=categoria.pk).exists():
+                    slug = f"{base_slug}-{counter}"
+                    counter += 1
+
+            categoria.nombre = nombre
+            categoria.slug = slug
+            categoria.descripcion = descripcion
+            categoria.padre_id = padre_id
+            categoria.coleccion_id = coleccion_id
+            categoria.activo = activo
+            categoria.posicion = posicion
+
+            if remove_imagen:
+                categoria.imagen = None
+
+            nueva_imagen = request.FILES.get('imagen')
+            if nueva_imagen:
+                categoria.imagen = nueva_imagen
+
+            categoria.save()
+            messages.success(request, f'Categoría "{nombre}" actualizada exitosamente.')
+            return redirect('productos:panel_admin_categories')
+
+    categorias = Categoria.objects.filter(
+        activo=True, padre__isnull=True
+    ).exclude(pk=categoria_id).order_by('nombre')
+    colecciones = Coleccion.objects.filter(activo=True).order_by('nombre')
+
+    return render(request, 'panel_admin/category_edit.html', {
+        'categoria': categoria,
+        'categorias': categorias,
+        'colecciones': colecciones,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
+@require_POST
+def panel_admin_category_delete(request, categoria_id):
+    """
+    Elimina una categoría. Solo acepta POST.
+    """
+    categoria = get_object_or_404(Categoria, pk=categoria_id)
+    nombre = categoria.nombre
+    categoria.delete()
+    messages.success(request, f'Categoría "{nombre}" eliminada correctamente.')
+    return redirect('productos:panel_admin_categories')
 
 
 # ══════════════════════════════════════════════════════

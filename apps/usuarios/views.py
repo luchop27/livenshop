@@ -372,26 +372,31 @@ def login_usuario(request):
 
     if request.user.is_authenticated:
         if request.user.rol == 'admin_tienda' or request.user.is_staff:
-            return redirect('core:admin_index')
-        return redirect('usuarios:my_account')
+            return redirect('panel_admin_demo')
+        return redirect('my-account')
     
     if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '').strip()
         next_url = request.POST.get('next') or request.GET.get('next')
+
+        if not email or not password:
+            messages.error(request, 'Por favor, ingrese email y contraseña.')
+            return render(request, 'login.html', {'next': next_url, 'disable_cart_nav': True})
 
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
             login(request, user)
             
-            if user.rol == 'admin_tienda' or user.is_staff:
-                return redirect('core:admin_index')
-            
+            # Prioridad de redirección: next -> admin/staff -> my-account
             if next_url and url_has_allowed_host_and_scheme(next_url, {request.get_host()}):
                 return redirect(next_url)
             
-            return redirect('usuarios:my_account')
+            if user.rol == 'admin_tienda' or user.is_staff:
+                return redirect('panel_admin_demo')
+            
+            return redirect('my-account')
         else:
             messages.error(request, 'Email o contraseña incorrectos.')
             return render(request, 'login.html', {
@@ -404,6 +409,7 @@ def login_usuario(request):
         'next': next_url,
         'disable_cart_nav': True,
     })
+
 
 
 def registrar_usuario(request):
@@ -1090,3 +1096,74 @@ def is_in_wishlist(request, producto_id):
             'success': False,
             'message': f'Error: {str(e)}'
         }, status=500)
+
+
+# ══════════════════════════════════════════════════════
+# PANEL ADMIN — USUARIOS
+# ══════════════════════════════════════════════════════
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
+from django.db.models import Q as DQ
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_users(request):
+    """
+    Listado de usuarios para el panel administrativo.
+    """
+    search = request.GET.get('q', '').strip()
+    rol_filtro = request.GET.get('rol', '').strip()
+    estado_filtro = request.GET.get('estado', '').strip()
+
+    usuarios_qs = Usuario.objects.all().order_by('-fecha_registro')
+
+    if search:
+        usuarios_qs = usuarios_qs.filter(
+            DQ(email__icontains=search) |
+            DQ(nombre__icontains=search) |
+            DQ(apellido__icontains=search) |
+            DQ(telefono__icontains=search)
+        )
+
+    if rol_filtro:
+        usuarios_qs = usuarios_qs.filter(rol=rol_filtro)
+
+    if estado_filtro == 'activo':
+        usuarios_qs = usuarios_qs.filter(is_active=True)
+    elif estado_filtro == 'inactivo':
+        usuarios_qs = usuarios_qs.filter(is_active=False)
+
+    paginator = Paginator(usuarios_qs, 20)
+    page_number = request.GET.get('page')
+    usuarios = paginator.get_page(page_number)
+
+    return render(request, 'panel_admin/user_list.html', {
+        'usuarios': usuarios,
+        'total_usuarios': paginator.count,
+        'search': search,
+        'rol_filtro': rol_filtro,
+        'estado_filtro': estado_filtro,
+    })
+
+
+
+@staff_member_required(login_url='usuarios:login')
+@require_POST
+def panel_admin_user_toggle_status(request, usuario_id):
+    """
+    Activa o desactiva un usuario vía POST/JSON.
+    """
+    from django.db import models as dj_models
+    usuario = get_object_or_404(Usuario, pk=usuario_id)
+
+    if usuario == request.user:
+        return JsonResponse({'success': False, 'message': 'No puedes desactivar tu propia cuenta.'})
+
+    usuario.is_active = not usuario.is_active
+    usuario.save()
+
+    accion = 'activado' if usuario.is_active else 'desactivado'
+    return JsonResponse({'success': True, 'message': f'Usuario {accion} correctamente.', 'is_active': usuario.is_active})
+

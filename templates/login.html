@@ -38,15 +38,17 @@
                         <div id="login">
                             <h5 class="mb_36">Log in</h5>
                             <div>
-                                <form class="" id="login-form" action="my-account.html" accept-charset="utf-8">
+                                <form class="" id="login-form" action="{% url 'login' %}" method="post" accept-charset="utf-8">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ next }}">
                                     <div class="tf-field style-1 mb_15">
                                         <input class="tf-field-input tf-input" placeholder="" type="email"
-                                            id="property3" name="email">
+                                            id="property3" name="email" required>
                                         <label class="tf-field-label fw-4 text_black-2" for="property3">Email *</label>
                                     </div>
                                     <div class="tf-field style-1 mb_30">
                                         <input class="tf-field-input tf-input" placeholder="" type="password"
-                                            id="property4" name="password">
+                                            id="property4" name="password" required>
                                         <label class="tf-field-label fw-4 text_black-2" for="property4">Password
                                             *</label>
                                     </div>
@@ -56,7 +58,7 @@
                                     <div class="">
                                         <button type="submit"
                                             class="tf-btn w-100 radius-3 btn-fill animate-hover-btn justify-content-center">Log
-                                            in</button>
+                                             in</button>
                                     </div>
                                 </form>
                             </div>
