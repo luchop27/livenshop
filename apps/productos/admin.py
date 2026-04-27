@@ -218,3 +218,12 @@ class ReturnPolicyAdmin(admin.ModelAdmin):
             'fields': ('dias_devolucion', 'orden', 'activo')
         }),
     )
+
+from .models import ShopGramPost
+
+@admin.register(ShopGramPost)
+class ShopGramPostAdmin(admin.ModelAdmin):
+    list_display = ['instagram_url', 'imagen', 'activo', 'created_at']
+    list_editable = ['activo']
+    readonly_fields = ['created_at']
+    list_per_page = 10

@@ -3,6 +3,10 @@ $(document).ready(function() {
         var button = $(event.relatedTarget); // Botón que activó el modal
         var productId = button.data('product-id'); // Extrae el ID del producto
         
+        console.log('DEBUG: Modal activado');
+        console.log('DEBUG: Product ID:', productId);
+        console.log('DEBUG: Button:', button);
+        
         if (productId) {
             // Muestra loading
             $('#quickview-title').text('Cargando...');
@@ -12,7 +16,11 @@ $(document).ready(function() {
             $('#quickview-images').html( '<div class="swiper-slide"><div class="item"><img src="' + PLACEHOLDER_IMG + '" alt="Cargando..."></div></div>'
 );
             
-            $.get('/productos/api/producto/' + productId + '/quick-view/', function(data) {
+            var url = '/api/producto/' + productId + '/quick-view/';
+            console.log('DEBUG: Haciendo petición a:', url);
+            
+            $.get(url, function(data) {
+                console.log('DEBUG: Datos recibidos:', data);
                 // Pobla el modal con los datos
                 $('#quickview-title').text(data.nombre);
                 $('#quickview-price').text('$' + data.precio_final);
@@ -60,9 +68,13 @@ $(document).ready(function() {
                     $('.tf-product-info-badges').hide();
                 }
                 
-            }).fail(function() {
-                alert('Error al cargar el producto.');
+            }).fail(function(xhr, status, error) {
+                console.error('DEBUG: Error en la petición:', status, error);
+                console.error('DEBUG: Respuesta:', xhr.responseText);
+                alert('Error al cargar el producto. Status: ' + status);
             });
+        } else {
+            console.warn('DEBUG: No se encontró product-id en el botón');
         }
     });
 });

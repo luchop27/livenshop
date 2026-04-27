@@ -10,54 +10,113 @@
                 data-centered="false" data-space="0" data-loop="true" data-auto-play="true" data-delay="2000"
                 data-speed="1000">
                 <div class="swiper-wrapper">
-                    <div class="swiper-slide" lazy="true">
-                        <div class="wrap-slider">
-                            <img class="lazyload" data-src="{% static 'images/slider/plant_slide_1.jpg' %}"
-                                src="{% static 'images/slider/plant_slide_1.jpg' %}" alt="plant-01">
-                            <div class="box-content">
-                                <div class="container">
-                                    <h1 class="fade-item fade-item-1 text-white">Quality<br>Craftsmanship</h1>
-                                    <p class="fade-item fade-item-2 text-white">Discover furniture crafted with
-                                        meticulous attention to detail</p>
-                                    <a href="shop-default.html"
-                                        class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3"><span>Shop
-                                            collection</span><i class="icon icon-arrow-right"></i></a>
+
+                    {% if colecciones %}
+                        {% for coleccion in colecciones %}
+                            <div class="swiper-slide" lazy="true">
+                                <div class="wrap-slider">
+                                    {% if coleccion.imagen %}
+                                        <img class="lazyload"
+                                            data-src="{{ coleccion.imagen.url }}"
+                                            src="{{ coleccion.imagen.url }}"
+                                            alt="{{ coleccion.nombre }}">
+                                    {% else %}
+                                        <img class="lazyload"
+                                            data-src="{% static 'images/slider/plant_slide_1.jpg' %}"
+                                            src="{% static 'images/slider/plant_slide_1.jpg' %}"
+                                            alt="{{ coleccion.nombre }}">
+                                    {% endif %}
+                                    <div class="box-content text-center">
+                                        <div class="container">
+                                            <h1 class="fade-item fade-item-1 text-white">{{ coleccion.nombre }}</h1>
+                                            {% if coleccion.descripcion %}
+                                                <p class="fade-item fade-item-2 text-white">
+                                                    {{ coleccion.descripcion|truncatewords:15 }}
+                                                </p>
+                                            {% else %}
+                                                <p class="fade-item fade-item-2 text-white">
+                                                    Descubre nuestra colección exclusiva
+                                                </p>
+                                            {% endif %}
+                                            <a href="{{ coleccion.get_absolute_url }}"
+                                                class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
+                                                <span>Ver colección</span>
+                                                <i class="icon icon-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    {% else %}
+                        <div class="swiper-slide" lazy="true">
+                            <div class="wrap-slider">
+                                <img class="lazyload"
+                                    data-src="{% static 'images/slider/plant_slide_1.jpg' %}"
+                                    src="{% static 'images/slider/plant_slide_1.jpg' %}"
+                                    alt="slide-01">
+                                <div class="box-content text-center">
+                                    <div class="container">
+                                        <h1 class="fade-item fade-item-1 text-white">Quality<br>Craftsmanship</h1>
+                                        <p class="fade-item fade-item-2 text-white">
+                                            Descubre muebles elaborados con atención meticulosa al detalle
+                                        </p>
+                                        <a href="{% url 'productos:lista_productos' %}"
+                                            class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
+                                            <span>Ver colección</span>
+                                            <i class="icon icon-arrow-right"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="swiper-slide" lazy="true">
-                        <div class="wrap-slider">
-                            <img class="lazyload" data-src="{% static 'images/slider/plant_slide_2.jpg' %}"
-                                src="{% static 'images/slider/plant_slide_2.jpg' %}" alt="plant-01">
-                            <div class="box-content">
-                                <div class="container">
-                                    <h1 class="fade-item fade-item-1 text-white">Quality<br>Craftsmanship</h1>
-                                    <p class="fade-item fade-item-2 text-white">Discover furniture crafted with
-                                        meticulous attention to detail</p>
-                                    <a href="shop-default.html"
-                                        class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3"><span>Shop
-                                            collection</span><i class="icon icon-arrow-right"></i></a>
+
+                        <div class="swiper-slide" lazy="true">
+                            <div class="wrap-slider">
+                                <img class="lazyload"
+                                    data-src="{% static 'images/slider/plant_slide_2.jpg' %}"
+                                    src="{% static 'images/slider/plant_slide_2.jpg' %}"
+                                    alt="slide-02">
+                                <div class="box-content text-center">
+                                    <div class="container">
+                                        <h1 class="fade-item fade-item-1 text-white">Diseño<br>Atemporal</h1>
+                                        <p class="fade-item fade-item-2 text-white">
+                                            Piezas que transforman cada espacio en un hogar
+                                        </p>
+                                        <a href="{% url 'productos:lista_productos' %}"
+                                            class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
+                                            <span>Explorar</span>
+                                            <i class="icon icon-arrow-right"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="swiper-slide" lazy="true">
-                        <div class="wrap-slider">
-                            <img class="lazyload" data-src="{% static 'images/slider/plant_slide_3.jpg' %}"
-                                src="{% static 'images/slider/plant_slide_3.jpg' %}" alt="plant-01">
-                            <div class="box-content">
-                                <div class="container">
-                                    <h1 class="fade-item fade-item-1 text-white">Quality<br>Craftsmanship</h1>
-                                    <p class="fade-item fade-item-2 text-white">Discover furniture crafted with
-                                        meticulous attention to detail</p>
-                                    <a href="shop-default.html"
-                                        class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3"><span>Shop
-                                            collection</span><i class="icon icon-arrow-right"></i></a>
+
+                        <div class="swiper-slide" lazy="true">
+                            <div class="wrap-slider">
+                                <img class="lazyload"
+                                    data-src="{% static 'images/slider/plant_slide_3.jpg' %}"
+                                    src="{% static 'images/slider/plant_slide_3.jpg' %}"
+                                    alt="slide-03">
+                                <div class="box-content text-center">
+                                    <div class="container">
+                                        <h1 class="fade-item fade-item-1 text-white">Materiales<br>Nobles</h1>
+                                        <p class="fade-item fade-item-2 text-white">
+                                            Calidad que se siente, elegancia que se ve
+                                        </p>
+                                        <a href="{% url 'productos:lista_productos' %}"
+                                            class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
+                                            <span>Ver todo</span>
+                                            <i class="icon icon-arrow-right"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
+
                 </div>
             </div>
             <div class="wrap-pagination">
@@ -175,9 +234,18 @@
                                 <div class="card-product">
                                     <div class="card-product-wrapper">
                                         <a href="{{ producto.get_absolute_url }}" class="product-img">
-                                            {% with producto.imagenes.first as img %}
-                                                {% if img %}
-                                                    <img class="lazyload img-product" data-src="{{ img.src }}" src="{{ img.src }}" alt="{{ producto.nombre }}">
+                                            {% with producto.imagenes.all as imgs %}
+                                                {% if imgs.0 %}
+                                                    <img class="lazyload img-product" 
+                                                        data-src="{{ imgs.0.src }}" 
+                                                        src="{{ imgs.0.src }}" 
+                                                        alt="{{ producto.nombre }}">
+                                                {% endif %}
+                                                {% if imgs.1 %}
+                                                    <img class="lazyload img-hover" 
+                                                        data-src="{{ imgs.1.src }}" 
+                                                        src="{{ imgs.1.src }}" 
+                                                        alt="{{ producto.nombre }}">
                                                 {% endif %}
                                             {% endwith %}
                                         </a>
@@ -218,50 +286,7 @@
                                 </div>
                             </div>
                             {% endfor %}
-                            <div class="swiper-slide" lazy="true">
-                                <div class="card-product">
-                                    <div class="card-product-wrapper card-product-horizontal-img">
-                                        <a href="product-detail.html" class="product-img">
-                                            <img class="lazyload img-product"
-                                                data-src="{% static 'images/products/ejemplo.jpg' %}"
-                                                src="{% static 'images/products/ejemplo.jpg' %}" alt="image-product">
-                                            <img class="lazyload img-hover" data-src="{% static 'images/products/ejemplo2.jpg' %}"
-                                                src="{% static 'images/products/ejemplo2.jpg' %}" alt="image-product">
-                                        </a>
-                                        <div class="list-product-btn absolute-2">
-                                            <a href="#quick_add" data-bs-toggle="modal"
-                                                class="box-icon bg_white quick-add tf-btn-loading">
-                                                <span class="icon icon-bag"></span>
-                                                <span class="tooltip">Quick Add</span>
-                                            </a>
-                                            <a href="#"
-                                                class="box-icon bg_white wishlist btn-icon-action">
-                                                <span class="icon icon-heart"></span>
-                                                <span class="tooltip">Add to Wishlist</span>
-                                                <span class="icon icon-delete"></span>
-                                            </a>
-                                            <a href="#compare" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft"
-                                                class="box-icon bg_white compare btn-icon-action">
-                                                <span class="icon icon-compare"></span>
-                                                <span class="tooltip">Add to Compare</span>
-                                                <span class="icon icon-check"></span>
-                                            </a>
-                                            <a href="#quick_view" data-bs-toggle="modal"
-                                                class="box-icon bg_white quickview tf-btn-loading">
-                                                <span class="icon icon-view"></span>
-                                                <span class="tooltip">Quick View</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <a href="product-detail.html" class="title link">Womb Ottoman</a>
-                                        <span class="price">
-                                            <span class="old-price">$1,695.00</span>
-                                            <span class="new-price">$1,356.00</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                     <div class="nav-sw nav-next-slider nav-next-product box-icon w_46 round"><span
@@ -273,88 +298,49 @@
         </section>
         <!-- /Product -->
 
-        <!-- Banner collection -->
         <section class="banner-hero-collection-wrap banner-parallax"
-            style="background-image: url('{% static 'images/slider/food-banner-collection.jpg' %}');">
-            <div class="box-content">
-                <div class="container">
-                    <a href="shop-collection-sub.html" class="card-box text-md-start text-center rounded-0">
-                        <h5>Our foundation is set on tried and true processes and open lines of communication.</h5>
-                        <p class="text">We understand that, redesigning your home is a huge undertaking that requires courage and trust. Our experience allows us to guide you every step of the way, keep you informed, and deliver a finished product that is undeniably unique to you.</p>
-                        <div class="wow fadeInUp" data-wow-delay="0s">
-                            <button class="tf-btn style-2 fw-7 text-2 btn-fill animate-hover-btn"><span>Start
-                                    today</span></button>
-                        </div>
-                    </a>
-                </div>
+        style="background-image: url('{% static "images/slider/banner.png" %}');">
+        <div class="box-content">
+            <div class="container">
+                <a href="shop-collection-sub.html" class="card-box text-md-start text-center rounded-0">
+                    <h5>Our foundation is set on tried and true processes and open lines of communication.</h5>
+                    <p class="text">We understand that, redesigning your home is a huge undertaking that requires courage and trust. Our experience allows us to guide you every step of the way, keep you informed, and deliver a finished product that is undeniably unique to you.</p>
+                    <div class="wow fadeInUp" data-wow-delay="0s">
+                        <button class="tf-btn style-2 fw-7 text-2 btn-fill animate-hover-btn">
+                            <span>Start today</span>
+                        </button>
+                    </div>
+                </a>
             </div>
+        </div>
         </section>
-        <!-- /Banner collection -->
          
        <!-- Shop Gram -->
         <section class="pb-0 flat-spacing-18">
             <div class="container-full px-0">
                 <div class="flat-title wow fadeInUp" data-wow-delay="0s">
                     <span class="title">Shop Gram</span>
-                    <p class="sub-title">Here’s some of our most popular products people are in love with.</p>
+                    <p class="sub-title">Here's some of our most popular products people are in love with.</p>
                 </div>
                 <div dir="ltr" class="swiper tf-sw-shop-gallery" data-preview="5" data-tablet="3" data-mobile="2"
                     data-space-lg="0" data-space-md="0">
                     <div class="swiper-wrapper">
+                        {% for post in shop_gram_posts %}
                         <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_01.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_01.jpg' %}" alt="image-gallery">
+                            <a href="{{ post.instagram_url }}" target="_blank" rel="noopener noreferrer">
+                                <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
+                                    <div class="img-style">
+                                        <img class="lazyload img-hover shopgram-img"
+                                            data-src="{{ post.imagen.url }}"
+                                            src="{{ post.imagen.url }}"
+                                            alt="Instagram post">
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
-                        <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".1s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_02.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_02.jpg' %}" alt="image-gallery">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".2s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_03.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_03.jpg' %}" alt="image-gallery">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".3s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_04.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_04.jpg' %}" alt="image-gallery">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".4s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_05.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_05.jpg' %}" alt="image-gallery">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".4s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_06.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_06.jpg' %}" alt="image-gallery">
-                                </div>
-                            </div>
-                        </div>
+                        {% empty %}
+                        <p class="text-center w-100 py-4">No hay publicaciones aún.</p>
+                        {% endfor %}
                     </div>
                     <div class="absolute-dots sw-dots sw-pagination-gallery justify-content-center"></div>
                 </div>
