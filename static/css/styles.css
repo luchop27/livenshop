@@ -69,6 +69,13 @@
   --bg-scrollbar-thumb: #c1c1c1;
 }
 
+.shopgram-img {
+    width: 200%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+}
+
 /* Agregar a tu archivo de estilos */
 .card-product-horizontal-img .product-img img {
     width: 100%;

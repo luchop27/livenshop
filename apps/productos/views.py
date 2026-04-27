@@ -10,7 +10,7 @@ from django.db.models import Count, Q
 from django.contrib import messages
 from django.utils.text import slugify
 
-from .models import Producto, Categoria, Coleccion, CarritoItem, Imagen
+from .models import Producto, Categoria, Coleccion, CarritoItem, Imagen, AtributoProducto, ShopGramPost
 
 
 # ══════════════════════════════════════════════════════
@@ -20,7 +20,7 @@ from .models import Producto, Categoria, Coleccion, CarritoItem, Imagen
 def home(request):
     """
     Vista de la página de inicio.
-    Muestra productos destacados/trending y categorías principales.
+    Muestra productos destacados/trending, categorías principales y colecciones destacadas.
     """
     productos = Producto.objects.filter(
         activo=True
@@ -32,9 +32,14 @@ def home(request):
         padre=None
     ).order_by('posicion', 'nombre')[:6]
     
+    # Colecciones destacadas para el slider
+    colecciones = Coleccion.objects.filter(activo=True, destacada=True)
+    shop_gram_posts = ShopGramPost.objects.filter(activo=True)[:10]
     return render(request, 'home.html', {
         'productos': productos,
-        'categorias': categorias
+        'categorias': categorias,
+        'colecciones': colecciones,
+        'shop_gram_posts': shop_gram_posts
     })
 
 
@@ -457,7 +462,7 @@ class ProductoListView(ListView):
     Lista todos los productos activos.
     """
     model = Producto
-    template_name = 'productos/lista.html'
+    template_name = 'shop-fullwidth.html'
     context_object_name = 'productos'
     paginate_by = 12
 
@@ -479,7 +484,7 @@ class ProductoDetailView(DetailView):
     Muestra información, atributos, imágenes y productos relacionados.
     """
     model = Producto
-    template_name = 'productos/detalle.html'
+    template_name = 'detalle.html'
     context_object_name = 'producto'
     slug_field = 'slug'
 
@@ -489,16 +494,14 @@ class ProductoDetailView(DetailView):
         )
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        producto = self.get_object()
+        context = super().get_context_data(**kwargs)  # ← 4 espacios adentro
+        producto = self.object
         
-        # Productos relacionados (misma categoría)
         context['relacionados'] = Producto.objects.filter(
             categoria=producto.categoria,
             activo=True
-        ).exclude(pk=producto.pk)[:4].prefetch_related('imagenes')
+        ).exclude(pk=producto.pk)[:8].prefetch_related('imagenes')
         
-        # Atributos organizados
         context['atributos'] = producto.atributos.select_related('atributo')
         
         return context
@@ -510,7 +513,7 @@ class CategoriaListView(ListView):
     Incluye subcategorías.
     """
     model = Producto
-    template_name = 'productos/lista.html'
+    template_name = 'shop-fullwidth.html'
     context_object_name = 'productos'
     paginate_by = 12
 
@@ -529,7 +532,7 @@ class CategoriaListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = f'Categoría: {self.categoria.nombre}'
-        context['categoria'] = self.categoria
+        context['categoria_actual'] = self.categoria
         context['categorias'] = Categoria.objects.filter(activo=True, padre=None)
         return context
 
@@ -539,7 +542,7 @@ class ColeccionListView(ListView):
     Lista productos de una colección específica.
     """
     model = Producto
-    template_name = 'productos/lista.html'
+    template_name = 'shop-fullwidth.html'
     context_object_name = 'productos'
     paginate_by = 12
 
@@ -553,7 +556,7 @@ class ColeccionListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = f'Colección: {self.coleccion.nombre}'
-        context['coleccion'] = self.coleccion
+        context['coleccion_actual'] = self.coleccion
         context['categorias'] = Categoria.objects.filter(activo=True, padre=None)
         return context
 

@@ -24,12 +24,12 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/custom-overrides.css' %}" />
 
     <!-- Favicon and Touch Icons  -->
-    <link rel="shortcut icon" href="{% static 'images/logo/favicon.png' %}">
-    <link rel="apple-touch-icon-precomposed" href="{% static 'images/logo/favicon.png' %}">
+    <link rel="shortcut icon" href="{% static 'images/logo/logolivenblanco.png' %}">
+    <link rel="apple-touch-icon-precomposed" href="{% static 'images/logo/logolivenblanco.png' %}">
 
 </head>
 
-<body class="preload-wrapper bg_f5f5ec">
+<body class="preload-wrapper ">
     <!-- RTL -->
     <!-- <a href="#" id="toggle-rtl" class="tf-btn animate-hover-btn btn-fill">RTL</a> -->
     <!-- /RTL  -->
@@ -99,561 +99,277 @@
         <!-- /announcement-bar -->
 
         <!-- Header -->
-        <header id="header" class="header-default header-style-2">
-            <div class="main-header line">
-                <div class="container-full px_15 lg-px_40">
-                    <div class="row wrapper-header align-items-center">
-                        <div class="col-xl-5 tf-md-hidden">
-                            
-                        </div>
-                        <div class="col-md-4 col-3 tf-lg-hidden">
-                            <a href="#mobileMenu" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16"
-                                    fill="none">
-                                    <path
-                                        d="M2.00056 2.28571H16.8577C17.1608 2.28571 17.4515 2.16531 17.6658 1.95098C17.8802 1.73665 18.0006 1.44596 18.0006 1.14286C18.0006 0.839753 17.8802 0.549063 17.6658 0.334735C17.4515 0.120408 17.1608 0 16.8577 0H2.00056C1.69745 0 1.40676 0.120408 1.19244 0.334735C0.978109 0.549063 0.857702 0.839753 0.857702 1.14286C0.857702 1.44596 0.978109 1.73665 1.19244 1.95098C1.40676 2.16531 1.69745 2.28571 2.00056 2.28571ZM0.857702 8C0.857702 7.6969 0.978109 7.40621 1.19244 7.19188C1.40676 6.97755 1.69745 6.85714 2.00056 6.85714H22.572C22.8751 6.85714 23.1658 6.97755 23.3801 7.19188C23.5944 7.40621 23.7148 7.6969 23.7148 8C23.7148 8.30311 23.5944 8.59379 23.3801 8.80812C23.1658 9.02245 22.8751 9.14286 22.572 9.14286H2.00056C1.69745 9.14286 1.40676 9.02245 1.19244 8.80812C0.978109 8.59379 0.857702 8.30311 0.857702 8ZM0.857702 14.8571C0.857702 14.554 0.978109 14.2633 1.19244 14.049C1.40676 13.8347 1.69745 13.7143 2.00056 13.7143H12.2863C12.5894 13.7143 12.8801 13.8347 13.0944 14.049C13.3087 14.2633 13.4291 14.554 13.4291 14.8571C13.4291 15.1602 13.3087 15.4509 13.0944 15.6653C12.8801 15.8796 12.5894 16 12.2863 16H2.00056C1.69745 16 1.40676 15.8796 1.19244 15.6653C0.978109 15.4509 0.857702 15.1602 0.857702 14.8571Z"
-                                        fill="currentColor"></path>
-                                </svg>
+<header id="header" class="header-default header-style-2">
+    <div class="main-header line">
+        <div class="container-full px_15 lg-px_40">
+            <div class="row wrapper-header align-items-center">
+                <div class="col-xl-5 tf-md-hidden"></div>
+                <div class="col-md-4 col-3 tf-lg-hidden">
+                    <a href="#mobileMenu" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16" fill="none">
+                            <path d="M2.00056 2.28571H16.8577C17.1608 2.28571 17.4515 2.16531 17.6658 1.95098C17.8802 1.73665 18.0006 1.44596 18.0006 1.14286C18.0006 0.839753 17.8802 0.549063 17.6658 0.334735C17.4515 0.120408 17.1608 0 16.8577 0H2.00056C1.69745 0 1.40676 0.120408 1.19244 0.334735C0.978109 0.549063 0.857702 0.839753 0.857702 1.14286C0.857702 1.44596 0.978109 1.73665 1.19244 1.95098C1.40676 2.16531 1.69745 2.28571 2.00056 2.28571ZM0.857702 8C0.857702 7.6969 0.978109 7.40621 1.19244 7.19188C1.40676 6.97755 1.69745 6.85714 2.00056 6.85714H22.572C22.8751 6.85714 23.1658 6.97755 23.3801 7.19188C23.5944 7.40621 23.7148 7.6969 23.7148 8C23.7148 8.30311 23.5944 8.59379 23.3801 8.80812C23.1658 9.02245 22.8751 9.14286 22.572 9.14286H2.00056C1.69745 9.14286 1.40676 9.02245 1.19244 8.80812C0.978109 8.59379 0.857702 8.30311 0.857702 8ZM0.857702 14.8571C0.857702 14.554 0.978109 14.2633 1.19244 14.049C1.40676 13.8347 1.69745 13.7143 2.00056 13.7143H12.2863C12.5894 13.7143 12.8801 13.8347 13.0944 14.049C13.3087 14.2633 13.4291 14.554 13.4291 14.8571C13.4291 15.1602 13.3087 15.4509 13.0944 15.6653C12.8801 15.8796 12.5894 16 12.2863 16H2.00056C1.69745 16 1.40676 15.8796 1.19244 15.6653C0.978109 15.4509 0.857702 15.1602 0.857702 14.8571Z" fill="currentColor"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-md-4 col-6 text-center">
+                    <a href="{% url 'home' %}" class="logo-header">
+                        <img src="{% static 'images/logo/logoliven.png' %}" alt="logo" class="logo">
+                    </a>
+                </div>
+                <div class="col-xl-5 col-md-4 col-3">
+                    <ul class="nav-icon d-flex justify-content-end align-items-center gap-20">
+                        <li class="nav-search">
+                            <a href="#canvasSearch" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="link nav-icon-item text_liven-blue">
+                                <i class="icon icon-search"></i>
                             </a>
-                        </div>
-                        <div class="col-xl-2 col-md-4 col-6 text-center">
-                            <a href="{% url 'home' %}" class="logo-header">
-                                <img src="{% static 'images/logo/logoliven.png' %}" alt="logo" class="logo">
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li class="nav-account" style="position:relative;">
+                            <a href="javascript:void(0)" class="link nav-icon-item text_liven-blue"
+                                id="accountDropdownToggle"
+                                onclick="toggleAccountDropdown(event)"
+                                style="position:relative;">
+                                <i class="icon icon-account"></i>
+                                <span style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#22c55e;border-radius:50%;border:1.5px solid #fff;"></span>
                             </a>
-                        </div>
-
-                        <div class="col-xl-5 col-md-4 col-3">
-                            <ul class="nav-icon d-flex justify-content-end align-items-center gap-20">
-                                <li class="nav-search"><a href="#canvasSearch" data-bs-toggle="offcanvas"
-                                        aria-controls="offcanvasLeft" class="link nav-icon-item text_liven-blue"><i
-                                            class="icon icon-search"></i></a></li>
-
-                                {% if user.is_authenticated %}
-                                <!-- Usuario autenticado: dropdown -->
-                                <li class="nav-account" style="position:relative;">
-                                    <a href="javascript:void(0)" class="link nav-icon-item text_liven-blue"
-                                        id="accountDropdownToggle"
-                                        onclick="toggleAccountDropdown(event)"
-                                        style="position:relative;">
-                                        <i class="icon icon-account"></i>
-                                        <!-- Punto verde: sesión activa -->
-                                        <span style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#22c55e;border-radius:50%;border:1.5px solid #fff;"></span>
-                                    </a>
-                                    <div id="accountDropdown" style="
-                                        display:none;
-                                        position:absolute;
-                                        top:calc(100% + 12px);
-                                        right:0;
-                                        background:#fff;
-                                        border:1px solid #e5e7eb;
-                                        border-radius:12px;
-                                        box-shadow:0 12px 32px rgba(0,0,0,0.12);
-                                        min-width:210px;
-                                        z-index:9999;
-                                        padding:8px 0;
-                                        animation:fadeInDown .15s ease;
-                                    ">
-                                        <div style="padding:12px 16px 10px;border-bottom:1px solid #f3f4f6;">
-                                            <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;">Hola,</div>
-                                            <div style="font-weight:700;color:#111827;font-size:14px;margin-top:2px;">
-                                                {{ user.get_short_name|default:user.email }}
-                                            </div>
-                                            {% if user.is_staff %}
-                                            <div style="font-size:11px;color:#7c3aed;font-weight:600;margin-top:3px;">⚡ Administrador</div>
-                                            {% else %}
-                                            <div style="font-size:11px;color:#6b7280;margin-top:3px;">{{ user.email }}</div>
-                                            {% endif %}
-                                        </div>
-                                        {% if user.is_staff %}
-                                        <a href="{% url 'panel_admin_demo' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;transition:background .15s;" onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='transparent'">
-                                            <i class="icon icon-grid" style="font-size:15px;color:#7c3aed;"></i>
-                                            Panel Admin
-                                        </a>
-                                        <a href="{% url 'usuarios:panel_admin_users' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='transparent'">
-                                            <i class="icon icon-user" style="font-size:15px;color:#7c3aed;"></i>
-                                            Gestión Usuarios
-                                        </a>
-                                        {% else %}
-                                        <a href="{% url 'my-account' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
-                                            <i class="icon icon-account" style="font-size:15px;color:#6b7280;"></i>
-                                            Mi Cuenta
-                                        </a>
-                                        <a href="{% url 'my-account-orders' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
-                                            <i class="icon icon-box" style="font-size:15px;color:#6b7280;"></i>
-                                            Mis Pedidos
-                                        </a>
-                                        {% endif %}
-                                        <div style="height:1px;background:#f3f4f6;margin:4px 0;"></div>
-                                        <a href="{% url 'logout' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#dc2626;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
-                                            <i class="icon icon-log-out" style="font-size:15px;"></i>
-                                            Cerrar Sesión
-                                        </a>
-                                    </div>
-                                </li>
+                            <div id="accountDropdown" style="display:none;position:absolute;top:calc(100% + 12px);right:0;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.12);min-width:210px;z-index:9999;padding:8px 0;">
+                                <div style="padding:12px 16px 10px;border-bottom:1px solid #f3f4f6;">
+                                    <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;">Hola,</div>
+                                    <div style="font-weight:700;color:#111827;font-size:14px;margin-top:2px;">{{ user.get_short_name|default:user.email }}</div>
+                                    {% if user.is_staff %}
+                                    <div style="font-size:11px;color:#7c3aed;font-weight:600;margin-top:3px;">⚡ Administrador</div>
+                                    {% else %}
+                                    <div style="font-size:11px;color:#6b7280;margin-top:3px;">{{ user.email }}</div>
+                                    {% endif %}
+                                </div>
+                                {% if user.is_staff %}
+                                <a href="{% url 'panel_admin_demo' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='transparent'">
+                                    <i class="icon icon-grid" style="font-size:15px;color:#7c3aed;"></i> Panel Admin
+                                </a>
+                                <a href="{% url 'usuarios:panel_admin_users' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='transparent'">
+                                    <i class="icon icon-user" style="font-size:15px;color:#7c3aed;"></i> Gestión Usuarios
+                                </a>
                                 {% else %}
-                                <!-- Anónimo: abre modal de login -->
-                                <li class="nav-account">
-                                    <a href="#login" data-bs-toggle="modal"
-                                        class="link nav-icon-item text_liven-blue">
-                                        <i class="icon icon-account"></i>
-                                    </a>
-                                </li>
+                                <a href="{% url 'my-account' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
+                                    <i class="icon icon-account" style="font-size:15px;color:#6b7280;"></i> Mi Cuenta
+                                </a>
+                                <a href="{% url 'my-account-orders' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#111827;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
+                                    <i class="icon icon-box" style="font-size:15px;color:#6b7280;"></i> Mis Pedidos
+                                </a>
                                 {% endif %}
-
-                                <li class="nav-wishlist"><a href="{% url 'wishlist' %}" class="link nav-icon-item text_liven-blue"><i
-                                            class="icon icon-heart"></i><span class="count-box bg_liven-blue">0</span></a></li>
-                                <li class="nav-cart"><a href="#shoppingCart" data-bs-toggle="modal"
-                                        class="link nav-icon-item text_liven-blue"><i class="icon icon-bag"></i><span
-                                            class="count-box bg_liven-blue">0</span></a></li>
-                            </ul>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="header-bottom line tf-md-hidden">
-                <div class="container-full px_15 lg-px_40">
-                    <div class="wrapper-header d-flex justify-content-center align-items-center">
-                        <nav class="box-navigation text-center">
-                            <ul class="box-nav-ul d-flex align-items-center justify-content-center gap-30">
-                                
-                                <li class="menu-item">
-                                    <a href="{% url 'home' %}" class="item-link text_liven-blue">Home</a>
-                                </li>
-                                <li class="menu-item position-relative">
-                                    <a href="{% url 'shop' %}" class="item-link text_liven-blue">Shop<i class="icon icon-arrow-down"></i></a>
-                                    <div class="sub-menu submenu-default">
-                                        <ul class="menu-list">
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Apothecary</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Velas aromáticas</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Aceites esenciales</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Incienso</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Library</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Libros decorativos</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Revistas</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Papelería</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Pantry</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Café</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Té</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Snacks gourmet</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Decor</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Cuadros</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Jarrones</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Espejos</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Tabletop</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Platos</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Vasos</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Cubiertos</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Textiles</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Cojines</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Mantas</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Cortinas</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Furniture</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Sillas</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Mesas</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Estanterías</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Vintage</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Decoración antigua</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Muebles vintage</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Coleccionables</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Art</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Pinturas</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Esculturas</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Ilustraciones</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Office</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Escritorios</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Organizadores</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Sillas de oficina</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Gift Card</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Tarjeta $25</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Tarjeta $50</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Tarjeta $100</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Workshops</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Decoración</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Arte</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">DIY</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-
-                                            <li class="menu-item-2">
-                                                <a href="#" class="menu-link-text link text_black-2">Sale</a>
-                                                <div class="sub-menu submenu-default">
-                                                    <ul class="menu-list">
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Descuentos</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Últimas unidades</a></li>
-                                                        <li><a href="#" class="menu-link-text link text_black-2">Ofertas especiales</a></li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-                                            
-
-                                        </ul>
-                                    </div>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="{% url 'brands' %}" class="item-link text_liven-blue">Brands</a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="{% url 'portfolio' %}" class="item-link text_liven-blue">Portfolio</a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="{% url 'services' %}" class="item-link text_liven-blue">Services</a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="{% url 'about' %}" class="item-link text_liven-blue">About</a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="{% url 'contact' %}" class="item-link text_liven-blue">Contact</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-
-        </header>
-        <!-- /Header -->
-
-        <!-- mobile menu -->
-        <div class="offcanvas offcanvas-start canvas-mb" id="mobileMenu">
-        <span class="icon-close icon-close-popup" data-bs-dismiss="offcanvas" aria-label="Close"></span>
-        <div class="mb-canvas-content">
-            <div class="mb-body">
-                <ul class="nav-ul-mb" id="wrapper-menu-navigation">
-
-                    <!-- Home -->
-                    <li class="nav-mb-item">
-                        <a href="{% url 'home' %}" class="mb-menu-link text_liven-blue">Home</a>
-                    </li>
-
-                    <!-- Shop -->
-                    <li class="nav-mb-item">
-                        <a href="#dropdown-categories" class="collapsed mb-menu-link current text_liven-blue1"
-                            data-bs-toggle="collapse" aria-expanded="true" aria-controls="dropdown-categories">
-                            <span>Shop</span>
-                            <span class="btn-open-sub"></span>
-                        </a>
-
-                        <div id="dropdown-categories" class="collapse">
-                            <ul class="sub-nav-menu">
-
-                                <!-- Apothecary -->
-                                <li>
-                                    <a href="#sub-apothecary" class="sub-nav-link collapsed" data-bs-toggle="collapse">
-                                        <span>Apothecary</span>
-                                        <span class="btn-open-sub"></span>
-                                    </a>
-                                    <div id="sub-apothecary" class="collapse">
-                                        <ul class="sub-nav-menu sub-menu-level-2">
-                                            <li><a href="{% url 'shop' %}" class="sub-nav-link">Velas</a></li>
-                                            <li><a href="#" class="sub-nav-link">Aceites</a></li>
-                                            <li><a href="#" class="sub-nav-link">Incienso</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <!-- Library -->
-                                <li>
-                                    <a href="#sub-library" class="sub-nav-link collapsed" data-bs-toggle="collapse">
-                                        <span>Library</span>
-                                        <span class="btn-open-sub"></span>
-                                    </a>
-                                    <div id="sub-library" class="collapse">
-                                        <ul class="sub-nav-menu sub-menu-level-2">
-                                            <li><a href="#" class="sub-nav-link">Libros</a></li>
-                                            <li><a href="#" class="sub-nav-link">Revistas</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <!-- Pantry -->
-                                <li>
-                                    <a href="#sub-pantry" class="sub-nav-link collapsed" data-bs-toggle="collapse">
-                                        <span>Pantry</span>
-                                        <span class="btn-open-sub"></span>
-                                    </a>
-                                    <div id="sub-pantry" class="collapse">
-                                        <ul class="sub-nav-menu sub-menu-level-2">
-                                            <li><a href="#" class="sub-nav-link">Café</a></li>
-                                            <li><a href="#" class="sub-nav-link">Té</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <!-- Decor -->
-                                <li>
-                                    <a href="#sub-decor" class="sub-nav-link collapsed" data-bs-toggle="collapse">
-                                        <span>Decor</span>
-                                        <span class="btn-open-sub"></span>
-                                    </a>
-                                    <div id="sub-decor" class="collapse">
-                                        <ul class="sub-nav-menu sub-menu-level-2">
-                                            <li><a href="#" class="sub-nav-link">Cuadros</a></li>
-                                            <li><a href="#" class="sub-nav-link">Jarrones</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <!-- Tabletop -->
-                                <li>
-                                    <a href="#sub-tabletop" class="sub-nav-link collapsed" data-bs-toggle="collapse">
-                                        <span>Tabletop</span>
-                                        <span class="btn-open-sub"></span>
-                                    </a>
-                                    <div id="sub-tabletop" class="collapse">
-                                        <ul class="sub-nav-menu sub-menu-level-2">
-                                            <li><a href="#" class="sub-nav-link">Platos</a></li>
-                                            <li><a href="#" class="sub-nav-link">Vasos</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <!-- Textiles -->
-                                <li>
-                                    <a href="#sub-textiles" class="sub-nav-link collapsed" data-bs-toggle="collapse">
-                                        <span>Textiles</span>
-                                        <span class="btn-open-sub"></span>
-                                    </a>
-                                    <div id="sub-textiles" class="collapse">
-                                        <ul class="sub-nav-menu sub-menu-level-2">
-                                            <li><a href="#" class="sub-nav-link">Cojines</a></li>
-                                            <li><a href="#" class="sub-nav-link">Mantas</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <!-- Furniture -->
-                                <li>
-                                    <a href="#sub-furniture" class="sub-nav-link collapsed" data-bs-toggle="collapse">
-                                        <span>Furniture</span>
-                                        <span class="btn-open-sub"></span>
-                                    </a>
-                                    <div id="sub-furniture" class="collapse">
-                                        <ul class="sub-nav-menu sub-menu-level-2">
-                                            <li><a href="#" class="sub-nav-link">Sillas</a></li>
-                                            <li><a href="#" class="sub-nav-link">Mesas</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <!-- Vintage -->
-                                <li>
-                                    <a href="#sub-vintage" class="sub-nav-link collapsed" data-bs-toggle="collapse">
-                                        <span>Vintage</span>
-                                        <span class="btn-open-sub"></span>
-                                    </a>
-                                    <div id="sub-vintage" class="collapse">
-                                        <ul class="sub-nav-menu sub-menu-level-2">
-                                            <li><a href="#" class="sub-nav-link">Decoración</a></li>
-                                            <li><a href="#" class="sub-nav-link">Coleccionables</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <!-- Art -->
-                                <li>
-                                    <a href="#sub-art" class="sub-nav-link collapsed" data-bs-toggle="collapse">
-                                        <span>Art</span>
-                                        <span class="btn-open-sub"></span>
-                                    </a>
-                                    <div id="sub-art" class="collapse">
-                                        <ul class="sub-nav-menu sub-menu-level-2">
-                                            <li><a href="#" class="sub-nav-link">Pinturas</a></li>
-                                            <li><a href="#" class="sub-nav-link">Ilustraciones</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <!-- Office -->
-                                <li>
-                                    <a href="#sub-office" class="sub-nav-link collapsed" data-bs-toggle="collapse">
-                                        <span>Office</span>
-                                        <span class="btn-open-sub"></span>
-                                    </a>
-                                    <div id="sub-office" class="collapse">
-                                        <ul class="sub-nav-menu sub-menu-level-2">
-                                            <li><a href="#" class="sub-nav-link">Escritorios</a></li>
-                                            <li><a href="#" class="sub-nav-link">Organizadores</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <!-- Gift Card -->
-                                <li><a href="#" class="sub-nav-link">Gift Card</a></li>
-
-                                <!-- Workshops -->
-                                <li><a href="#" class="sub-nav-link">Workshops</a></li>
-
-                                <!-- Sale -->
-                                <li><a href="#" class="sub-nav-link">Sale</a></li>
-
-                            </ul>
-                        </div>
-                    </li>
-                    <!-- Brands -->
-                    <li class="nav-mb-item">
-                        <a href="{% url 'brands' %}" class="mb-menu-link text_liven-blue">Brands</a>
-                    </li>
-                    <!-- Portfolio -->
-                    <li class="nav-mb-item">
-                        <a href="{% url 'portfolio' %}" class="mb-menu-link text_liven-blue">Portfolio</a>
-                    </li>
-                    <!-- Services -->
-                    <li class="nav-mb-item">
-                        <a href="{% url 'services' %}" class="mb-menu-link text_liven-blue">Services</a>
-                    </li>
-
-                    <!-- About -->
-                    <li class="nav-mb-item">
-                        <a href="{% url 'about' %}" class="mb-menu-link text_liven-blue">About</a>
-                    </li>
-
-                    <!-- Contact -->
-                    <li class="nav-mb-item">
-                        <a href="{% url 'contact' %}" class="mb-menu-link text_liven-blue">Contact</a>
-                    </li>
-
-
-                    
-
-                </ul>
-                <div class="mb-other-content">
-                    <div class="d-flex group-icon">
-                        <a href="wishlist.html" class="site-nav-icon"><i class="icon icon-heart"></i>Wishlist</a>
-                        <a href="home-search.html" class="site-nav-icon"><i class="icon icon-search"></i>Search</a>
-                    </div>
-                    <div class="mb-notice">
-                        <a href="contact-1.html" class="text-need">Need help ?</a>
-                    </div>
-                    <ul class="mb-info">
-                        <li>Address: 1234 Fashion Street, Suite 567, <br> New York, NY 10001</li>
-                        <li>Email: <b>info@fashionshop.com</b></li>
-                        <li>Phone: <b>(212) 555-1234</b></li>
+                                <div style="height:1px;background:#f3f4f6;margin:4px 0;"></div>
+                                <a href="{% url 'logout' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#dc2626;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
+                                    <i class="icon icon-log-out" style="font-size:15px;"></i> Cerrar Sesión
+                                </a>
+                            </div>
+                        </li>
+                        {% else %}
+                        <li class="nav-account">
+                            <a href="#login" data-bs-toggle="modal" class="link nav-icon-item text_liven-blue">
+                                <i class="icon icon-account"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-wishlist">
+                            <a href="{% url 'wishlist' %}" class="link nav-icon-item text_liven-blue">
+                                <i class="icon icon-heart"></i><span class="count-box bg_liven-blue">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-cart">
+                            <a href="#shoppingCart" data-bs-toggle="modal" class="link nav-icon-item text_liven-blue">
+                                <i class="icon icon-bag"></i><span class="count-box bg_liven-blue">0</span>
+                            </a>
+                        </li>
                     </ul>
-                </div>
-            </div>
-            <div class="mb-bottom">
-                {% if user.is_authenticated %}
-                    {% if user.is_staff %}
-                    <a href="{% url 'panel_admin_demo' %}" class="site-nav-icon" style="color:#8b5cf6;font-weight:600;">
-                        <i class="icon icon-grid"></i>Panel Admin
-                    </a>
-                    {% else %}
-                    <a href="{% url 'my-account' %}" class="site-nav-icon">
-                        <i class="icon icon-account"></i>Mi Cuenta
-                    </a>
-                    {% endif %}
-                    <a href="{% url 'logout' %}" class="site-nav-icon" style="color:#dc2626;">
-                        <i class="icon icon-log-out"></i>Salir
-                    </a>
-                {% else %}
-                    <a href="#login" data-bs-toggle="modal" class="site-nav-icon">
-                        <i class="icon icon-account"></i>Login / Registro
-                    </a>
-                {% endif %}
-                <div class="bottom-bar-language">
-                    <div class="tf-currencies">
-                        <select class="image-select center style-default type-currencies">
-                            <option data-thumbnail="{% static 'images/country/fr.svg' %}">EUR € | France</option>
-                            <option data-thumbnail="{% static 'images/country/de.svg' %}">EUR € | Germany</option>
-                            <option selected data-thumbnail="{% static 'images/country/us.svg' %}">USD $ | United States</option>
-                            <option data-thumbnail="{% static 'images/country/vn.svg' %}">VND ₫ | Vietnam</option>
-                        </select>
-                    </div>
-                    <div class="tf-languages">
-                        <select class="image-select center style-default type-languages">
-                            <option>English</option>
-                            <option>العربية</option>
-                            <option>简体中文</option>
-                            <option>اردو</option>
-                        </select>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- /mobile menu -->
+
+    <!-- Nav Desktop -->
+    <div class="header-bottom line tf-md-hidden">
+        <div class="container-full px_15 lg-px_40">
+            <div class="wrapper-header d-flex justify-content-center align-items-center">
+                <nav class="box-navigation text-center">
+                    <ul class="box-nav-ul d-flex align-items-center justify-content-center gap-30">
+                        <li class="menu-item">
+                            <a href="{% url 'home' %}" class="item-link text_liven-blue">Home</a>
+                        </li>
+                        <li class="menu-item position-relative">
+                            <a href="{% url 'shop' %}" class="item-link text_liven-blue">Shop<i class="icon icon-arrow-down"></i></a>
+                            {% if menu_categorias %}
+                            <div class="sub-menu submenu-default">
+                                <ul class="menu-list">
+                                    {% for categoria in menu_categorias %}
+                                    <li class="menu-item-2">
+                                        <a href="{{ categoria.get_absolute_url }}" class="menu-link-text link text_black-2">{{ categoria.nombre }}</a>
+                                        {% with subs=categoria.subcategorias.all %}
+                                        {% if subs %}
+                                        <div class="sub-menu submenu-default">
+                                            <ul class="menu-list">
+                                                {% for sub in subs %}
+                                                {% if sub.activo %}
+                                                <li>
+                                                    <a href="{{ sub.get_absolute_url }}" class="menu-link-text link text_black-2">{{ sub.nombre }}</a>
+                                                </li>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        {% endif %}
+                                        {% endwith %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </li>
+                        <li class="menu-item">
+                            <a href="{% url 'brands' %}" class="item-link text_liven-blue">Brands</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{% url 'portfolio' %}" class="item-link text_liven-blue">Portfolio</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{% url 'services' %}" class="item-link text_liven-blue">Services</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{% url 'about' %}" class="item-link text_liven-blue">About</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{% url 'contact' %}" class="item-link text_liven-blue">Contact</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- /Header -->
+
+<!-- Mobile Menu -->
+<div class="offcanvas offcanvas-start canvas-mb" id="mobileMenu">
+    <span class="icon-close icon-close-popup" data-bs-dismiss="offcanvas" aria-label="Close"></span>
+    <div class="mb-canvas-content">
+        <div class="mb-body">
+            <ul class="nav-ul-mb" id="wrapper-menu-navigation">
+                <li class="nav-mb-item">
+                    <a href="{% url 'home' %}" class="mb-menu-link text_liven-blue">Home</a>
+                </li>
+                <li class="nav-mb-item">
+                    <a href="#mb-dropdown-shop" class="collapsed mb-menu-link current text_liven-blue force-menu-liven"
+                        data-bs-toggle="collapse" aria-expanded="false" aria-controls="mb-dropdown-shop">
+                        <span>Shop</span>
+                        <span class="btn-open-sub"></span>
+                    </a>
+                    <div id="mb-dropdown-shop" class="collapse">
+                        <ul class="sub-nav-menu">
+                            {% for categoria in menu_categorias %}
+                            {% with subs=categoria.subcategorias.all %}
+                            {% if subs %}
+                            <li>
+                                <a href="#mb-sub-{{ categoria.slug }}" class="sub-nav-link collapsed force-menu-liven"
+                                    data-bs-toggle="collapse" aria-expanded="false">
+                                    <span>{{ categoria.nombre }}</span>
+                                    <span class="btn-open-sub"></span>
+                                </a>
+                                <div id="mb-sub-{{ categoria.slug }}" class="collapse">
+                                    <ul class="sub-nav-menu sub-menu-level-2">
+                                        <li>
+                                            <a href="{{ categoria.get_absolute_url }}" class="sub-nav-link force-menu-liven">Ver todo {{ categoria.nombre }}</a>
+                                        </li>
+                                        {% for sub in subs %}
+                                        {% if sub.activo %}
+                                        <li>
+                                            <a href="{{ sub.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ sub.nombre }}</a>
+                                        </li>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </li>
+                            {% else %}
+                            <li>
+                                <a href="{{ categoria.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ categoria.nombre }}</a>
+                            </li>
+                            {% endif %}
+                            {% endwith %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-mb-item">
+                    <a href="{% url 'brands' %}" class="mb-menu-link text_liven-blue">Brands</a>
+                </li>
+                <li class="nav-mb-item">
+                    <a href="{% url 'portfolio' %}" class="mb-menu-link text_liven-blue">Portfolio</a>
+                </li>
+                <li class="nav-mb-item">
+                    <a href="{% url 'services' %}" class="mb-menu-link text_liven-blue">Services</a>
+                </li>
+                <li class="nav-mb-item">
+                    <a href="{% url 'about' %}" class="mb-menu-link text_liven-blue">About</a>
+                </li>
+                <li class="nav-mb-item">
+                    <a href="{% url 'contact' %}" class="mb-menu-link text_liven-blue">Contact</a>
+                </li>
+            </ul>
+            <div class="mb-other-content">
+                <div class="d-flex group-icon">
+                    <a href="{% url 'wishlist' %}" class="site-nav-icon"><i class="icon icon-heart"></i>Wishlist</a>
+                    <a href="#canvasSearch" data-bs-toggle="offcanvas" class="site-nav-icon"><i class="icon icon-search"></i>Search</a>
+                </div>
+                <div class="mb-notice">
+                    <a href="{% url 'contact' %}" class="text-need">Need help?</a>
+                </div>
+                <ul class="mb-info">
+                    <li>Address: 1234 Fashion Street, Suite 567, <br> New York, NY 10001</li>
+                    <li>Email: <b>info@fashionshop.com</b></li>
+                    <li>Phone: <b>(212) 555-1234</b></li>
+                </ul>
+            </div>
+        </div>
+        <div class="mb-bottom">
+            {% if user.is_authenticated %}
+                {% if user.is_staff %}
+                <a href="{% url 'panel_admin_demo' %}" class="site-nav-icon" style="color:#8b5cf6;font-weight:600;">
+                    <i class="icon icon-grid"></i>Panel Admin
+                </a>
+                {% else %}
+                <a href="{% url 'my-account' %}" class="site-nav-icon">
+                    <i class="icon icon-account"></i>Mi Cuenta
+                </a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="site-nav-icon" style="color:#dc2626;">
+                    <i class="icon icon-log-out"></i>Salir
+                </a>
+            {% else %}
+                <a href="#login" data-bs-toggle="modal" class="site-nav-icon">
+                    <i class="icon icon-account"></i>Login / Registro
+                </a>
+            {% endif %}
+            <div class="bottom-bar-language">
+                <div class="tf-currencies">
+                    <select class="image-select center style-default type-currencies">
+                        <option data-thumbnail="{% static 'images/country/fr.svg' %}">EUR € | France</option>
+                        <option data-thumbnail="{% static 'images/country/de.svg' %}">EUR € | Germany</option>
+                        <option selected data-thumbnail="{% static 'images/country/us.svg' %}">USD $ | United States</option>
+                        <option data-thumbnail="{% static 'images/country/vn.svg' %}">VND ₫ | Vietnam</option>
+                    </select>
+                </div>
+                <div class="tf-languages">
+                    <select class="image-select center style-default type-languages">
+                        <option>English</option>
+                        <option>العربية</option>
+                        <option>简体中文</option>
+                        <option>اردو</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Mobile Menu -->
 
         {% block content %}{% endblock %}
         <!-- gotop -->
@@ -830,6 +546,7 @@
     <script src="{% static 'js/lazysize.min.js' %}"></script>
     <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
     <script src="{% static 'js/count-down.js' %}"></script>
+    <script src="{% static 'js/drift.min.js' %}"></script> 
     <script src="{% static 'js/wow.min.js' %}"></script>
     <script src="{% static 'js/multiple-modal.js' %}"></script>
     <script src="{% static 'js/magnific-popup.min.js' %}"></script>
@@ -837,7 +554,10 @@
 
     <script src="{% static 'js/nouislider.min.js' %}"></script>
     <script src="{% static 'js/shop.js' %}"></script>
-
+    <script src="{% static 'js/quickview.js' %}"></script>
+    <script src="{% static 'js/photoswipe-lightbox.umd.min.js' %}"></script> 
+    <script src="{% static 'js/photoswipe.umd.min.js' %}"></script>  
+    <script src="{% static 'js/zoom.js' %}"></script> 
     <script>
     // ── Dropdown de cuenta ──────────────────────────────
     function toggleAccountDropdown(e) {
@@ -876,15 +596,61 @@
     }
 }
 
+/* 🔥 CLASE CON MÁXIMA PRIORIDAD para menú */
+.force-menu-liven {
+    color: #1e3a8a !important;
+}
+
+.force-menu-liven,
+.force-menu-liven a,
+.force-menu-liven span,
+.force-menu-liven * {
+    color: #1e3a8a !important;
+}
+
+.force-menu-liven:hover,
+.force-menu-liven a:hover,
+.force-menu-liven span:hover,
+.force-menu-liven *:hover {
+    color: #1e3a8a !important;
+}
+
+.force-menu-liven:active,
+.force-menu-liven.active,
+.force-menu-liven a:active,
+.force-menu-liven a.active,
+.force-menu-liven span:active,
+.force-menu-liven span.active {
+    color: #1e3a8a !important;
+}
+
+/* 🔥 CLASE GLOBAL para forzar color liven-blue */
+.force-liven-blue {
+    color: #1e3a8a !important;
+}
+
+.force-liven-blue *,
+.force-liven-blue a {
+    color: #1e3a8a !important;
+}
+
+.force-liven-blue a:hover {
+    color: #1e3a8a !important;
+}
+
 /* 🔥 Forzar color en menú móvil */
 .sub-nav-link,
-.mb-menu-link {
+.mb-menu-link,
+.menu-link-text,
+.item-link {
     color: #1e3a8a !important; /* tu azul liven */
 }
 
 /* Hover */
 .sub-nav-link:hover,
-.mb-menu-link:hover {
+.mb-menu-link:hover,
+.menu-link-text:hover,
+.item-link:hover {
     color: #1e3a8a !important;
 }
 
@@ -892,9 +658,25 @@
 .sub-nav-link.active,
 .mb-menu-link.active,
 .sub-nav-link.collapsed,
-.mb-menu-link.collapsed {
+.mb-menu-link.collapsed,
+.menu-link-text.active,
+.item-link.active {
     color: #1e3a8a !important;
 }
+
+/* Enlaces dentro de menús */
+.menu-list a,
+.sub-menu a,
+.sub-nav-menu a {
+    color: #1e3a8a !important;
+}
+
+.menu-list a:hover,
+.sub-menu a:hover,
+.sub-nav-menu a:hover {
+    color: #1e3a8a !important;
+}
+
 .footer-logo img {
     width: 140px; /* tamaño en PC */
     height: auto;
@@ -929,6 +711,40 @@
 
 /* hover */
 .nav-mb-item a:hover {
+    color: #1e3a8a !important;
+}
+
+/* Box-nav-ul (menú desktop principal) */
+.box-nav-ul .item-link,
+.box-nav-ul a {
+    color: #1e3a8a !important;
+}
+
+.box-nav-ul .item-link:hover,
+.box-nav-ul a:hover {
+    color: #1e3a8a !important;
+}
+
+/* Desplegables del Shop en desktop */
+.submenu-default .menu-link-text,
+.submenu-default a {
+    color: #1e3a8a !important;
+}
+
+.submenu-default .menu-link-text:hover,
+.submenu-default a:hover {
+    color: #1e3a8a !important;
+}
+
+/* Desplegables del Shop en mobile */
+.sub-nav-menu .sub-nav-link span,
+#mb-dropdown-shop .sub-nav-link,
+#mb-dropdown-shop a {
+    color: #1e3a8a !important;
+}
+
+#mb-dropdown-shop .sub-nav-link:hover,
+#mb-dropdown-shop a:hover {
     color: #1e3a8a !important;
 }
 </style>

@@ -51,6 +51,11 @@
   -------------------------------------------------------------------------------------*/
   var filterProducts = function () {
     const priceSlider = document.getElementById("price-value-range");
+    
+    // Si el elemento no existe, no continuar
+    if (!priceSlider) {
+      return;
+    }
   
     const minPrice = parseInt(priceSlider.dataset.min);
     const maxPrice = parseInt(priceSlider.dataset.max);

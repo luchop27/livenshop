@@ -417,3 +417,18 @@ class ReturnPolicy(models.Model):
 
     def __str__(self):
         return self.titulo
+
+
+class ShopGramPost(models.Model):
+    instagram_url = models.URLField(verbose_name="URL de Instagram")
+    imagen = models.ImageField(upload_to='shopgram/', verbose_name="Imagen", blank=True, null=True)
+    activo = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Shop Gram Post"
+        verbose_name_plural = "Shop Gram Posts"
+
+    def __str__(self):
+        return self.instagram_url
