@@ -10,7 +10,11 @@ from django.db.models import Count, Q
 from django.contrib import messages
 from django.utils.text import slugify
 
-from .models import Producto, Categoria, Coleccion, CarritoItem, Imagen, AtributoProducto, ShopGramPost
+from .models import Marca, Producto, Categoria, Coleccion, CarritoItem, Imagen, AtributoProducto, ShopGramPost
+
+
+def _active_marcas():
+    return Marca.objects.filter(activo=True).order_by('nombre')
 
 
 # ══════════════════════════════════════════════════════
@@ -24,7 +28,7 @@ def home(request):
     """
     productos = Producto.objects.filter(
         activo=True
-    ).prefetch_related('imagenes')[:12]
+    ).select_related('marca').prefetch_related('imagenes')[:12]
     
     # Categorías principales (sin padre)
     categorias = Categoria.objects.filter(
@@ -58,7 +62,7 @@ def panel_admin_dashboard(request):
 
     # Productos más recientes
     productos_recientes = Producto.objects.select_related(
-        'categoria'
+        'categoria', 'marca'
     ).prefetch_related('imagenes').order_by('-created_at')[:5]
 
     # Categorías con más productos
@@ -97,13 +101,13 @@ def panel_admin_products(request):
     estado_filtro = request.GET.get('estado', '').strip()
 
     productos_qs = Producto.objects.select_related(
-        'categoria', 'coleccion'
+        'categoria', 'coleccion', 'marca'
     ).prefetch_related('imagenes').order_by('-created_at')
 
     if search:
         productos_qs = productos_qs.filter(
             Q(nombre__icontains=search) |
-            Q(marca__icontains=search) |
+            Q(marca__nombre__icontains=search) |
             Q(slug__icontains=search)
         )
 
@@ -145,10 +149,11 @@ def panel_admin_product_add(request):
         categoria_id = request.POST.get('categoria') or None
         coleccion_id = request.POST.get('coleccion') or None
         descripcion_corta = request.POST.get('descripcion_corta', '').strip()
-        descripcion_larga = request.POST.get('descripcion_larga', '').strip()
-        marca = request.POST.get('marca', '').strip()
+        descripcion_completa = request.POST.get('descripcion_completa', '').strip()
+        marca_id = request.POST.get('marca') or None
         material = request.POST.get('material', '').strip()
         dimensiones = request.POST.get('dimensiones', '').strip()
+        peso = request.POST.get('peso') or None
         destacado = request.POST.get('destacado') == 'on'
         activo = request.POST.get('activo') == 'on'
 
@@ -171,11 +176,12 @@ def panel_admin_product_add(request):
                 stock=stock,
                 categoria_id=categoria_id,
                 coleccion_id=coleccion_id,
+                marca_id=marca_id,
                 descripcion_corta=descripcion_corta,
-                descripcion_larga=descripcion_larga,
-                marca=marca,
+                descripcion_completa=descripcion_completa,
                 material=material,
                 dimensiones=dimensiones,
+                peso=peso,
                 destacado=destacado,
                 activo=activo,
             )
@@ -196,10 +202,12 @@ def panel_admin_product_add(request):
 
     categorias = Categoria.objects.filter(activo=True).order_by('padre__nombre', 'nombre')
     colecciones = Coleccion.objects.filter(activo=True).order_by('nombre')
+    marcas = _active_marcas()
 
     return render(request, 'panel_admin/product_add.html', {
         'categorias': categorias,
         'colecciones': colecciones,
+        'marcas': marcas,
     })
 
 
@@ -218,10 +226,11 @@ def panel_admin_product_edit(request, producto_id):
         categoria_id = request.POST.get('categoria') or None
         coleccion_id = request.POST.get('coleccion') or None
         descripcion_corta = request.POST.get('descripcion_corta', '').strip()
-        descripcion_larga = request.POST.get('descripcion_larga', '').strip()
-        marca = request.POST.get('marca', '').strip()
+        descripcion_completa = request.POST.get('descripcion_completa', '').strip()
+        marca_id = request.POST.get('marca') or None
         material = request.POST.get('material', '').strip()
         dimensiones = request.POST.get('dimensiones', '').strip()
+        peso = request.POST.get('peso') or None
         destacado = request.POST.get('destacado') == 'on'
         activo = request.POST.get('activo') == 'on'
 
@@ -244,11 +253,12 @@ def panel_admin_product_edit(request, producto_id):
             producto.stock = stock
             producto.categoria_id = categoria_id
             producto.coleccion_id = coleccion_id
+            producto.marca_id = marca_id
             producto.descripcion_corta = descripcion_corta
-            producto.descripcion_larga = descripcion_larga
-            producto.marca = marca
+            producto.descripcion_completa = descripcion_completa
             producto.material = material
             producto.dimensiones = dimensiones
+            producto.peso = peso
             producto.destacado = destacado
             producto.activo = activo
             producto.save()
@@ -275,12 +285,118 @@ def panel_admin_product_edit(request, producto_id):
 
     categorias = Categoria.objects.filter(activo=True).order_by('padre__nombre', 'nombre')
     colecciones = Coleccion.objects.filter(activo=True).order_by('nombre')
+    marcas = _active_marcas()
 
     return render(request, 'panel_admin/product_edit.html', {
         'producto': producto,
         'categorias': categorias,
         'colecciones': colecciones,
+        'marcas': marcas,
     })
+
+
+# ══════════════════════════════════════════════════════
+# PANEL ADMIN — MARCAS
+# ══════════════════════════════════════════════════════
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_brands(request):
+    search = request.GET.get('q', '').strip()
+    marcas = Marca.objects.annotate(num_productos=Count('productos', distinct=True))
+
+    if search:
+        marcas = marcas.filter(nombre__icontains=search)
+
+    marcas = marcas.order_by('nombre')
+
+    return render(request, 'panel_admin/brand_list.html', {
+        'marcas': marcas,
+        'search': search,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_brand_add(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        slug_manual = request.POST.get('slug', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        activo = request.POST.get('estado', 'True') == 'True'
+        imagen = request.FILES.get('imagen') or None
+
+        if not nombre:
+            messages.error(request, 'El nombre de la marca es obligatorio.')
+        else:
+            slug = slug_manual if slug_manual else slugify(nombre)
+            base_slug = slug
+            counter = 1
+            while Marca.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            Marca.objects.create(
+                nombre=nombre,
+                slug=slug,
+                descripcion=descripcion,
+                activo=activo,
+                imagen=imagen,
+            )
+            messages.success(request, f'Marca "{nombre}" creada exitosamente.')
+            return redirect('productos:panel_admin_brands')
+
+    return render(request, 'panel_admin/brand_add.html')
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_brand_edit(request, brand_id):
+    marca = get_object_or_404(Marca, pk=brand_id)
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        slug_manual = request.POST.get('slug', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        activo = request.POST.get('estado', 'True') == 'True'
+        remove_imagen = request.POST.get('remove_imagen')
+        nueva_imagen = request.FILES.get('imagen')
+
+        if not nombre:
+            messages.error(request, 'El nombre de la marca es obligatorio.')
+        else:
+            slug = slug_manual if slug_manual else marca.slug
+            if slug != marca.slug:
+                base_slug = slug
+                counter = 1
+                while Marca.objects.filter(slug=slug).exclude(pk=marca.pk).exists():
+                    slug = f"{base_slug}-{counter}"
+                    counter += 1
+
+            marca.nombre = nombre
+            marca.slug = slug
+            marca.descripcion = descripcion
+            marca.activo = activo
+
+            if remove_imagen:
+                marca.imagen = None
+            if nueva_imagen:
+                marca.imagen = nueva_imagen
+
+            marca.save()
+            messages.success(request, f'Marca "{nombre}" actualizada exitosamente.')
+            return redirect('productos:panel_admin_brands')
+
+    return render(request, 'panel_admin/brand_edit.html', {
+        'marca': marca,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
+@require_POST
+def panel_admin_brand_delete(request, brand_id):
+    marca = get_object_or_404(Marca, pk=brand_id)
+    nombre = marca.nombre
+    marca.delete()
+    messages.success(request, f'Marca "{nombre}" eliminada correctamente.')
+    return redirect('productos:panel_admin_brands')
 
 
 @staff_member_required(login_url='usuarios:login')
@@ -469,7 +585,7 @@ class ProductoListView(ListView):
     def get_queryset(self):
         return Producto.objects.filter(
             activo=True
-        ).prefetch_related('imagenes').select_related('categoria', 'coleccion')
+        ).prefetch_related('imagenes').select_related('categoria', 'coleccion', 'marca')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -489,9 +605,9 @@ class ProductoDetailView(DetailView):
     slug_field = 'slug'
 
     def get_queryset(self):
-        return Producto.objects.filter(activo=True).prefetch_related(
-            'imagenes', 'atributos__atributo'
-        )
+        return Producto.objects.filter(activo=True).select_related(
+            'marca', 'categoria', 'coleccion'
+        ).prefetch_related('imagenes', 'atributos__atributo')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)  # ← 4 espacios adentro
@@ -500,7 +616,7 @@ class ProductoDetailView(DetailView):
         context['relacionados'] = Producto.objects.filter(
             categoria=producto.categoria,
             activo=True
-        ).exclude(pk=producto.pk)[:8].prefetch_related('imagenes')
+        ).exclude(pk=producto.pk)[:8].select_related('marca').prefetch_related('imagenes')
         
         context['atributos'] = producto.atributos.select_related('atributo')
         
@@ -527,7 +643,7 @@ class CategoriaListView(ListView):
         return Producto.objects.filter(
             categoria__in=categorias,
             activo=True
-        ).prefetch_related('imagenes').select_related('categoria')
+        ).prefetch_related('imagenes').select_related('categoria', 'marca')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -551,7 +667,7 @@ class ColeccionListView(ListView):
         return Producto.objects.filter(
             coleccion=self.coleccion,
             activo=True
-        ).prefetch_related('imagenes').select_related('categoria')
+        ).prefetch_related('imagenes').select_related('categoria', 'marca')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -581,7 +697,7 @@ class CarritoView(ListView):
     def get_queryset(self):
         return CarritoItem.objects.filter(
             usuario=self.request.user
-        ).select_related('producto').prefetch_related('producto__imagenes')
+        ).select_related('producto', 'producto__marca').prefetch_related('producto__imagenes')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -712,10 +828,11 @@ def producto_quick_view(request, producto_id):
         'tiene_oferta': producto.tiene_oferta(),
         'porcentaje_descuento': producto.porcentaje_descuento(),
         'descripcion_corta': producto.descripcion_corta or '',
-        'descripcion_larga': producto.descripcion_larga or '',
+        'descripcion_completa': producto.descripcion_completa or '',
         'imagenes': imagenes,
         'atributos': atributos,
         'categoria': producto.categoria.nombre if producto.categoria else '',
+        'marca': producto.marca.nombre if producto.marca else '',
         'url_detalle': producto.get_absolute_url(),
     }
     

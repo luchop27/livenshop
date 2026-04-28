@@ -2,6 +2,7 @@
 from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 import os
 
 
@@ -17,6 +18,51 @@ def validate_image_extension(value):
     valid_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.heic', '.heif']
     if ext not in valid_extensions:
         raise ValidationError(f'Archivo no permitido. Solo se aceptan: {", ".join(valid_extensions)}')
+
+
+def generate_unique_slug(model_class, value, instance_pk=None):
+    """Genera un slug único para un modelo dado."""
+    base_slug = slugify(value)
+    slug = base_slug
+    counter = 1
+
+    while True:
+        queryset = model_class.objects.filter(slug=slug)
+        if instance_pk:
+            queryset = queryset.exclude(pk=instance_pk)
+        if not queryset.exists():
+            return slug
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+
+
+# -----------------------------
+# MARCA
+# -----------------------------
+class Marca(models.Model):
+    """
+    Marca comercial asociada a productos del catálogo.
+    """
+    nombre = models.CharField(max_length=150)
+    slug = models.SlugField(max_length=180, unique=True)
+    imagen = models.ImageField(upload_to='marcas/', blank=True, null=True)
+    descripcion = models.TextField(blank=True, null=True)
+    activo = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['nombre']
+        verbose_name = 'Marca'
+        verbose_name_plural = 'Marcas'
+
+    def __str__(self):
+        return self.nombre
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(Marca, self.nombre, self.pk)
+        super().save(*args, **kwargs)
 
 
 # -----------------------------
@@ -128,6 +174,14 @@ class Producto(models.Model):
         blank=True,
         related_name='productos'
     )
+    marca = models.ForeignKey(
+        Marca,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='productos',
+        help_text='Marca comercial asociada a este producto'
+    )
     coleccion = models.ForeignKey(
         Coleccion,
         on_delete=models.SET_NULL,
@@ -140,9 +194,8 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     descripcion_corta = models.TextField(blank=True, null=True)
-    descripcion_larga = models.TextField(blank=True, null=True)
+    descripcion_completa = models.TextField(blank=True, null=True)
 
-    marca = models.CharField(max_length=100, blank=True, null=True)
     precio = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     precio_oferta = models.DecimalField(
         max_digits=12,
@@ -152,6 +205,13 @@ class Producto(models.Model):
         help_text="Si tiene precio de oferta, ingrésalo aquí"
     )
     stock = models.PositiveIntegerField(default=0)
+    peso = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text='Peso del producto en kg'
+    )
 
     # Dimensiones/medidas (útil para decoración)
     dimensiones = models.CharField(
@@ -198,7 +258,7 @@ class Producto(models.Model):
         return self.precio
 
     def porcentaje_descuento(self):
-        if self.tiene_oferta():
+        if self.tiene_oferta() and self.precio:
             descuento = ((self.precio - self.precio_oferta) / self.precio) * 100
             return round(descuento)
         return 0

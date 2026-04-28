@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Coleccion, Categoria, Producto, Imagen, Atributo, 
+    Marca, Coleccion, Categoria, Producto, Imagen, Atributo, 
     AtributoProducto, CarritoItem, ShippingInfo, ReturnPolicy
 )
 
@@ -21,28 +21,55 @@ class AtributoProductoInline(admin.TabularInline):
 
 
 # =====================
+# BRAND ADMIN
+# =====================
+@admin.register(Marca)
+class MarcaAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'activo', 'created_at']
+    list_filter = ['activo', 'created_at']
+    search_fields = ['nombre', 'descripcion']
+    prepopulated_fields = {'slug': ('nombre',)}
+    fieldsets = (
+        ('Información Básica', {
+            'fields': ('nombre', 'slug', 'descripcion')
+        }),
+        ('Imagen', {
+            'fields': ('imagen',)
+        }),
+        ('Estado', {
+            'fields': ('activo',)
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+    readonly_fields = ['created_at', 'updated_at']
+
+
+# =====================
 # PRODUCT ADMIN
 # =====================
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'categoria', 'precio', 'precio_oferta', 'stock', 'activo', 'destacado']
-    list_filter = ['activo', 'destacado', 'categoria', 'coleccion', 'created_at']
-    search_fields = ['nombre', 'descripcion_corta', 'descripcion_larga', 'marca']
+    list_display = ['nombre', 'marca', 'categoria', 'precio', 'precio_oferta', 'stock', 'peso', 'activo', 'destacado']
+    list_filter = ['activo', 'destacado', 'marca', 'categoria', 'coleccion', 'created_at']
+    search_fields = ['nombre', 'descripcion_corta', 'descripcion_completa', 'marca__nombre']
     prepopulated_fields = {'slug': ('nombre',)}
     inlines = [ImagenInline, AtributoProductoInline]
     fieldsets = (
         ('Información Básica', {
-            'fields': ('nombre', 'slug', 'categoria', 'coleccion')
+            'fields': ('nombre', 'slug', 'marca', 'categoria', 'coleccion')
         }),
         ('Descripción', {
-            'fields': ('descripcion_corta', 'descripcion_larga'),
+            'fields': ('descripcion_corta', 'descripcion_completa'),
             'classes': ('collapse',)
         }),
         ('Precios y Stock', {
             'fields': ('precio', 'precio_oferta', 'stock')
         }),
         ('Detalles del Producto', {
-            'fields': ('marca', 'dimensiones', 'material'),
+            'fields': ('peso', 'dimensiones', 'material'),
             'classes': ('collapse',)
         }),
         ('Estado', {

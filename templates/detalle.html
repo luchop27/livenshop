@@ -62,7 +62,7 @@
                                     </div>
                                     {% if producto.marca %}
                                     <div class="tf-product-info-badges">
-                                        <div class="badges">{{ producto.marca }}</div>
+                                        <div class="badges">{{ producto.marca.nombre }}</div>
                                     </div>
                                     {% endif %}
                                     <div class="tf-product-info-price">
@@ -176,9 +176,9 @@
                             <div class="widget-content-tab">
                                 <div class="widget-content-inner active">
                                     <div class="">
-                                        {% if producto.descripcion_larga %}
+                                        {% if producto.descripcion_completa %}
                                         <p class="mb_30">
-                                            {{ producto.descripcion_larga|linebreaks }}
+                                            {{ producto.descripcion_completa|linebreaks }}
                                         </p>
                                         {% elif producto.descripcion_corta %}
                                         <p class="mb_30">

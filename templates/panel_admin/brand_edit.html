@@ -1,0 +1,157 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Editar Marca | Panel Admin LivenShop{% endblock %}
+{% block menu_brand %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Editar: {{ marca.nombre }}</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><a href="{% url 'productos:panel_admin_brands' %}"><div class="text-tiny">Marcas</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Editar</div></li>
+                </ul>
+            </div>
+
+            {% if messages %}{% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+            {% endfor %}{% endif %}
+
+            <div class="wg-box">
+                <form class="form-new-product form-style-1" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Nombre de la Marca <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow tf-input" type="text" name="nombre" id="id_nombre" value="{{ marca.nombre }}" required>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Slug</div>
+                        <input class="flex-grow tf-input" type="text" name="slug" id="id_slug" value="{{ marca.slug }}">
+                        <small class="text-muted">Cambia con cuidado — afecta URLs públicas y referencias internas.</small>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Descripción</div>
+                        <textarea class="flex-grow tf-input" name="descripcion" rows="3">{{ marca.descripcion|default:'' }}</textarea>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Imagen de la Marca</div>
+                        {% if marca.imagen %}
+                        <div id="imagen-actual-marca" style="margin-bottom:12px;">
+                            <div style="position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;max-width:250px;">
+                                <img src="{{ marca.imagen.url }}" style="width:100%;height:auto;display:block;">
+                                <button type="button" onclick="removeCurrentImage()"
+                                    style="position:absolute;top:8px;right:8px;background:rgba(220,53,69,.9);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+                                <div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.7);color:white;padding:3px 8px;border-radius:4px;font-size:11px;">Imagen actual</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <input type="hidden" id="remove-current-image" name="remove_imagen" value="">
+                        <div id="upload-container-marca" {% if marca.imagen %}style="display:none;"{% endif %}>
+                            <div class="up-load" id="upload-area-marca" style="min-height:120px;border:2px dashed #ddd;border-radius:8px;padding:16px;text-align:center;">
+                                <label for="marcaImagen" style="cursor:pointer;display:block;">
+                                    <i class="icon-upload-cloud" style="font-size:1.8rem;"></i>
+                                    <div class="text-tiny mt-6">Haz clic o arrastra para cambiar imagen</div>
+                                    <input type="file" id="marcaImagen" name="imagen" accept="image/*" style="display:none;">
+                                </label>
+                            </div>
+                            <div id="imagen-preview-nueva" style="display:none;margin-top:10px;"></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Estado</div>
+                        <div class="radio-buttons">
+                            <div class="item">
+                                <input type="radio" name="estado" value="True" id="marca-activo" {% if marca.activo %}checked{% endif %}>
+                                <label for="marca-activo"><span class="body-title-2">Activa</span></label>
+                            </div>
+                            <div class="item">
+                                <input type="radio" name="estado" value="False" id="marca-inactiva" {% if not marca.activo %}checked{% endif %}>
+                                <label for="marca-inactiva"><span class="body-title-2">Inactiva</span></label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="bot">
+                        <a href="{% url 'productos:panel_admin_brands' %}" class="tf-button style-1 w208">Cancelar</a>
+                        <button class="tf-button w208" type="submit">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="wg-box mt-30" style="border:1px solid #fca5a5;">
+                <div class="body-title mb-10" style="color:#dc2626;">Zona de Peligro</div>
+                <p class="text-tiny mb-14">Eliminar esta marca la desvinculará de los productos. Acción irreversible.</p>
+                <form method="post" action="{% url 'productos:panel_admin_brand_delete' marca.pk %}" onsubmit="return confirm('¿Eliminar la marca {{ marca.nombre|escapejs }}?')">
+                    {% csrf_token %}
+                    <button type="submit" class="tf-button" style="background:#dc2626;border-color:#dc2626;">
+                        <i class="icon-trash-2"></i> Eliminar Marca
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function generateSlug(text) {
+    return text.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'');
+}
+const nombreInput = document.getElementById('id_nombre');
+const slugInput = document.getElementById('id_slug');
+nombreInput.addEventListener('input', function() {
+    if (!slugInput.dataset.manuallyEdited) slugInput.value = generateSlug(this.value);
+});
+slugInput.addEventListener('input', function() { this.dataset.manuallyEdited = 'true'; });
+
+function removeCurrentImage() {
+    if (!confirm('¿Eliminar la imagen actual?')) return;
+    document.getElementById('remove-current-image').value = '1';
+    const actual = document.getElementById('imagen-actual-marca');
+    if (actual) actual.style.display = 'none';
+    document.getElementById('upload-container-marca').style.display = 'block';
+}
+
+const marcaImageInput = document.getElementById('marcaImagen');
+const uploadAreaMarca = document.getElementById('upload-area-marca');
+const imagenPreviewNueva = document.getElementById('imagen-preview-nueva');
+
+if (marcaImageInput) {
+    marcaImageInput.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) handleMarcaImage(e.target.files[0]);
+    });
+}
+function handleMarcaImage(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        uploadAreaMarca.style.display = 'none';
+        imagenPreviewNueva.style.display = 'block';
+        imagenPreviewNueva.innerHTML = `
+            <div style="position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;max-width:250px;">
+                <img src="${e.target.result}" style="width:100%;height:auto;display:block;">
+                <button type="button" onclick="removeNewImage()"
+                    style="position:absolute;top:8px;right:8px;background:rgba(220,53,69,.9);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+            </div>`;
+    };
+    reader.readAsDataURL(file);
+}
+function removeNewImage() {
+    marcaImageInput.value = '';
+    imagenPreviewNueva.style.display = 'none';
+    imagenPreviewNueva.innerHTML = '';
+    uploadAreaMarca.style.display = 'block';
+}
+</script>
+{% endblock %}

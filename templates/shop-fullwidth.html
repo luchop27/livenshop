@@ -98,7 +98,7 @@
                     <!-- LIST LAYOUT -->
                     <div class="tf-list-layout wrapper-shop" id="listLayout">
                         {% for producto in productos %}
-                        <div class="card-product list-layout" data-product-id="{{ producto.id }}" data-availability="{{ producto.availability }}" data-brand="{{ producto.marca|default:'Ecomus' }}">
+                        <div class="card-product list-layout" data-product-id="{{ producto.id }}" data-availability="{{ producto.availability }}" data-brand="{{ producto.marca.nombre|default:'Ecomus' }}">
                             <div class="card-product-wrapper">
                                 <a href="{{ producto.get_absolute_url }}" class="product-img">
                                     {% with producto.imagenes.all as imgs %}
@@ -184,7 +184,7 @@
                     <!-- GRID LAYOUT -->
                     <div class="tf-grid-layout wrapper-shop tf-col-4" id="gridLayout">
                         {% for producto in productos %}
-                        <div class="card-product grid" data-product-id="{{ producto.id }}" data-availability="{{ producto.availability }}" data-brand="{{ producto.marca|default:'Ecomus' }}">
+                        <div class="card-product grid" data-product-id="{{ producto.id }}" data-availability="{{ producto.availability }}" data-brand="{{ producto.marca.nombre|default:'Ecomus' }}">
                             <div class="card-product-wrapper">
                                 <a href="{{ producto.get_absolute_url }}" class="product-img">
                                     {% with producto.imagenes.all as imgs %}

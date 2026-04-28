@@ -1,0 +1,106 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Marcas | Panel Admin{% endblock %}
+{% block menu_brand %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Marcas</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Marcas</div></li>
+                </ul>
+            </div>
+
+            <div class="wg-box">
+                <div class="flex items-center justify-between gap10 flex-wrap">
+                    <div class="wg-filter flex-grow">
+                        <form class="form-search" method="get">
+                            <fieldset class="name">
+                                <input type="text" placeholder="Buscar marca..." name="q" value="{{ search }}" aria-required="true">
+                            </fieldset>
+                            <div class="button-submit">
+                                <button type="submit"><i class="icon-search"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                    <a class="tf-button style-1" href="{% url 'productos:panel_admin_brand_add' %}">
+                        <i class="icon-plus"></i>Agregar marca
+                    </a>
+                </div>
+
+                <div class="wg-table table-all-category">
+                    <ul class="table-title flex gap20 mb-14">
+                        <li><div class="body-title">Marca</div></li>
+                        <li><div class="body-title">Slug</div></li>
+                        <li><div class="body-title">Productos</div></li>
+                        <li><div class="body-title">Estado</div></li>
+                        <li><div class="body-title">Acciones</div></li>
+                    </ul>
+
+                    {% if marcas %}
+                    <ul class="flex flex-column">
+                        {% for marca in marcas %}
+                        <li class="wg-product item-row gap20">
+                            <div class="name">
+                                <div class="image">
+                                    {% if marca.imagen %}
+                                        <img src="{{ marca.imagen.url }}" alt="{{ marca.nombre }}" style="width:60px;height:60px;object-fit:cover;">
+                                    {% else %}
+                                        <img src="{% static 'panel_admin/images/products/product-1.jpg' %}" alt="{{ marca.nombre }}" style="width:60px;height:60px;object-fit:cover;">
+                                    {% endif %}
+                                </div>
+                                <div class="title line-clamp-2 mb-0">
+                                    <strong class="body-text">{{ marca.nombre }}</strong>
+                                    <div class="text-tiny text-muted">{{ marca.descripcion|default:'Sin descripción' }}</div>
+                                </div>
+                            </div>
+
+                            <div class="body-text text-main-dark mt-4"><code>{{ marca.slug }}</code></div>
+
+                            <div class="body-text text-main-dark mt-4">{{ marca.num_productos }}</div>
+
+                            <div class="body-text text-main-dark mt-4">
+                                {% if marca.activo %}
+                                    <span class="block-available bg-1 fw-7">Activa</span>
+                                {% else %}
+                                    <span class="block-not-available bg-1 fw-7">Inactiva</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="list-icon-function">
+                                <div class="item edit" title="Editar">
+                                    <a href="{% url 'productos:panel_admin_brand_edit' marca.pk %}"><i class="icon-edit-3"></i></a>
+                                </div>
+                                <div class="item remove" title="Eliminar">
+                                    <form method="post" action="{% url 'productos:panel_admin_brand_delete' marca.pk %}" onsubmit="return confirm('¿Eliminar {{ marca.nombre|escapejs }}?')">
+                                        {% csrf_token %}
+                                        <button type="submit" style="border:none;background:transparent;padding:0;color:#dc2626;cursor:pointer;"><i class="icon-trash-2"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <p class="text-muted">
+                            {% if search %}
+                                No se encontraron marcas con "{{ search }}".
+                            {% else %}
+                                No hay marcas registradas todavía.
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

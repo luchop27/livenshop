@@ -74,6 +74,17 @@
                                         </ul>
                                     </li>
 
+                                    <li class="menu-item has-children {% block menu_brand %}{% endblock %}">
+                                        <a href="#" class="menu-item-button">
+                                            <div class="icon"><i class="icon-tag"></i></div>
+                                            <div class="text">Marcas</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item"><a href="{% url 'productos:panel_admin_brands' %}"><div class="text">Lista de marcas</div></a></li>
+                                            <li class="sub-menu-item"><a href="{% url 'productos:panel_admin_brand_add' %}"><div class="text">Nueva marca</div></a></li>
+                                        </ul>
+                                    </li>
+
                                     <li class="menu-item has-children {% block menu_category %}{% endblock %}">
                                         <a href="#" class="menu-item-button">
                                             <div class="icon"><i class="icon-layers"></i></div>

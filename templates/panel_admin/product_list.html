@@ -47,8 +47,8 @@
                         </form>
                     </div>
 
-                    <a class="tf-button style-1" href="#">
-                        <i class="icon-plus"></i>Agregar producto (pendiente)
+                    <a class="tf-button style-1" href="{% url 'productos:panel_admin_product_add' %}">
+                        <i class="icon-plus"></i>Agregar producto
                     </a>
                 </div>
 
@@ -80,12 +80,24 @@
                                     {% endwith %}
                                 </div>
                                 <div class="title line-clamp-2 mb-0">
-                                    <a href="{{ producto.get_absolute_url }}" class="body-text" target="_blank">{{ producto.nombre }}</a>
+                                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+                                        <a href="{% url 'productos:panel_admin_product_edit' producto.pk %}" class="body-text" title="Editar producto"><i class="icon-edit-3" style="font-size:14px;"></i></a>
+                                        <a href="{{ producto.get_absolute_url }}" target="_blank" class="body-text" title="Ver en tienda"><i class="icon-eye" style="font-size:14px;"></i></a>
+                                        <a href="{% url 'productos:panel_admin_product_edit' producto.pk %}" class="body-text">{{ producto.nombre }}</a>
+                                        <a href="{{ producto.get_absolute_url }}" target="_blank" class="text-secondary" style="font-size:11px;white-space:nowrap;" title="Abrir en página">Ver en página ↗</a>
+                                    </div>
                                     <div class="text-tiny">
                                         {% if producto.categoria %}
                                             {{ producto.categoria.nombre }}
                                         {% else %}
                                             Sin categoria
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-tiny text-muted">
+                                        {% if producto.marca %}
+                                            Marca: {{ producto.marca.nombre }}
+                                        {% else %}
+                                            Sin marca
                                         {% endif %}
                                     </div>
                                 </div>
@@ -123,13 +135,7 @@
 
                             <div class="body-text text-main-dark mt-4">{{ producto.created_at|date:"d/m/Y" }}</div>
 
-                            <div class="list-icon-function">
-                                <div class="item eye" title="Ver en tienda">
-                                    <a href="{{ producto.get_absolute_url }}" target="_blank"><i class="icon-eye"></i></a>
-                                </div>
-                                <div class="item edit" title="Edicion pendiente">
-                                    <a href="#"><i class="icon-edit-3"></i></a>
-                                </div>
+                            <div class="list-icon-function" style="display:none;">
                             </div>
                         </li>
                         {% empty %}

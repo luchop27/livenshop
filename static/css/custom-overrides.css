@@ -26,3 +26,8 @@ a.mb-menu-link.text_liven-blue,
 .mb-menu-link.collapsed.current.text_liven-blue {
   color: #0C2038 !important;
 }
+
+/* New utility: alternative liven blue for desktop navbar */
+.text_liven-blue1 {
+  color: #0C2038 !important;
+}

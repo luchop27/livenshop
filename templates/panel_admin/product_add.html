@@ -38,6 +38,36 @@
                         </label>
                     </div>
                     <div id="images-preview" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:14px;"></div>
+                    <style>
+                        .image-preview-container {
+                            position: relative;
+                            border: 1px solid #ddd;
+                            border-radius: 8px;
+                            overflow: hidden;
+                            aspect-ratio: 1;
+                        }
+                        .image-preview-container button {
+                            position: absolute;
+                            top: 4px;
+                            right: 4px;
+                            z-index: 10;
+                            background: rgba(220, 53, 69, 0.9);
+                            color: white;
+                            border: none;
+                            border-radius: 50%;
+                            width: 22px;
+                            height: 22px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 0;
+                        }
+                        .image-preview-container button:hover {
+                            background: rgba(220, 53, 69, 1);
+                        }
+                    </style>
                 </div>
 
                 <!-- Info básica -->
@@ -65,7 +95,14 @@
                     </div>
                     <fieldset class="mb-20">
                         <div class="body-title mb-10">Marca</div>
-                        <input class="flex-grow tf-input" type="text" name="marca" placeholder="Ej: LivenDecor, Artesanal">
+                        <div class="select flex-grow">
+                            <select name="marca" class="tf-input">
+                                <option value="">-- Sin marca --</option>
+                                {% for brand in marcas %}
+                                <option value="{{ brand.id }}">{{ brand.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </fieldset>
                     <fieldset class="mb-20">
                         <div class="body-title mb-10">Descripción Corta</div>
@@ -73,14 +110,14 @@
                     </fieldset>
                     <fieldset>
                         <div class="body-title mb-10">Descripción Completa</div>
-                        <textarea class="flex-grow tf-input" name="descripcion_larga" rows="5" placeholder="Descripción detallada del artículo decorativo..."></textarea>
+                        <textarea class="flex-grow tf-input" name="descripcion_completa" rows="5" placeholder="Descripción detallada del artículo decorativo..."></textarea>
                     </fieldset>
                 </div>
 
                 <!-- Detalles decorativos -->
                 <div class="wg-box mb-30">
                     <div class="body-title mb-20">Características Decorativas</div>
-                    <div class="cols-lg gap22">
+                    <div class="cols-lg gap22 mb-20">
                         <fieldset>
                             <div class="body-title mb-10">Material</div>
                             <input class="flex-grow tf-input" type="text" name="material" placeholder="Ej: Cerámica, Madera, Vidrio">
@@ -90,6 +127,10 @@
                             <input class="flex-grow tf-input" type="text" name="dimensiones" placeholder="Ej: 30cm x 20cm x 10cm">
                         </fieldset>
                     </div>
+                    <fieldset>
+                        <div class="body-title mb-10">Peso</div>
+                        <input class="flex-grow tf-input" type="number" name="peso" step="0.01" min="0" placeholder="Ej: 1.25">
+                    </fieldset>
                 </div>
 
                 <!-- Clasificación -->
@@ -167,10 +208,10 @@ function handleFiles(files) {
         const reader = new FileReader();
         reader.onload = e => {
             const div = document.createElement('div');
-            div.style.cssText = 'position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;aspect-ratio:1;';
+            div.className = 'image-preview-container';
             div.dataset.index = idx;
             div.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">
-                <button type="button" onclick="removeImage(${idx})" style="position:absolute;top:4px;right:4px;background:rgba(220,53,69,.9);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;">×</button>
+                <button type="button" onclick="removeImage(${idx})">×</button>
                 ${idx === 0 ? '<div style="position:absolute;bottom:4px;left:4px;background:rgba(34,197,94,.9);color:white;font-size:9px;padding:2px 5px;border-radius:4px;">Principal</div>' : ''}`;
             imagesPreview.appendChild(div);
         };

@@ -97,8 +97,7 @@
 
         </div>
         <!-- /announcement-bar -->
-
-        <!-- Header -->
+<!-- Header -->
 <header id="header" class="header-default header-style-2">
     <div class="main-header line">
         <div class="container-full px_15 lg-px_40">
@@ -119,16 +118,16 @@
                 <div class="col-xl-5 col-md-4 col-3">
                     <ul class="nav-icon d-flex justify-content-end align-items-center gap-20">
                         <li class="nav-search">
-                            <a href="#canvasSearch" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="link nav-icon-item text_liven-blue">
+                            <a href="#canvasSearch" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="link nav-icon-item" style="color: #0C2038 !important;">
                                 <i class="icon icon-search"></i>
                             </a>
                         </li>
                         {% if user.is_authenticated %}
                         <li class="nav-account" style="position:relative;">
-                            <a href="javascript:void(0)" class="link nav-icon-item text_liven-blue"
+                            <a href="javascript:void(0)" class="link nav-icon-item"
                                 id="accountDropdownToggle"
                                 onclick="toggleAccountDropdown(event)"
-                                style="position:relative;">
+                                style="color: #0C2038 !important; position:relative;">
                                 <i class="icon icon-account"></i>
                                 <span style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#22c55e;border-radius:50%;border:1.5px solid #fff;"></span>
                             </a>
@@ -165,18 +164,18 @@
                         </li>
                         {% else %}
                         <li class="nav-account">
-                            <a href="#login" data-bs-toggle="modal" class="link nav-icon-item text_liven-blue">
+                            <a href="#login" data-bs-toggle="modal" class="link nav-icon-item" style="color: #0C2038 !important;">
                                 <i class="icon icon-account"></i>
                             </a>
                         </li>
                         {% endif %}
                         <li class="nav-wishlist">
-                            <a href="{% url 'wishlist' %}" class="link nav-icon-item text_liven-blue">
+                            <a href="{% url 'wishlist' %}" class="link nav-icon-item" style="color: #0C2038 !important;">
                                 <i class="icon icon-heart"></i><span class="count-box bg_liven-blue">0</span>
                             </a>
                         </li>
                         <li class="nav-cart">
-                            <a href="#shoppingCart" data-bs-toggle="modal" class="link nav-icon-item text_liven-blue">
+                            <a href="#shoppingCart" data-bs-toggle="modal" class="link nav-icon-item" style="color: #0C2038 !important;">
                                 <i class="icon icon-bag"></i><span class="count-box bg_liven-blue">0</span>
                             </a>
                         </li>
@@ -193,10 +192,10 @@
                 <nav class="box-navigation text-center">
                     <ul class="box-nav-ul d-flex align-items-center justify-content-center gap-30">
                         <li class="menu-item">
-                            <a href="{% url 'home' %}" class="item-link text_liven-blue">Home</a>
+                            <a href="{% url 'home' %}" class="item-link" style="color: #0C2038 !important;">Home</a>
                         </li>
                         <li class="menu-item position-relative">
-                            <a href="{% url 'shop' %}" class="item-link text_liven-blue">Shop<i class="icon icon-arrow-down"></i></a>
+                            <a href="{% url 'shop' %}" class="item-link" style="color: #0C2038 !important;">Shop<i class="icon icon-arrow-down"></i></a>
                             {% if menu_categorias %}
                             <div class="sub-menu submenu-default">
                                 <ul class="menu-list">
@@ -225,19 +224,19 @@
                             {% endif %}
                         </li>
                         <li class="menu-item">
-                            <a href="{% url 'brands' %}" class="item-link text_liven-blue">Brands</a>
+                            <a href="{% url 'brands' %}" class="item-link" style="color: #0C2038 !important;">Brands</a>
                         </li>
                         <li class="menu-item">
-                            <a href="{% url 'portfolio' %}" class="item-link text_liven-blue">Portfolio</a>
+                            <a href="{% url 'portfolio' %}" class="item-link" style="color: #0C2038 !important;">Portfolio</a>
                         </li>
                         <li class="menu-item">
-                            <a href="{% url 'services' %}" class="item-link text_liven-blue">Services</a>
+                            <a href="{% url 'services' %}" class="item-link" style="color: #0C2038 !important;">Services</a>
                         </li>
                         <li class="menu-item">
-                            <a href="{% url 'about' %}" class="item-link text_liven-blue">About</a>
+                            <a href="{% url 'about' %}" class="item-link" style="color: #0C2038 !important;">About</a>
                         </li>
                         <li class="menu-item">
-                            <a href="{% url 'contact' %}" class="item-link text_liven-blue">Contact</a>
+                            <a href="{% url 'contact' %}" class="item-link" style="color: #0C2038 !important;">Contact</a>
                         </li>
                     </ul>
                 </nav>
@@ -254,11 +253,12 @@
         <div class="mb-body">
             <ul class="nav-ul-mb" id="wrapper-menu-navigation">
                 <li class="nav-mb-item">
-                    <a href="{% url 'home' %}" class="mb-menu-link text_liven-blue">Home</a>
+                    <a href="{% url 'home' %}" class="mb-menu-link" style="color: #0C2038 !important;">Home</a>
                 </li>
                 <li class="nav-mb-item">
-                    <a href="#mb-dropdown-shop" class="collapsed mb-menu-link current text_liven-blue force-menu-liven"
-                        data-bs-toggle="collapse" aria-expanded="false" aria-controls="mb-dropdown-shop">
+                    <a href="#mb-dropdown-shop" class="collapsed mb-menu-link current force-menu-liven"
+                        data-bs-toggle="collapse" aria-expanded="false" aria-controls="mb-dropdown-shop"
+                        style="color: #0C2038 !important;">
                         <span>Shop</span>
                         <span class="btn-open-sub"></span>
                     </a>
@@ -299,25 +299,25 @@
                     </div>
                 </li>
                 <li class="nav-mb-item">
-                    <a href="{% url 'brands' %}" class="mb-menu-link text_liven-blue">Brands</a>
+                    <a href="{% url 'brands' %}" class="mb-menu-link" style="color: #0C2038 !important;">Brands</a>
                 </li>
                 <li class="nav-mb-item">
-                    <a href="{% url 'portfolio' %}" class="mb-menu-link text_liven-blue">Portfolio</a>
+                    <a href="{% url 'portfolio' %}" class="mb-menu-link" style="color: #0C2038 !important;">Portfolio</a>
                 </li>
                 <li class="nav-mb-item">
-                    <a href="{% url 'services' %}" class="mb-menu-link text_liven-blue">Services</a>
+                    <a href="{% url 'services' %}" class="mb-menu-link" style="color: #0C2038 !important;">Services</a>
                 </li>
                 <li class="nav-mb-item">
-                    <a href="{% url 'about' %}" class="mb-menu-link text_liven-blue">About</a>
+                    <a href="{% url 'about' %}" class="mb-menu-link" style="color: #0C2038 !important;">About</a>
                 </li>
                 <li class="nav-mb-item">
-                    <a href="{% url 'contact' %}" class="mb-menu-link text_liven-blue">Contact</a>
+                    <a href="{% url 'contact' %}" class="mb-menu-link" style="color: #0C2038 !important;">Contact</a>
                 </li>
             </ul>
             <div class="mb-other-content">
                 <div class="d-flex group-icon">
-                    <a href="{% url 'wishlist' %}" class="site-nav-icon"><i class="icon icon-heart"></i>Wishlist</a>
-                    <a href="#canvasSearch" data-bs-toggle="offcanvas" class="site-nav-icon"><i class="icon icon-search"></i>Search</a>
+                    <a href="{% url 'wishlist' %}" class="site-nav-icon" style="color: #0C2038 !important;"><i class="icon icon-heart"></i>Wishlist</a>
+                    <a href="#canvasSearch" data-bs-toggle="offcanvas" class="site-nav-icon" style="color: #0C2038 !important;"><i class="icon icon-search"></i>Search</a>
                 </div>
                 <div class="mb-notice">
                     <a href="{% url 'contact' %}" class="text-need">Need help?</a>
@@ -370,7 +370,6 @@
     </div>
 </div>
 <!-- /Mobile Menu -->
-
         {% block content %}{% endblock %}
         <!-- gotop -->
         <button id="goTop">
