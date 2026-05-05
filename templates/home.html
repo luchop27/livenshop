@@ -130,34 +130,17 @@
         <!-- brand -->
         <section class="flat-spacing-2 pb_0">
             <div class="container">
-                <div class="mb_30 fw-7 text_green-2 text-center">AS FEATURED IN</div>
+                <div class="mb_30 fw-7 text_green-2 text-center">MARCAS</div>
                 <div dir="ltr" class="swiper tf-sw-brand border-0" data-loop="false" data-play="false" data-preview="4"
                     data-tablet="2" data-mobile="1" data-space-lg="0" data-space-md="0">
                     <div class="swiper-wrapper">
+                        {% for marca in marcas %}
                         <div class="swiper-slide">
                             <div class="brand-item border-0">
-                                <img class="lazyload" data-src="{% static 'images/brand/brand-13.png' %}"
-                                    src="{% static 'images/brand/brand-13.png' %}" alt="image-brand">
+                                <img class="lazyload" data-src="{{ marca.imagen.url }}" src="{{ marca.imagen.url }}" alt="{{ marca.nombre }}">
                             </div>
                         </div>
-                        <div class="swiper-slide">
-                            <div class="brand-item border-0">
-                                <img class="lazyload" data-src="{% static 'images/brand/brand-14.png' %}"
-                                    src="{% static 'images/brand/brand-14.png' %}" alt="image-brand">
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="brand-item border-0">
-                                <img class="lazyload" data-src="{% static 'images/brand/brand-15.png' %}"
-                                    src="{% static 'images/brand/brand-15.png' %}" alt="image-brand">
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="brand-item border-0">
-                                <img class="lazyload" data-src="{% static 'images/brand/brand-16.png' %}"
-                                    src="{% static 'images/brand/brand-16.png' %}" alt="image-brand">
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
                 <div class="sw-dots style-2 sw-pagination-brand justify-content-center"></div>
@@ -165,61 +148,100 @@
         </section>
         <!-- /brand -->
 
-        <!-- Categories -->
-        <section class="flat-spacing-18">
-            <div class="container">
-                <div class="flat-title">
-                    <span class="title wow fadeInUp" data-wow-delay="0s">Design deals, delivered free</span>
-                </div>
-                <div class="wrap-carousel wrap-mobile">
-                    <div dir="ltr" class="swiper tf-sw-mobile" data-preview="1.3" data-space="15">
-                        <div class="swiper-wrapper grid-mobile-1">
-                            {% for categoria in categorias %}
-                            <div class="swiper-slide">
-                                <div class="collection-item-v2 hover-img">
-                                    <a href="{{ categoria.get_absolute_url }}" class="collection-inner">
-                                        <div class="collection-image img-style">
-                                            {% if categoria.imagen %}
-                                                <img class="lazyload" data-src="{{ categoria.imagen.url }}"
-                                                    src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}">
-                                            {% else %}
-                                                <img class="lazyload" data-src="{% static 'images/placeholder.jpg' %}"
-                                                    src="{% static 'images/placeholder.jpg' %}" alt="{{ categoria.nombre }}">
-                                            {% endif %}
-                                        </div>
-                                        <div class="collection-content">
-                                            <div class="top wow fadeInUp" data-wow-delay="0s">
-                                                <h5 class="heading">{{ categoria.nombre }}</h5>
-                                                <p class="subheading">{{ categoria.descripcion|truncatewords:5 }}</p>
-                                            </div>
-                                            <div class="bottom wow fadeInUp" data-wow-delay="0s">
-                                                <button class="tf-btn btn-line collection-other-link fw-6"><span>Shop
-                                                        now</span><i class="icon icon-arrow1-top-left"></i></button>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- /Categories -->
 
         
 
         <!-- Product -->
         <section class="flat-spacing-12 has-line-bottom">
             <div class="container">
+                    <!-- Sección de selección de marca -->
+                    <div class="brand-filter mb-3 d-flex justify-content-center">
+                <div class="nav-brand-filter d-flex gap-2">
+                    <div class="nav-brand-list d-flex gap-2">
+                        <!-- Botón "Todos" -->
+                        {% for marca in marcas %}
+                            <a href="#" class="brand-item" data-slug="{{ marca.slug }}">
+                                {{ marca.nombre }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        <!-- Título -->
+
+                <!-- Slider de productos -->
+                <div class="hover-sw-nav hover-sw-2">
+                    <div dir="ltr" class="swiper tf-sw-product-sell wrap-sw-over" data-preview="4" data-tabley="3" data-mobile="2" data-space-lg="30" data-space-md="15" data-pagination="2" data-pagination-md="3" data-pagination-lg="3">
+                        <div class="swiper-wrapper">
+                            {% for producto in productos %}
+                            <div class="swiper-slide" lazy="true">
+                                <div class="card-product">
+                                    <div class="card-product-wrapper">
+                                        <a href="{{ producto.get_absolute_url }}" class="product-img">
+                                            {% with producto.imagenes.all as imgs %}
+                                                {% if imgs.0 %}
+                                                    <img class="lazyload img-product" data-src="{{ imgs.0.src }}" src="{{ imgs.0.src }}" alt="{{ producto.nombre }}">
+                                                {% endif %}
+                                                {% if imgs.1 %}
+                                                    <img class="lazyload img-hover" data-src="{{ imgs.1.src }}" src="{{ imgs.1.src }}" alt="{{ producto.nombre }}">
+                                                {% endif %}
+                                            {% endwith %}
+                                        </a>
+                                        <div class="list-product-btn absolute-2">
+                                            <a href="#quick_add" data-bs-toggle="modal" class="box-icon bg_white quick-add tf-btn-loading">
+                                                <span class="icon icon-bag"></span>
+                                                <span class="tooltip">Quick Add</span>
+                                            </a>
+                                            <a href="#" class="box-icon bg_white wishlist btn-icon-action">
+                                                <span class="icon icon-heart"></span>
+                                                <span class="tooltip">Add to Wishlist</span>
+                                                <span class="icon icon-delete"></span>
+                                            </a>
+                                            <a href="#quick_view" data-bs-toggle="modal" data-product-id="{{ producto.id }}" class="box-icon bg_white quickview tf-btn-loading">
+                                                <span class="icon icon-view"></span>
+                                                <span class="tooltip">Quick View</span>
+                                            </a>
+                                        </div>
+                                        {% if producto.tiene_oferta %}
+                                            <div class="on-sale-wrap text-end">
+                                                <div class="on-sale-item">-{{ producto.porcentaje_descuento }}%</div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-product-info">
+                                        <a href="{{ producto.get_absolute_url }}" class="title link">{{ producto.nombre }}</a>
+                                        <span class="price">
+                                            {% if producto.tiene_oferta %}
+                                                <span class="old-price">${{ producto.precio }}</span>
+                                                <span class="new-price">${{ producto.precio_oferta }}</span>
+                                            {% else %}
+                                                <span class="new-price">${{ producto.precio }}</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="nav-sw nav-next-slider nav-next-product box-icon w_46 round"><span class="icon icon-arrow-left"></span></div>
+                    <div class="nav-sw nav-prev-slider nav-prev-product box-icon w_46 round"><span class="icon icon-arrow-right"></span></div>
+                </div>
+            </div>
+        </section>
+<!-- /Product -->
+
+
+        <!-- Product -->
+        <section class="flat-spacing-12 has-line-bottom">
+            <div class="container">
                 <div class="flat-title wow fadeInUp" data-wow-delay="0s">
-                    <span class="title">Trending now</span>
+                    <span class="title">NUEVOS PRODUCTOS</span>
                     <div class="d-flex gap-16 align-items-center">
                         <div class="nav-sw-arrow nav-next-slider nav-next-product"><span
                                 class="icon icon-arrow1-left"></span></div>
-                        <a href="product-style-05.html" class="tf-btn btn-line fs-12 fw-6">VIEW ALL</a>
+                        <a href="product-style-05.html" class="tf-btn btn-line fs-12 fw-6">VER TODOS</a>
                         <div class="nav-sw-arrow nav-prev-slider nav-prev-product"><span
                                 class="icon icon-arrow1-right"></span></div>
                     </div>
@@ -298,6 +320,50 @@
         </section>
         <!-- /Product -->
 
+        <!-- Categories -->
+        <section class="flat-spacing-18">
+            <div class="container">
+                <!-- <div class="flat-title">
+                    <span class="title wow fadeInUp" data-wow-delay="0s">CATEGORIAS</span>
+                </div> -->
+                <div class="wrap-carousel wrap-mobile">
+                    <div dir="ltr" class="swiper tf-sw-mobile" data-preview="1.3" data-space="15">
+                        <div class="swiper-wrapper grid-mobile-1">
+                            {% for categoria in categorias %}
+                            <div class="swiper-slide">
+                                <div class="collection-item-v2 hover-img">
+                                    <a href="{{ categoria.get_absolute_url }}" class="collection-inner">
+                                        <div class="collection-image img-style">
+                                            {% if categoria.imagen %}
+                                                <img class="lazyload" data-src="{{ categoria.imagen.url }}"
+                                                    src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}">
+                                            {% else %}
+                                                <img class="lazyload" data-src="{% static 'images/placeholder.jpg' %}"
+                                                    src="{% static 'images/placeholder.jpg' %}" alt="{{ categoria.nombre }}">
+                                            {% endif %}
+                                        </div>
+                                        <div class="collection-content">
+                                            <div class="top wow fadeInUp" data-wow-delay="0s">
+                                                <h5 class="heading">{{ categoria.nombre }}</h5>
+                                                <p class="subheading">{{ categoria.descripcion|truncatewords:5 }}</p>
+                                            </div>
+                                            <div class="bottom wow fadeInUp" data-wow-delay="0s">
+                                                <button class="tf-btn btn-line collection-other-link fw-6"><span>Shop
+                                                        now</span><i class="icon icon-arrow1-top-left"></i></button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /Categories -->
+
         <section class="banner-hero-collection-wrap banner-parallax"
         style="background-image: url('{% static "images/slider/banner.png" %}');">
         <div class="box-content">
@@ -347,5 +413,100 @@
             </div>
         </section>
         <!-- /Shop Gram -->
+<script>
+(function () {
+    // Guarda referencia al swiper del slider de productos
+    let productoSwiper = null;
 
+    function getSwiperInstance() {
+        // Busca la instancia Swiper inicializada en el elemento
+        const el = document.querySelector('.tf-sw-product-sell');
+        if (el && el.swiper) return el.swiper;
+        return null;
+    }
+
+    function buildSlide(p) {
+        const ofertaBadge = p.tiene_oferta
+            ? `<div class="on-sale-wrap text-end">
+                 <div class="on-sale-item">-${p.porcentaje_descuento}%</div>
+               </div>`
+            : '';
+
+        const imgHover = p.imagen_2
+            ? `<img class="lazyload img-hover" data-src="${p.imagen_2}" src="${p.imagen_2}" alt="${p.nombre}">`
+            : '';
+
+        const precioHTML = p.tiene_oferta
+            ? `<span class="old-price">$${p.precio}</span>
+               <span class="new-price">$${p.precio_oferta}</span>`
+            : `<span class="new-price">$${p.precio}</span>`;
+
+        return `
+        <div class="swiper-slide">
+            <div class="card-product">
+                <div class="card-product-wrapper">
+                    <a href="${p.url}" class="product-img">
+                        <img class="lazyload img-product" data-src="${p.imagen_1}" src="${p.imagen_1}" alt="${p.nombre}">
+                        ${imgHover}
+                    </a>
+                    <div class="list-product-btn absolute-2">
+                        <a href="#quick_add" data-bs-toggle="modal" class="box-icon bg_white quick-add tf-btn-loading">
+                            <span class="icon icon-bag"></span>
+                            <span class="tooltip">Quick Add</span>
+                        </a>
+                        <a href="#" class="box-icon bg_white wishlist btn-icon-action">
+                            <span class="icon icon-heart"></span>
+                            <span class="tooltip">Add to Wishlist</span>
+                            <span class="icon icon-delete"></span>
+                        </a>
+                        <a href="#quick_view" data-bs-toggle="modal" data-product-id="${p.id}" class="box-icon bg_white quickview tf-btn-loading">
+                            <span class="icon icon-view"></span>
+                            <span class="tooltip">Quick View</span>
+                        </a>
+                    </div>
+                    ${ofertaBadge}
+                </div>
+                <div class="card-product-info">
+                    <a href="${p.url}" class="title link">${p.nombre}</a>
+                    <span class="price">${precioHTML}</span>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function cargarProductos(slug) {
+        fetch(`/marca/${slug}/`)
+            .then(r => r.json())
+            .then(data => {
+                const swiper = getSwiperInstance();
+                const wrapper = document.querySelector('.tf-sw-product-sell .swiper-wrapper');
+
+                if (!wrapper) return;
+
+                // Reemplaza slides
+                wrapper.innerHTML = data.productos.map(buildSlide).join('');
+
+                // Reinicia el swiper
+                if (swiper) {
+                    swiper.update();
+                    swiper.slideTo(0, 0);
+                }
+            })
+            .catch(err => console.error('Error cargando productos:', err));
+    }
+
+    // Event listeners en los botones de marca
+    document.querySelectorAll('.brand-item').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            // Actualiza clase activa
+            document.querySelectorAll('.brand-item').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            cargarProductos(this.dataset.slug);
+        });
+    });
+})();
+</script>
 {% endblock %}

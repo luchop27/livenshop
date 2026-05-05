@@ -22,7 +22,6 @@ urlpatterns = [
     path('usuarios/', include('apps.usuarios.urls')),
     path('about/', TemplateView.as_view(template_name='about-us.html'), name='about'),
     path('portfolio/', TemplateView.as_view(template_name='portfolio.html'), name='portfolio'),
-    path('brands/', TemplateView.as_view(template_name='brands.html'), name='brands'),
     path('shop/', TemplateView.as_view(template_name='shop-fullwidth.html'), name='shop'),
     path('services/', TemplateView.as_view(template_name='services.html'), name='services'),
     path('contact/', TemplateView.as_view(template_name='contact.html'), name='contact'),
