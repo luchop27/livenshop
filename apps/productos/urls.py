@@ -23,6 +23,8 @@ urlpatterns = [
     path('producto/<slug:slug>/', views.ProductoDetailView.as_view(), name='detalle_producto'),
     path('categoria/<slug:slug>/', views.CategoriaListView.as_view(), name='lista_por_categoria'),
     path('coleccion/<slug:slug>/', views.ColeccionListView.as_view(), name='lista_por_coleccion'),
+    path('marcas/<slug:slug>/', views.MarcaListView.as_view(), name='lista_por_marca'),
+     path('marca/<slug:slug>/', views.productos_por_marca, name='productos_por_marca'),  # ← NUEVA RUTA
 
     # ── CARRITO ───────────────────────────────────────
     path('carrito/', views.CarritoView.as_view(), name='carrito'),
@@ -31,6 +33,5 @@ urlpatterns = [
     path('carrito/actualizar/', views.actualizar_cantidad, name='actualizar_cantidad'),
 
     # ── API ────────────────────────────────────────────
-
     path('api/producto/<int:producto_id>/quick-view/', views.producto_quick_view, name='producto_quick_view'),
 ]

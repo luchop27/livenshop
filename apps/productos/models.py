@@ -3,6 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
+from django.urls import reverse
 import os
 
 
@@ -40,9 +41,6 @@ def generate_unique_slug(model_class, value, instance_pk=None):
 # MARCA
 # -----------------------------
 class Marca(models.Model):
-    """
-    Marca comercial asociada a productos del catálogo.
-    """
     nombre = models.CharField(max_length=150)
     slug = models.SlugField(max_length=180, unique=True)
     imagen = models.ImageField(upload_to='marcas/', blank=True, null=True)
@@ -59,11 +57,13 @@ class Marca(models.Model):
     def __str__(self):
         return self.nombre
 
+    def get_absolute_url(self):
+        return reverse('productos:lista_por_marca', args=[self.slug])
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_unique_slug(Marca, self.nombre, self.pk)
         super().save(*args, **kwargs)
-
 
 # -----------------------------
 # COLECCIÓN

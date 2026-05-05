@@ -9,6 +9,9 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.contrib import messages
 from django.utils.text import slugify
+from .models import Producto, Categoria, Marca, Coleccion, CarritoItem
+from django.views.generic import ListView, DetailView
+from django.shortcuts import get_object_or_404
 
 from .models import Marca, Producto, Categoria, Coleccion, CarritoItem, Imagen, AtributoProducto, ShopGramPost
 
@@ -39,13 +42,37 @@ def home(request):
     # Colecciones destacadas para el slider
     colecciones = Coleccion.objects.filter(activo=True, destacada=True)
     shop_gram_posts = ShopGramPost.objects.filter(activo=True)[:10]
+    marcas = Marca.objects.filter(activo=True).order_by('nombre')
     return render(request, 'home.html', {
         'productos': productos,
         'categorias': categorias,
         'colecciones': colecciones,
-        'shop_gram_posts': shop_gram_posts
+        'shop_gram_posts': shop_gram_posts,\
+        'marcas': marcas,
     })
+def productos_por_marca(request, slug):
+    if slug == 'todos':
+        productos = Producto.objects.filter(activo=True).prefetch_related('imagenes').select_related('marca')
+    else:
+        marca = get_object_or_404(Marca, slug=slug, activo=True)
+        productos = Producto.objects.filter(marca=marca, activo=True).prefetch_related('imagenes')
 
+    data = []
+    for p in productos:
+        imgs = list(p.imagenes.all())
+        data.append({
+            'id': p.id,
+            'nombre': p.nombre,
+            'url': p.get_absolute_url(),
+            'precio': str(p.precio),
+            'precio_oferta': str(p.precio_oferta) if p.precio_oferta else None,
+            'tiene_oferta': p.tiene_oferta(),
+            'porcentaje_descuento': p.porcentaje_descuento(),
+            'imagen_1': imgs[0].src if len(imgs) > 0 else '',
+            'imagen_2': imgs[1].src if len(imgs) > 1 else '',
+        })
+
+    return JsonResponse({'productos': data})
 
 @staff_member_required(login_url='usuarios:login')
 def panel_admin_dashboard(request):
@@ -568,7 +595,20 @@ def panel_admin_category_delete(request, categoria_id):
     messages.success(request, f'Categoría "{nombre}" eliminada correctamente.')
     return redirect('productos:panel_admin_categories')
 
+class MarcaListView(ListView):
+    model = Producto
+    template_name = 'shop-fullwidth.html'  # el mismo template que usas para categoría
+    context_object_name = 'productos'
 
+    def get_queryset(self):
+        self.marca = get_object_or_404(Marca, slug=self.kwargs['slug'], activo=True)
+        return Producto.objects.filter(marca=self.marca, activo=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['marca'] = self.marca
+        context['titulo'] = self.marca.nombre
+        return context
 # ══════════════════════════════════════════════════════
 # CATÁLOGO - CLASS BASED VIEWS
 # ══════════════════════════════════════════════════════

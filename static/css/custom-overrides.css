@@ -1,5 +1,52 @@
 /* Custom Overrides for Mobile Menu Colors */
+/* Fondo azul del toolbar */
 
+.bg_celeste {
+    background-color: #7EC8E3 !important;
+    color: #ffffff !important;
+}
+.tf-toolbar-bottom {
+    background-color: #0C2038 !important;
+}
+
+
+/* Links y texto en blanco */
+.tf-toolbar-bottom .toolbar-item a,
+.tf-toolbar-bottom .toolbar-item a:hover,
+.tf-toolbar-bottom .toolbar-item a:focus {
+    color: #ffffff !important;
+}
+
+/* Íconos en blanco */
+.tf-toolbar-bottom .toolbar-icon i {
+    color: #ffffff !important;
+}
+
+/* Labels en blanco */
+.tf-toolbar-bottom .toolbar-label {
+    color: #ffffff !important;
+}
+
+/* Contador - fondo celeste pastel, número blanco */
+.tf-toolbar-bottom .toolbar-count {
+    background-color: #7EC8E3 !important;
+    color: #ffffff !important;
+}
+
+/* Excepción: Admin sigue en morado */
+.tf-toolbar-bottom .toolbar-item a[style*="7c3aed"] {
+    color: #7c3aed !important;
+}
+.tf-toolbar-bottom .toolbar-item a[style*="7c3aed"] i,
+.tf-toolbar-bottom .toolbar-item a[style*="7c3aed"] .toolbar-label {
+    color: #7c3aed !important;
+}
+
+/* Restaurar fondo original de los botones del menú móvil */
+.canvas-mb .site-nav-icon {
+    background-color: #0C2038 !important;
+    color: #ffffff !important; /* letras siguen blancas */
+}
 /* Force text_liven-blue color on mobile menu links */
 .nav-ul-mb .nav-mb-item .mb-menu-link.text_liven-blue,
 a.mb-menu-link.text_liven-blue,
@@ -30,4 +77,241 @@ a.mb-menu-link.text_liven-blue,
 /* New utility: alternative liven blue for desktop navbar */
 .text_liven-blue1 {
   color: #0C2038 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* HEADER CON FONDO AZUL Y TEXTO BLANCO - MÁXIMA PRIORIDAD */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* Aplicar fondo azul al header */
+.header-liven-white-text,
+.header-liven-white-text .main-header,
+.header-liven-white-text .header-bottom {
+  background-color: #0C2038 !important;
+}
+
+/* Todos los textos, iconos y enlaces del header en blanco */
+.header-liven-white-text,
+.header-liven-white-text *,
+.header-liven-white-text a,
+.header-liven-white-text .item-link,
+.header-liven-white-text .nav-icon-item,
+.header-liven-white-text .menu-link-text,
+.header-liven-white-text .box-nav-ul a,
+.header-liven-white-text i,
+.header-liven-white-text .icon,
+.header-liven-white-text span {
+  color: #ffffff !important;
+}
+
+/* Hover states - mantener blanco */
+.header-liven-white-text a:hover,
+.header-liven-white-text .item-link:hover,
+.header-liven-white-text .nav-icon-item:hover,
+.header-liven-white-text .menu-link-text:hover,
+.header-liven-white-text .box-nav-ul a:hover {
+  color: #ffffff !important;
+}
+
+/* Asegurar que los submenús también tengan fondo azul y texto blanco */
+.header-liven-white-text .sub-menu,
+.header-liven-white-text .submenu-default {
+  background-color: #0C2038 !important;
+}
+
+.header-liven-white-text .sub-menu a,
+.header-liven-white-text .submenu-default a,
+.header-liven-white-text .sub-menu .menu-link-text,
+.header-liven-white-text .submenu-default .menu-link-text {
+  color: #ffffff !important;
+}
+
+.header-liven-white-text .sub-menu a:hover,
+.header-liven-white-text .submenu-default a:hover,
+.header-liven-white-text .sub-menu .menu-link-text:hover,
+.header-liven-white-text .submenu-default .menu-link-text:hover {
+  color: #ffffff !important;
+}
+
+/* Bordes y líneas del header */
+.header-liven-white-text .line {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Dropdown de cuenta */
+.header-liven-white-text #accountDropdown {
+  background-color: #ffffff !important;
+}
+
+.header-liven-white-text #accountDropdown a {
+  color: #111827 !important;
+}
+
+.header-liven-white-text #accountDropdown a:hover {
+  color: #111827 !important;
+  background-color: #f5f3ff !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* MENÚ MÓVIL CON FONDO AZUL Y TODO EN BLANCO - MÁXIMA PRIORIDAD */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* Fondo azul para todo el menú móvil */
+.offcanvas.canvas-mb {
+  background-color: #0C2038 !important;
+}
+
+/* TODOS los elementos dentro del menú móvil en BLANCO - SIN EXCEPCIONES */
+.offcanvas.canvas-mb {
+  color: #ffffff !important;
+}
+
+.offcanvas.canvas-mb,
+.offcanvas.canvas-mb * {
+  color: #ffffff !important;
+}
+
+/* Enlaces EXCEPTO .site-nav-icon */
+.offcanvas.canvas-mb a:not(.site-nav-icon),
+.offcanvas.canvas-mb a:not(.site-nav-icon) * {
+  color: #ffffff !important;
+}
+
+.offcanvas.canvas-mb span {
+  color: #ffffff !important;
+}
+
+.offcanvas.canvas-mb p,
+.offcanvas.canvas-mb li,
+.offcanvas.canvas-mb h1,
+.offcanvas.canvas-mb h2,
+.offcanvas.canvas-mb h3,
+.offcanvas.canvas-mb h4,
+.offcanvas.canvas-mb h5,
+.offcanvas.canvas-mb h6 {
+  color: #ffffff !important;
+}
+
+.offcanvas.canvas-mb .nav-mb-item > a {
+  color: #ffffff !important;
+}
+
+.offcanvas.canvas-mb .mb-menu-link {
+  color: #ffffff !important;
+}
+
+.offcanvas.canvas-mb .sub-nav-link {
+  color: #ffffff !important;
+}
+
+/* .site-nav-icon - NO debe ser blanco, solo su contenido interno */
+.offcanvas.canvas-mb .site-nav-icon i,
+.offcanvas.canvas-mb .site-nav-icon .icon,
+.offcanvas.canvas-mb .site-nav-icon span {
+  color: #ffffff !important;
+}
+
+.offcanvas.canvas-mb i,
+.offcanvas.canvas-mb .icon {
+  color: #ffffff !important;
+}
+
+.offcanvas.canvas-mb .text-need {
+  color: #ffffff !important;
+}
+
+.offcanvas.canvas-mb .mb-notice {
+  color: #ffffff !important;
+}
+
+.offcanvas.canvas-mb .mb-info {
+  color: #ffffff !important;
+}
+
+/* Hover - todo sigue siendo blanco */
+.offcanvas.canvas-mb a:hover,
+.offcanvas.canvas-mb .mb-menu-link:hover,
+.offcanvas.canvas-mb .sub-nav-link:hover,
+.offcanvas.canvas-mb .text-need:hover {
+  color: #ffffff !important;
+}
+
+/* Iconos dentro de site-nav-icon en hover */
+.offcanvas.canvas-mb .site-nav-icon:hover i,
+.offcanvas.canvas-mb .site-nav-icon:hover .icon {
+  color: #ffffff !important;
+}
+
+/* Estados activos */
+.offcanvas.canvas-mb .active,
+.offcanvas.canvas-mb .collapsed {
+  color: #ffffff !important;
+}
+
+/* Bordes y separadores */
+.offcanvas.canvas-mb .collapse {
+  background-color: #0C2038 !important;
+}
+
+/* Botón de cerrar */
+.offcanvas.canvas-mb .icon-close-popup {
+  color: #ffffff !important;
+}
+
+/* Selects en el menú móvil */
+.offcanvas.canvas-mb select,
+.offcanvas.canvas-mb .image-select,
+.offcanvas.canvas-mb .type-currencies,
+.offcanvas.canvas-mb .type-languages {
+  background-color: #1a3a52 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.offcanvas.canvas-mb select option {
+  background-color: #0C2038 !important;
+  color: #ffffff !important;
+}
+
+/* Elementos internos */
+.offcanvas.canvas-mb .mb-canvas-content {
+  background-color: #0C2038 !important;
+}
+
+.offcanvas.canvas-mb .mb-body {
+  background-color: #0C2038 !important;
+}
+
+.offcanvas.canvas-mb .mb-bottom {
+  background-color: #0C2038 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.offcanvas.canvas-mb .mb-other-content {
+  background-color: #0C2038 !important;
+}
+
+.offcanvas.canvas-mb .bottom-bar-language {
+  background-color: #0C2038 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* LOGO RESPONSIVE - SCALES Y PADDINGS */
+/* ═══════════════════════════════════════════════════════════════ */
+/* Logo desktop */
+/* Desktop */
+.logo-responsive {
+    transform: scale(2.8) !important;
+    padding-left: 22px !important;
+}
+.btn-open-sub::before,
+.btn-open-sub::after {
+    background-color: #fff;
+}
+
+@media (max-width: 767px) {
+  .logo-header img.logo-responsive {
+    transform: scale(1.8) !important; /* era 2.8, ajusta a tu gusto */
+    padding-left: 3px !important;
+  }
 }
