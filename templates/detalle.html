@@ -85,8 +85,8 @@
                                     </div>
                                     <div class="tf-product-info-buy-button">
                                         <form class="">
-                                            <a href="#" class="tf-btn btn-fill justify-content-center fw-6 fs-16 flex-grow-1 animate-hover-btn btn-add-to-cart"><span>Agregar al carrito -&nbsp;</span><span class="tf-qty-price total-price">${{ producto.precio_final|floatformat:2 }}</span></a>
-                                            <a href="#" class="tf-product-btn-wishlist hover-tooltip box-icon bg_white wishlist btn-icon-action">
+                                            <a href="#" data-product-id="{{ producto.id }}" class="tf-btn btn-fill justify-content-center fw-6 fs-16 flex-grow-1 animate-hover-btn btn-add-to-cart"><span>Agregar al carrito -&nbsp;</span><span class="tf-qty-price total-price">${{ producto.precio_final|floatformat:2 }}</span></a>
+                                            <a href="#" class="tf-product-btn-wishlist hover-tooltip box-icon bg_white wishlist btn-icon-action {% if producto.id in request.session.wishlist %}active{% endif %}" data-product-id="{{ producto.id }}">
                                                 <span class="icon icon-heart"></span>
                                                 <span class="tooltip">Añadir a Favoritos</span>
                                                 <span class="icon icon-delete"></span>
@@ -147,7 +147,7 @@
                                             <span class="btn-quantity plus-btn">+</span>
                                         </div>
                                     </div>
-                                    <a href="#" class="tf-btn btn-fill radius-3 justify-content-center fw-6 fs-14 flex-grow-1 animate-hover-btn btn-add-to-cart"><span>Agregar al carrito - ${{ producto.precio_final|floatformat:2 }}</span></a>
+                                    <a href="#" data-product-id="{{ producto.id }}" class="tf-btn btn-fill radius-3 justify-content-center fw-6 fs-14 flex-grow-1 animate-hover-btn btn-add-to-cart"><span>Agregar al carrito - ${{ producto.precio_final|floatformat:2 }}</span></a>
                                 </div>
                             </form>
                         </div>
@@ -258,11 +258,7 @@
                                             {% endfor %}
                                         </a>
                                         <div class="list-product-btn">
-                                            <a href="#quick_add" data-bs-toggle="modal" class="box-icon bg_white quick-add tf-btn-loading">
-                                                <span class="icon icon-bag"></span>
-                                                <span class="tooltip">Añadir</span>
-                                            </a>
-                                            <a href="#" class="box-icon bg_white wishlist btn-icon-action">
+                                            <a href="#" class="box-icon bg_white wishlist btn-icon-action {% if prod.id in request.session.wishlist %}active{% endif %}" data-product-id="{{ prod.id }}">
                                                 <span class="icon icon-heart"></span>
                                                 <span class="tooltip">Favoritos</span>
                                                 <span class="icon icon-delete"></span>

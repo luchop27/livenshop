@@ -137,6 +137,9 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 # Login
 LOGIN_URL = 'login'
 
+# Cart Session ID
+CART_SESSION_ID = 'cart'
+
 # Email Configuration (IMPORTANTE: Configurar con valores reales en producción)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # En desarrollo, muestra emails en consola
 # Para producción, usar:

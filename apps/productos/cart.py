@@ -1,0 +1,210 @@
+from decimal import Decimal
+from django.conf import settings
+from apps.productos.models import Producto, CarritoItem
+
+class Cart:
+    """
+    Clase para manejar el carrito de compras en la sesión y BD.
+    Si el usuario está autenticado, sincroniza con CarritoItem en la BD.
+    """
+    
+    def __init__(self, request):
+        self.request = request
+        self.session = request.session
+        self.user = request.user
+        
+        if self.user.is_authenticated:
+            self._load_from_db()
+        else:
+            cart = self.session.get(settings.CART_SESSION_ID)
+            if not cart:
+                cart = self.session[settings.CART_SESSION_ID] = {}
+            self.cart = cart
+    
+    def _load_from_db(self):
+        items_db = CarritoItem.objects.filter(usuario=self.user).select_related('producto')
+        
+        self.cart = {}
+        for item in items_db:
+            product_key = str(item.producto_id)
+            
+            self.cart[product_key] = {
+                'producto_id': item.producto_id,
+                'nombre': item.producto.nombre,
+                'producto_slug': item.producto.slug,
+                'precio': str(item.precio),
+                'quantity': item.cantidad,
+                'imagen': item.imagen_url,
+                '_db_id': item.id
+            }
+            
+    def _save_to_db(self):
+        if not self.user.is_authenticated:
+            return
+            
+        valid_items = {k: v for k, v in self.cart.items() if not k.startswith('_') and isinstance(v, dict)}
+        existing_db_ids = {item['_db_id'] for item in valid_items.values() if '_db_id' in item}
+        
+        CarritoItem.objects.filter(usuario=self.user).exclude(id__in=existing_db_ids).delete()
+        
+        for product_key, item_data in valid_items.items():
+            producto_id = item_data['producto_id']
+            cantidad = item_data['quantity']
+            precio = Decimal(item_data['precio'])
+            imagen_url = item_data.get('imagen')
+            
+            if '_db_id' in item_data:
+                try:
+                    carrito_item = CarritoItem.objects.get(id=item_data['_db_id'])
+                    carrito_item.cantidad = cantidad
+                    carrito_item.save()
+                except CarritoItem.DoesNotExist:
+                    CarritoItem.objects.get_or_create(
+                        usuario=self.user,
+                        producto_id=producto_id,
+                        defaults={'cantidad': cantidad, 'precio': precio, 'imagen_url': imagen_url}
+                    )
+            else:
+                CarritoItem.objects.get_or_create(
+                    usuario=self.user,
+                    producto_id=producto_id,
+                    defaults={'cantidad': cantidad, 'precio': precio, 'imagen_url': imagen_url}
+                )
+
+    def add(self, producto, quantity=1, override_quantity=False):
+        product_id = str(producto.id)
+        
+        if product_id not in self.cart:
+            precio = producto.precio_final()
+            primera_imagen = producto.imagenes.first()
+            imagen_url = primera_imagen.imagen.url if primera_imagen and primera_imagen.imagen else None
+            
+            self.cart[product_id] = {
+                'producto_id': producto.id,
+                'producto_slug': producto.slug,
+                'nombre': producto.nombre,
+                'precio': str(precio),
+                'quantity': 0,
+                'imagen': imagen_url,
+            }
+        
+        if override_quantity:
+            self.cart[product_id]['quantity'] = quantity
+        else:
+            self.cart[product_id]['quantity'] += quantity
+        
+        self.save()
+
+    def save(self):
+        self.session.modified = True
+        if self.user.is_authenticated:
+            self._save_to_db()
+
+    def remove(self, product_id):
+        product_id = str(product_id)
+        if product_id in self.cart:
+            if self.user.is_authenticated and '_db_id' in self.cart[product_id]:
+                try:
+                    CarritoItem.objects.get(id=self.cart[product_id]['_db_id']).delete()
+                except CarritoItem.DoesNotExist:
+                    pass
+            del self.cart[product_id]
+            self.save()
+
+    def __iter__(self):
+        valid_items = {k: v for k, v in self.cart.items() if not k.startswith('_') and isinstance(v, dict)}
+        product_ids = [int(item['producto_id']) for item in valid_items.values()]
+        productos = Producto.objects.filter(id__in=product_ids).prefetch_related('imagenes')
+        
+        for key, item_data in valid_items.items():
+            item = item_data.copy()
+            item['cart_key'] = key
+            producto = next((p for p in productos if p.id == item['producto_id']), None)
+            item['producto'] = producto
+            
+            if 'producto_slug' not in item and producto:
+                item['producto_slug'] = producto.slug
+            
+            item['precio_decimal'] = Decimal(item['precio'])
+            item['total_precio'] = item['precio_decimal'] * item['quantity']
+            # Agregar 'total' que es lo que espera el template
+            item['total'] = item['total_precio']
+            yield item
+
+    def __len__(self):
+        return sum(item['quantity'] for key, item in self.cart.items() if not key.startswith('_') and isinstance(item, dict))
+
+    def get_total_price(self):
+        subtotal = sum(Decimal(item['precio']) * item['quantity'] for key, item in self.cart.items() if not key.startswith('_') and isinstance(item, dict))
+        if self.has_gift_wrap():
+            subtotal += Decimal('5.00')
+        return subtotal
+
+    def clear(self):
+        if self.user.is_authenticated:
+            CarritoItem.objects.filter(usuario=self.user).delete()
+        self.cart = {}
+        if settings.CART_SESSION_ID in self.session:
+            self.session[settings.CART_SESSION_ID] = {}
+        self.session.modified = True
+        self.save()
+
+    def update_quantity(self, product_id, quantity):
+        product_id = str(product_id)
+        if product_id in self.cart:
+            if quantity > 0:
+                self.cart[product_id]['quantity'] = quantity
+            else:
+                self.remove(product_id)
+            self.save()
+
+    def sync_with_stock(self, adjust_to_stock=True):
+        valid_items = {key: item for key, item in self.cart.items() if not key.startswith('_') and isinstance(item, dict)}
+        has_changes = False
+
+        for product_key, item_data in list(valid_items.items()):
+            try:
+                producto = Producto.objects.get(id=item_data['producto_id'])
+            except Producto.DoesNotExist:
+                self.cart.pop(product_key, None)
+                has_changes = True
+                continue
+
+            stock_real = int(producto.stock or 0)
+            quantity = int(item_data.get('quantity') or 0)
+
+            if stock_real <= 0 or quantity <= 0:
+                self.cart.pop(product_key, None)
+                has_changes = True
+                continue
+
+            if quantity > stock_real:
+                if adjust_to_stock:
+                    self.cart[product_key]['quantity'] = stock_real
+                    has_changes = True
+                else:
+                    self.cart.pop(product_key, None)
+                    has_changes = True
+
+        if has_changes:
+            self.save()
+
+    def set_note(self, note):
+        cart_data = self.session.get(settings.CART_SESSION_ID, {})
+        cart_data['_note'] = note
+        self.session[settings.CART_SESSION_ID] = cart_data
+        self.save()
+
+    def get_note(self):
+        cart_data = self.session.get(settings.CART_SESSION_ID, {})
+        return cart_data.get('_note', '')
+
+    def set_gift_wrap(self, enabled=True):
+        cart_data = self.session.get(settings.CART_SESSION_ID, {})
+        cart_data['_gift_wrap'] = enabled
+        self.session[settings.CART_SESSION_ID] = cart_data
+        self.save()
+
+    def has_gift_wrap(self):
+        cart_data = self.session.get(settings.CART_SESSION_ID, {})
+        return cart_data.get('_gift_wrap', False)

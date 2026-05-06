@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .testimonial-item.style-column {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 450px;
+    }
+
+    .testimonial-item.style-column .rating,
+    .testimonial-item.style-column .heading,
+    .testimonial-item.style-column .author,
+    .testimonial-item.style-column .product {
+        flex-shrink: 0;
+    }
+
+    .testimonial-item.style-column .heading {
+        min-height: 50px;
+    }
+
+    .testimonial-item.style-column .text {
+        flex-grow: 1;
+        min-height: 80px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+    }
+
+    .testimonial-item.style-column .author {
+        margin-top: auto;
+    }
+
+    .testimonial-item.style-column .product {
+        margin-top: 15px;
+    }
+
+    .tf-sw-testimonial .swiper-slide {
+        height: auto;
+    }
+</style>
+
+<div class="tf-page-title">
+    <div class="container-full">
+        <div class="heading text-center">Carrito de Compras</div>
+    </div>
+</div>
+
+<section class="flat-spacing-11">
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mb_20">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% if not cart_items %}
+            <div class="tf-page-cart text-center mt_140 mb_200">
+                <h5 class="mb_24">Tu carrito está vacío</h5>
+                <p class="mb_24">Puedes ver todos los productos disponibles y comprar en la tienda.</p>
+                <a href="{% url 'productos:lista_productos' %}" class="tf-btn btn-sm radius-3 btn-fill btn-icon animate-hover-btn">
+                    Volver a la tienda
+                    <i class="icon icon-arrow1-top-left"></i>
+                </a>
+            </div>
+        {% else %}
+            <div class="tf-page-cart-wrap">
+                <div class="tf-page-cart-item">
+                    <form>
+                        <table class="tf-table-page-cart">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                    <tr class="tf-cart-item" data-product-id="{{ item.producto_id }}" data-stock="{{ item.producto.stock|default:0 }}">
+                                        <td class="tf-cart-item_product">
+                                            {% if item.producto %}
+                                                <a href="{{ item.producto.get_absolute_url }}" class="img-box">
+                                            {% else %}
+                                                <a href="#" class="img-box">
+                                            {% endif %}
+                                                {% if item.imagen %}
+                                                    <img src="{{ item.imagen }}" alt="{{ item.nombre }}">
+                                                {% else %}
+                                                    <img src="{% static 'images/products/placeholder.jpg' %}" alt="{{ item.nombre }}">
+                                                {% endif %}
+                                            </a>
+                                            <div class="cart-info">
+                                                {% if item.producto %}
+                                                    <a href="{{ item.producto.get_absolute_url }}" class="cart-title link">{{ item.nombre }}</a>
+                                                {% else %}
+                                                    <span class="cart-title link">{{ item.nombre }}</span>
+                                                {% endif %}
+                                                <div class="cart-meta-variant">
+                                                    {% if item.producto and item.producto.stock %}<span class="text-muted ms-2">(Stock: {{ item.producto.stock }})</span>{% endif %}
+                                                </div>
+                                                <span class="remove-cart link remove" data-product-id="{{ item.producto_id }}">Eliminar</span>
+                                            </div>
+                                        </td>
+                                        <td class="tf-cart-item_price" cart-data-title="Precio">
+                                            <div class="cart-price price">${{ item.precio }}</div>
+                                        </td>
+                                        <td class="tf-cart-item_quantity" cart-data-title="Cantidad">
+                                            <div class="cart-quantity">
+                                                <div class="wg-quantity">
+                                                    <span class="btn-quantity minus-btn" data-action="decrease" {% if item.quantity <= 1 %}style="opacity: 0.5; cursor: not-allowed; pointer-events: none;"{% endif %}>
+                                                        <svg class="d-inline-block" width="9" height="1" viewBox="0 0 9 1" fill="currentColor">
+                                                            <path d="M9 1H5.14286H3.85714H0V1.50201e-05H3.85714L5.14286 0L9 1.50201e-05V1Z"></path>
+                                                        </svg>
+                                                    </span>
+                                                    <input type="text" name="number" value="{{ item.quantity }}" readonly>
+                                                    <span class="btn-quantity plus-btn" data-action="increase" {% if item.producto and item.quantity >= item.producto.stock %}style="opacity: 0.5; cursor: not-allowed; pointer-events: none;"{% endif %}>
+                                                        <svg class="d-inline-block" width="9" height="9" viewBox="0 0 9 9" fill="currentColor">
+                                                            <path d="M9 5.14286H5.14286V9H3.85714V5.14286H0V3.85714H3.85714V0H5.14286V3.85714H9V5.14286Z"></path>
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="tf-cart-item_total" cart-data-title="Total">
+                                            <div class="cart-total price">${{ item.total }}</div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </form>
+                </div>
+
+                <div class="tf-page-cart-footer">
+                    <div class="tf-cart-footer-inner">
+                        <div class="tf-free-shipping-bar">
+                            {% with free_shipping_threshold=250 %}
+                                <div class="tf-progress-bar">
+                                    <span id="shippingProgressBar" style="width: {% if cart.get_total_price >= free_shipping_threshold %}100{% else %}{% widthratio cart.get_total_price free_shipping_threshold 100 %}{% endif %}%;">
+                                        <div class="progress-car">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="21" height="14" viewBox="0 0 21 14" fill="currentColor">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0.875C0 0.391751 0.391751 0 0.875 0H13.5625C14.0457 0 14.4375 0.391751 14.4375 0.875V3.0625H17.3125C17.5867 3.0625 17.845 3.19101 18.0104 3.40969L20.8229 7.12844C20.9378 7.2804 21 7.46572 21 7.65625V11.375C21 11.8582 20.6082 12.25 20.125 12.25H17.7881C17.4278 13.2695 16.4554 14 15.3125 14C14.1696 14 13.1972 13.2695 12.8369 12.25H7.72563C7.36527 13.2695 6.39293 14 5.25 14C4.10706 14 3.13473 13.2695 2.77437 12.25H0.875C0.391751 12.25 0 11.8582 0 11.375V0.875ZM2.77437 10.5C3.13473 9.48047 4.10706 8.75 5.25 8.75C6.39293 8.75 7.36527 9.48046 7.72563 10.5H12.6875V1.75H1.75V10.5H2.77437ZM14.4375 8.89937V4.8125H16.8772L19.25 7.94987V10.5H17.7881C17.4278 9.48046 16.4554 8.75 15.3125 8.75C15.0057 8.75 14.7112 8.80264 14.4375 8.89937ZM5.25 10.5C4.76676 10.5 4.375 10.8918 4.375 11.375C4.375 11.8582 4.76676 12.25 5.25 12.25C5.73323 12.25 6.125 11.8582 6.125 11.375C6.125 10.8918 5.73323 10.5 5.25 10.5ZM15.3125 10.5C14.8293 10.5 14.4375 10.8918 14.4375 11.375C14.4375 11.8582 14.8293 12.25 15.3125 12.25C15.7957 12.25 16.1875 11.8582 16.1875 11.375C16.1875 10.8918 15.7957 10.5 15.3125 10.5Z"></path>
+                                            </svg>
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="tf-progress-msg" id="shippingProgressMessage">
+                                    {% if cart.get_total_price >= free_shipping_threshold %}
+                                        <span class="fw-6">Excelente.</span> Ya alcanzaste el envio gratuito.
+                                    {% else %}
+                                        <span class="fw-6">Envío nacional.</span> Te confirmaremos el costo al procesar tu compra.
+                                    {% endif %}
+                                </div>
+                            {% endwith %}
+                        </div>
+
+                        <div class="tf-page-cart-checkout">
+                            <div class="accordion-shipping-content">
+                                <div class="tf-cart-totals-discounts">
+                                    <h3>Subtotal</h3>
+                                    <span class="total-value" id="cartSubtotal">${{ cart.get_total_price }} USD</span>
+                                </div>
+
+                                <p class="tf-cart-tax">
+                                    Impuestos y <a href="#">envío</a> calculados al finalizar la compra.
+                                </p>
+
+                                <div class="tf-cart-totals-discounts">
+                                    <h3>Total</h3>
+                                    <span class="total-value" id="cartTotal">${{ cart.get_total_price }} USD</span>
+                                </div>
+
+                                <div class="cart-checkout-btn">
+                                    <a href="{% url 'productos:checkout' %}" class="tf-btn w-100 btn-fill animate-hover-btn radius-3 justify-content-center">
+                                        <span>Finalizar compra</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{% if productos_recomendados %}
+<section class="flat-spacing-17 pt_0">
+    <div class="container">
+        <div class="flat-title">
+            <span class="title">También te puede interesar</span>
+        </div>
+
+        <div class="hover-sw-nav hover-sw-2">
+            <div dir="ltr" class="swiper tf-sw-product-sell wrap-sw-over" data-preview="4" data-tablet="3" data-mobile="2" data-space-lg="30" data-space-md="15" data-pagination="2" data-pagination-md="3" data-pagination-lg="3">
+                <div class="swiper-wrapper">
+                    {% for producto in productos_recomendados %}
+                        <div class="swiper-slide" lazy="true">
+                            <div class="card-product">
+                                <div class="card-product-wrapper">
+                                    <a href="{{ producto.get_absolute_url }}" class="product-img">
+                                        {% if producto.imagenes.first %}
+                                            <img class="lazyload img-product" data-src="{{ producto.imagenes.first.src }}" src="{{ producto.imagenes.first.src }}" alt="{{ producto.nombre }}">
+                                        {% else %}
+                                            <img class="lazyload img-product" data-src="{% static 'images/products/placeholder.jpg' %}" src="{% static 'images/products/placeholder.jpg' %}" alt="{{ producto.nombre }}">
+                                        {% endif %}
+                                    </a>
+                                    <div class="list-product-btn">
+                                        <a href="#quick_view" data-bs-toggle="modal" data-product-id="{{ producto.id }}" class="box-icon bg_white quickview tf-btn-loading">
+                                            <span class="icon icon-view"></span>
+                                            <span class="tooltip">Vista rápida</span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="card-product-info">
+                                    <a href="{{ producto.get_absolute_url }}" class="title link">{{ producto.nombre }}</a>
+                                    <span class="price">${{ producto.precio_final }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="nav-sw nav-next-slider nav-next-product box-icon w_46 round"><span class="icon icon-arrow-left"></span></div>
+            <div class="nav-sw nav-prev-slider nav-prev-product box-icon w_46 round"><span class="icon icon-arrow-right"></span></div>
+            <div class="sw-dots style-2 sw-pagination-product justify-content-center"></div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<script>
+(function () {
+    'use strict';
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function notify(message, isError) {
+        if (isError) {
+            console.error(message);
+            alert(message);
+        } else {
+            console.log(message);
+        }
+    }
+
+    function updateCartCount(count) {
+        if (typeof count === 'undefined' || count === null) return;
+        document.querySelectorAll('.tf-cart-count, .toolbar-count').forEach(function (el) {
+            el.textContent = count;
+        });
+    }
+
+    function updateTotals(cartTotal) {
+        if (typeof cartTotal === 'undefined' || cartTotal === null) return;
+        const totalText = '$' + cartTotal + ' USD';
+        const subtotal = document.getElementById('cartSubtotal');
+        const total = document.getElementById('cartTotal');
+        if (subtotal) subtotal.textContent = totalText;
+        if (total) total.textContent = totalText;
+        updateShippingProgress(cartTotal);
+    }
+
+    function updateShippingProgress(cartTotal) {
+        const progressBar = document.getElementById('shippingProgressBar');
+        const message = document.getElementById('shippingProgressMessage');
+        if (!progressBar || !message) return;
+
+        const threshold = 250;
+        const totalValue = parseFloat(cartTotal || 0);
+        const percent = Math.max(0, Math.min(100, (totalValue / threshold) * 100));
+        progressBar.style.width = percent + '%';
+
+        if (totalValue >= threshold) {
+            message.innerHTML = '<span class="fw-6">Excelente.</span> Ya alcanzaste el envio gratuito.';
+        } else {
+            message.innerHTML = '<span class="fw-6">Envío nacional.</span> Te confirmaremos el costo al procesar tu compra.';
+        }
+    }
+
+    function setQtyButtonState(button, disabled) {
+        if (!button) return;
+        button.style.opacity = disabled ? '0.5' : '1';
+        button.style.cursor = disabled ? 'not-allowed' : 'pointer';
+        button.style.pointerEvents = disabled ? 'none' : 'auto';
+    }
+
+    function syncRowButtons(row, quantity, stock) {
+        const minusBtn = row.querySelector('.minus-btn');
+        const plusBtn = row.querySelector('.plus-btn');
+
+        setQtyButtonState(minusBtn, quantity <= 1);
+        setQtyButtonState(plusBtn, stock > 0 ? quantity >= stock : false);
+    }
+
+    function updateCartQuantity(row, newQuantity) {
+        const csrftoken = getCookie('csrftoken');
+        const productId = row.getAttribute('data-product-id');
+        const stock = parseInt(row.getAttribute('data-stock') || '0', 10);
+        const quantityInput = row.querySelector('input[name="number"]');
+        const itemTotal = row.querySelector('.cart-total');
+
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        formData.append('quantity', newQuantity);
+
+        fetch("{% url 'productos:cart_update' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                notify(data.message || 'No se pudo actualizar el carrito.', true);
+                return;
+            }
+
+            if (quantityInput) quantityInput.value = newQuantity;
+            if (itemTotal && data.item_total) itemTotal.textContent = '$' + data.item_total;
+
+            updateCartCount(data.cart_count);
+            updateTotals(data.cart_total);
+            syncRowButtons(row, newQuantity, stock);
+        })
+        .catch(() => notify('Ocurrió un error al actualizar la cantidad.', true));
+    }
+
+    document.querySelectorAll('.tf-cart-item').forEach(function (row) {
+        const minusBtn = row.querySelector('.minus-btn');
+        const plusBtn = row.querySelector('.plus-btn');
+        const quantityInput = row.querySelector('input[name="number"]');
+        const stock = parseInt(row.getAttribute('data-stock') || '0', 10);
+
+        if (!quantityInput) return;
+
+        const initialQty = parseInt(quantityInput.value || '1', 10);
+        syncRowButtons(row, initialQty, stock);
+
+        if (minusBtn) {
+            minusBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const currentQty = parseInt(quantityInput.value || '1', 10);
+                if (currentQty <= 1) return;
+                updateCartQuantity(row, currentQty - 1);
+            });
+        }
+
+        if (plusBtn) {
+            plusBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const currentQty = parseInt(quantityInput.value || '1', 10);
+                if (stock > 0 && currentQty >= stock) {
+                    notify('Stock máximo alcanzado para este producto.', true);
+                    return;
+                }
+                updateCartQuantity(row, currentQty + 1);
+            });
+        }
+    });
+
+    document.querySelectorAll('.remove-cart').forEach(function (removeBtn) {
+        removeBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const productId = this.getAttribute('data-product-id');
+            if (!productId) return;
+
+            if (!window.confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) return;
+
+            const formData = new FormData();
+            formData.append('product_id', productId);
+
+            fetch("{% url 'productos:cart_remove' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    notify(data.message || 'No se pudo eliminar el producto.', true);
+                    return;
+                }
+                window.location.reload();
+            })
+            .catch(() => notify('Ocurrió un error al eliminar el producto.', true));
+        });
+    });
+
+})();
+</script>
+{% endblock %}

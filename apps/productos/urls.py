@@ -26,12 +26,20 @@ urlpatterns = [
     path('marcas/<slug:slug>/', views.MarcaListView.as_view(), name='lista_por_marca'),
      path('marca/<slug:slug>/', views.productos_por_marca, name='productos_por_marca'),  # ← NUEVA RUTA
 
-    # ── CARRITO ───────────────────────────────────────
-    path('carrito/', views.CarritoView.as_view(), name='carrito'),
-    path('carrito/agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
-    path('carrito/eliminar/<int:item_id>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
-    path('carrito/actualizar/', views.actualizar_cantidad, name='actualizar_cantidad'),
+    # ── CARRITO & CHECKOUT ───────────────────────────────────────
+    path('cart/', views.view_cart, name='view_cart'),
+    path('cart/add/', views.cart_add, name='cart_add'),
+    path('cart/remove/', views.cart_remove, name='cart_remove'),
+    path('cart/update/', views.cart_update, name='cart_update'),
+    path('checkout/', views.checkout, name='checkout'),
+    path('checkout/process/', views.checkout_process, name='checkout_process'),
+    path('checkout/confirmation/<int:pedido_id>/', views.order_confirmation, name='order_confirmation'),
+    path('checkout/validate-discount/', views.validate_discount_code, name='validate_discount_code'),
 
     # ── API ────────────────────────────────────────────
     path('api/producto/<int:producto_id>/quick-view/', views.producto_quick_view, name='producto_quick_view'),
+
+    # ── WISHLIST ───────────────────────────────────────
+    path('wishlist/', views.view_wishlist, name='wishlist'),
+    path('wishlist/toggle/', views.wishlist_toggle, name='wishlist_toggle'),
 ]

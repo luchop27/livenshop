@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+        <div class="tf-page-title">
+            <div class="container-full">
+                <div class="heading text-center">Finalizar Compra</div>
+            </div>
+        </div>
+
+        <section class="flat-spacing-11">
+            <div class="container">
+                <div class="tf-page-cart-wrap layout-2">
+                    <div class="tf-page-cart-item">
+                        <h5 class="fw-5 mb_20">Detalles de Facturación</h5>
+                        <form class="form-checkout" method="post" action="{% url 'productos:checkout_process' %}" id="checkout-form">
+                            {% csrf_token %}
+                            <div class="box grid-2">
+                                <fieldset class="fieldset">
+                                    <label for="first-name">Nombre <span class="text-danger">*</span></label>
+                                    <input type="text" name="first_name" id="first-name" value="{{ user_nombre|default:'' }}" required>
+                                </fieldset>
+                                <fieldset class="fieldset">
+                                    <label for="last-name">Apellido <span class="text-danger">*</span></label>
+                                    <input type="text" name="last_name" id="last-name" value="{{ user_apellido|default:'' }}" required>
+                                </fieldset>
+                            </div>
+                            <fieldset class="box fieldset">
+                                <label for="province">Provincia <span class="text-danger">*</span></label>
+                                <div class="select-custom">
+                                    <select class="tf-select w-100" id="province" name="province" required>
+                                        <option value="">Selecciona tu provincia</option>
+                                        <option value="Azuay">Azuay</option>
+                                        <option value="Bolívar">Bolívar</option>
+                                        <option value="Cañar">Cañar</option>
+                                        <option value="Carchi">Carchi</option>
+                                        <option value="Chimborazo">Chimborazo</option>
+                                        <option value="Cotopaxi">Cotopaxi</option>
+                                        <option value="El Oro">El Oro</option>
+                                        <option value="Esmeraldas">Esmeraldas</option>
+                                        <option value="Galápagos">Galápagos</option>
+                                        <option value="Guayas">Guayas</option>
+                                        <option value="Imbabura">Imbabura</option>
+                                        <option value="Loja">Loja</option>
+                                        <option value="Los Ríos">Los Ríos</option>
+                                        <option value="Manabí">Manabí</option>
+                                        <option value="Morona Santiago">Morona Santiago</option>
+                                        <option value="Napo">Napo</option>
+                                        <option value="Orellana">Orellana</option>
+                                        <option value="Pastaza">Pastaza</option>
+                                        <option value="Pichincha">Pichincha</option>
+                                        <option value="Santa Elena">Santa Elena</option>
+                                        <option value="Santo Domingo de los Tsáchilas">Santo Domingo de los Tsáchilas</option>
+                                        <option value="Sucumbíos">Sucumbíos</option>
+                                        <option value="Tungurahua">Tungurahua</option>
+                                        <option value="Zamora Chinchipe">Zamora Chinchipe</option>
+                                    </select>
+                                </div>
+                            </fieldset>
+                            <fieldset class="box fieldset">
+                                <label for="city">Ciudad <span class="text-danger">*</span></label>
+                                <div class="select-custom">
+                                    <select class="tf-select w-100" id="city" name="city" required>
+                                        <option value="">Selecciona una provincia primero</option>
+                                    </select>
+                                </div>
+                            </fieldset>
+                            <fieldset class="box fieldset d-none" id="other-city-field">
+                                <label for="other-city">Especifica tu ciudad <span class="text-danger">*</span></label>
+                                <input type="text" name="other_city" id="other-city" placeholder="Ingresa tu ciudad">
+                            </fieldset>
+                            
+                            <input type="hidden" name="country" value="Ecuador">
+                            <fieldset class="box fieldset">
+                                <label for="address">Dirección Completa <span class="text-danger">*</span></label>
+                                <input type="text" name="address" id="address" placeholder="Ej: Av. 10 de Agosto y Naciones Unidas, Edificio X, Piso 5" required>
+                            </fieldset>
+                            
+                            <fieldset class="box fieldset">
+                                <label for="phone">Número de Teléfono <span class="text-danger">*</span></label>
+                                <input type="tel" name="phone" id="phone" placeholder="Ej: 0987654321" value="{{ user_telefono|default:'' }}" required>
+                            </fieldset>
+                            <fieldset class="box fieldset">
+                                <label for="email">Email <span class="text-danger">*</span></label>
+                                <input type="email" name="email" id="email" value="{{ user_email|default:'' }}" required>
+                            </fieldset>
+                            <fieldset class="box fieldset">
+                                <label for="note">Notas del pedido (opcional)</label>
+                                <textarea name="order_note" id="note">{{ note }}</textarea>
+                            </fieldset>
+                            
+                            <!-- Código de Descuento -->
+                            <div class="box-checkbox fieldset-radio mb_20">
+                                <input type="checkbox" id="has-discount-code" class="tf-check">
+                                <label for="has-discount-code" class="text_black-2">Tengo un código de descuento</label>
+                            </div>
+                            <fieldset class="box fieldset d-none" id="discount-code-field">
+                                <label for="discount-code">Código de Descuento</label>
+                                <div class="input-group">
+                                    <input type="text" name="discount_code" id="discount-code" placeholder="Ingresa tu código">
+                                    <button type="button" class="btn btn-sm btn-outline-dark ms-2" id="apply-discount-btn">Aplicar</button>
+                                </div>
+                                <small class="text-muted d-none" id="discount-message"></small>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="tf-page-cart-footer">
+                        <div class="tf-cart-footer-inner">
+                            <h5 class="fw-5 mb_20">Tu Pedido</h5>
+                            <div class="tf-page-cart-checkout widget-wrap-checkout">
+                                <ul class="wrap-checkout-product">
+                                    {% for item in cart_items %}
+                                    <li class="checkout-product-item">
+                                        <figure class="img-product">
+                                            {% if item.imagen %}
+                                                <img src="{{ item.imagen }}" alt="{{ item.nombre }}">
+                                            {% else %}
+                                                <img src="{% static 'images/products/placeholder.jpg' %}" alt="{{ item.nombre }}">
+                                            {% endif %}
+                                            <span class="quantity">{{ item.quantity }}</span>
+                                        </figure>
+                                        <div class="content">
+                                            <div class="info">
+                                                <p class="name">{{ item.nombre }}</p>
+                                            </div>
+                                            <span class="price">${{ item.total }}</span>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <div class="d-flex justify-content-between line pb_20">
+                                    <h6 class="fw-5">Subtotal</h6>
+                                    <h6 class="subtotal fw-5" id="checkout-subtotal">${{ cart.get_total_price }}</h6>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between line pb_20" id="shipping-line">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h6 class="fw-5 mb-0">Envío</h6>
+                                    </div>
+                                    <h6 class="fw-5" id="shipping-cost">$0.00</h6>
+                                </div>
+                                <div class="d-flex justify-content-between line pb_20 d-none" id="discount-line">
+                                    <h6 class="fw-5 text-success">Descuento (<span id="discount-code-applied"></span>)</h6>
+                                    <h6 class="fw-5 text-success" id="discount-amount">-$0.00</h6>
+                                </div>
+                                <div class="d-flex justify-content-between line pb_20">
+                                    <h6 class="fw-5">Total</h6>
+                                    <h6 class="total fw-5" id="checkout-total">${{ cart.get_total_price }}</h6>
+                                </div>
+                                <input type="hidden" name="discount_code_applied" id="discount-code-applied-input" value="">
+                                <input type="hidden" name="discount_amount" id="discount-amount-input" value="0">
+                                
+                                <!-- Opciones de Pago -->
+                                <div class="wd-check-payment">
+                                    <div class="fieldset-radio mb_20">
+                                        <input type="radio" name="payment_method" id="bank" class="tf-check" value="bank_transfer" checked>
+                                        <label for="bank">Transferencia Bancaria / WhatsApp</label>
+                                    </div>
+                                    <div class="fieldset-radio mb_20">
+                                        <input type="radio" name="payment_method" id="payphone" class="tf-check" value="payphone">
+                                        <label for="payphone">Tarjeta de Crédito / Débito (Payphone)</label>
+                                    </div>
+                                    
+                                    <p class="text_black-2 mb_20">Tus datos personales serán utilizados para procesar tu pedido y mejorar tu experiencia.</p>
+                                    <div class="box-checkbox fieldset-radio mb_20">
+                                        <input type="checkbox" name="terms_accepted" id="check-agree" class="tf-check" required>
+                                        <label for="check-agree" class="text_black-2">He leído y acepto los términos y condiciones.</label>
+                                    </div>
+                                </div>
+                                <button type="submit" form="checkout-form" id="place-order-btn"
+                                    class="tf-btn radius-3 btn-fill btn-icon animate-hover-btn justify-content-center">Realizar Pedido</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+<style>
+    .input-group { display: flex; gap: 10px; }
+    .input-group input { flex: 1; }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const provinceSelect = document.getElementById('province');
+        const citySelect = document.getElementById('city');
+        const otherCityField = document.getElementById('other-city-field');
+        const otherCityInput = document.getElementById('other-city');
+        
+        function getShippingCost(cityName, cartTotal) {
+            if (!cityName) return 0;
+            if (cityName.toLowerCase() === 'quito') {
+                return cartTotal > 50 ? 0 : 3;
+            }
+            return cartTotal >= 90 ? 0 : 7;
+        }
+
+        // Diccionario de Provincias y Ciudades de Ecuador
+        const ecuadorData = {
+            "Azuay": ["Cuenca", "Gualaceo", "Paute", "Sigsig", "Girón", "Santa Isabel", "Camilo Ponce Enríquez"],
+            "Bolívar": ["Guaranda", "Chillanes", "Chimbo", "Echeandía", "San Miguel", "Caluma"],
+            "Cañar": ["Azogues", "Biblián", "Cañar", "La Troncal", "El Tambo", "Suscal"],
+            "Carchi": ["Tulcán", "Bolívar", "Espejo", "Mira", "Montúfar", "San Pedro de Huaca"],
+            "Chimborazo": ["Riobamba", "Alausí", "Chambo", "Chunchi", "Colta", "Cumandá", "Guano", "Pallatanga"],
+            "Cotopaxi": ["Latacunga", "La Maná", "Pangua", "Pujilí", "Salcedo", "Saquisilí", "Sigchos"],
+            "El Oro": ["Machala", "Santa Rosa", "Pasaje", "Huaquillas", "Arenillas", "Zaruma", "Portovelo", "Piñas", "El Guabo"],
+            "Esmeraldas": ["Esmeraldas", "Atacames", "Eloy Alfaro", "Muisne", "Quinindé", "San Lorenzo"],
+            "Galápagos": ["Puerto Baquerizo Moreno", "Puerto Ayora", "Puerto Villamil"],
+            "Guayas": ["Guayaquil", "Durán", "Milagro", "Daule", "Samborondón", "El Empalme", "Naranjal", "Balzar", "Pedro Carbo", "Playas"],
+            "Imbabura": ["Ibarra", "Otavalo", "Cotacachi", "Antonio Ante", "Pimampiro", "San Miguel de Urcuquí"],
+            "Loja": ["Loja", "Calvas", "Catamayo", "Celica", "Macará", "Puyango", "Saraguro", "Zapotillo"],
+            "Los Ríos": ["Babahoyo", "Quevedo", "Buena Fe", "Ventanas", "Vinces", "Puebloviejo", "Valencia"],
+            "Manabí": ["Portoviejo", "Manta", "Chone", "El Carmen", "Monte Cristi", "Jipijapa", "Pedernales", "Bahía de Caráquez"],
+            "Morona Santiago": ["Macas", "Gualaquiza", "Sucúa", "Palora", "San Juan Bosco", "Logroño", "Limón Indanza"],
+            "Napo": ["Tena", "Archidona", "El Chaco", "Quijos", "Carlos Julio Arosemena Tola"],
+            "Orellana": ["Puerto Francisco de Orellana", "La Joya de los Sachas", "Loreto", "Nuevo Rocafuerte"],
+            "Pastaza": ["Puyo", "Mera", "Santa Clara", "Arajuno"],
+            "Pichincha": ["Quito", "Cayambe", "Machachi", "Sangolquí", "Pedro Vicente Maldonado", "Puerto Quito", "San Miguel de los Bancos", "Tabacundo"],
+            "Santa Elena": ["Santa Elena", "La Libertad", "Salinas"],
+            "Santo Domingo de los Tsáchilas": ["Santo Domingo", "La Concordia"],
+            "Sucumbíos": ["Nueva Loja", "Cascales", "Cuyabeno", "Lumbaqui", "Putumayo", "Shushufindi", "Tarapoa"],
+            "Tungurahua": ["Ambato", "Baños", "Cevallos", "Mocha", "Patate", "Pelileo", "Píllaro", "Quero", "Tisaleo"],
+            "Zamora Chinchipe": ["Zamora", "Zumba", "Yantzaza", "El Pangui", "Zumbi", "Palanda", "Paquisha"]
+        };
+
+        if (provinceSelect) {
+            // El plugin niceSelect se inicializa automáticamente por el tema
+            // Solo necesitamos vincular el evento 'change'
+
+            const handleProvinceChange = function() {
+                const selectedProvince = this.value;
+                citySelect.innerHTML = '<option value="">Selecciona tu ciudad</option>';
+
+                if (!selectedProvince) {
+                    citySelect.innerHTML = '<option value="">Selecciona una provincia primero</option>';
+                    if (window.jQuery && $(citySelect).length) {
+                        try {
+                            $(citySelect).niceSelect('update');
+                        } catch(e) {}
+                    }
+                    return;
+                }
+
+
+                // Llenar ciudades de la provincia seleccionada
+                const ciudades = ecuadorData[selectedProvince];
+                if (ciudades) {
+                    ciudades.forEach(ciudad => {
+                        const option = document.createElement("option");
+                        option.value = ciudad;
+                        option.textContent = ciudad;
+                        citySelect.appendChild(option);
+                    });
+                }
+                
+                // Agregar opción "Otra"
+                const otraOption = document.createElement("option");
+                otraOption.value = "Otra";
+                otraOption.textContent = "Otra ciudad";
+                citySelect.appendChild(otraOption);
+
+                citySelect.value = '';
+                
+                // Refrescar el nice-select después de inyectar las opciones en el DOM
+                if (window.jQuery && $(citySelect).length) {
+                    try {
+                        // Es más seguro destruir y recrear el plugin para que detecte las nuevas opciones dinámicas
+                        $(citySelect).niceSelect('update');
+                    } catch(e) {
+                        try {
+                            $(citySelect).selectpicker('refresh');
+                        } catch(e2) {}
+                    }
+                }
+                
+                calculateShipping();
+            };
+            
+            if (window.jQuery) {
+                $(provinceSelect).on('change', handleProvinceChange);
+            } else {
+                provinceSelect.addEventListener('change', handleProvinceChange);
+            }
+        }
+        
+        if (citySelect && otherCityField) {
+            const handleCityChange = function() {
+                if (this.value === 'Otra') {
+                    otherCityField.classList.remove('d-none');
+                    otherCityInput.setAttribute('required', 'required');
+                } else {
+                    otherCityField.classList.add('d-none');
+                    otherCityInput.removeAttribute('required');
+                    otherCityInput.value = '';
+                }
+                calculateShipping();
+            };
+            
+            if (window.jQuery) {
+                $(citySelect).on('change', handleCityChange);
+            } else {
+                citySelect.addEventListener('change', handleCityChange);
+            }
+        }
+        
+        const hasDiscountCodeCheckbox = document.getElementById('has-discount-code');
+        const discountCodeField = document.getElementById('discount-code-field');
+        if (hasDiscountCodeCheckbox && discountCodeField) {
+            hasDiscountCodeCheckbox.addEventListener('change', function() {
+                if (this.checked) discountCodeField.classList.remove('d-none');
+                else {
+                    discountCodeField.classList.add('d-none');
+                    document.getElementById('discount-code').value = '';
+                    removeDiscount();
+                }
+            });
+        }
+        
+        const applyDiscountBtn = document.getElementById('apply-discount-btn');
+        if (applyDiscountBtn) {
+            applyDiscountBtn.addEventListener('click', function() {
+                const discountCode = document.getElementById('discount-code').value.trim();
+                if (!discountCode) return;
+                
+                applyDiscountBtn.disabled = true;
+                applyDiscountBtn.textContent = 'Verificando...';
+                
+                fetch("{% url 'productos:validate_discount_code' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: 'discount_code=' + encodeURIComponent(discountCode)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.valid) {
+                        applyDiscount(discountCode, data.discount_amount);
+                        showDiscountMessage('Código aplicado', 'success');
+                    } else {
+                        showDiscountMessage(data.message || 'Código inválido', 'error');
+                        removeDiscount();
+                    }
+                })
+                .finally(() => {
+                    applyDiscountBtn.disabled = false;
+                    applyDiscountBtn.textContent = 'Aplicar';
+                });
+            });
+        }
+        
+        function applyDiscount(code, amount) {
+            document.getElementById('discount-line').classList.remove('d-none');
+            document.getElementById('discount-amount').textContent = '-$' + amount.toFixed(2);
+            document.getElementById('discount-code-applied').textContent = code;
+            document.getElementById('discount-amount-input').value = amount.toFixed(2);
+            calculateShipping();
+        }
+        
+        function removeDiscount() {
+            document.getElementById('discount-line').classList.add('d-none');
+            document.getElementById('discount-amount-input').value = '0';
+            showDiscountMessage('', '');
+            calculateShipping();
+        }
+
+        function showDiscountMessage(message, type) {
+            const el = document.getElementById('discount-message');
+            el.textContent = message;
+            el.className = 'text-muted ' + (type === 'success' ? 'text-success' : 'text-danger');
+        }
+
+        function calculateShipping() {
+            const city = citySelect.value.trim();
+            const subtotalText = document.getElementById('checkout-subtotal').textContent.trim();
+            const subtotal = parseFloat(subtotalText.replace('$', '')) || 0;
+            
+            const shippingCost = getShippingCost(city, subtotal);
+            document.getElementById('shipping-cost').textContent = '$' + shippingCost.toFixed(2);
+            
+            const discountAmount = parseFloat(document.getElementById('discount-amount-input').value) || 0;
+            const finalTotal = subtotal + shippingCost - discountAmount;
+            
+            document.getElementById('checkout-total').textContent = '$' + finalTotal.toFixed(2);
+        }
+    });
+</script>
+
+{% endblock %}

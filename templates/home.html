@@ -189,13 +189,9 @@
                                             {% endwith %}
                                         </a>
                                         <div class="list-product-btn absolute-2">
-                                            <a href="#quick_add" data-bs-toggle="modal" class="box-icon bg_white quick-add tf-btn-loading">
-                                                <span class="icon icon-bag"></span>
-                                                <span class="tooltip">Quick Add</span>
-                                            </a>
-                                            <a href="#" class="box-icon bg_white wishlist btn-icon-action">
+                                            <a href="#" class="box-icon bg_white wishlist btn-icon-action {% if producto.id in request.session.wishlist %}active{% endif %}" data-product-id="{{ producto.id }}">
                                                 <span class="icon icon-heart"></span>
-                                                <span class="tooltip">Add to Wishlist</span>
+                                                <span class="tooltip">Añadir a Favoritos</span>
                                                 <span class="icon icon-delete"></span>
                                             </a>
                                             <a href="#quick_view" data-bs-toggle="modal" data-product-id="{{ producto.id }}" class="box-icon bg_white quickview tf-btn-loading">
@@ -272,13 +268,9 @@
                                             {% endwith %}
                                         </a>
                                         <div class="list-product-btn absolute-2">
-                                            <a href="#quick_add" data-bs-toggle="modal" class="box-icon bg_white quick-add tf-btn-loading">
-                                                <span class="icon icon-bag"></span>
-                                                <span class="tooltip">Quick Add</span>
-                                            </a>
-                                            <a href="#" class="box-icon bg_white wishlist btn-icon-action">
+                                            <a href="#" class="box-icon bg_white wishlist btn-icon-action {% if producto.id in request.session.wishlist %}active{% endif %}" data-product-id="{{ producto.id }}">
                                                 <span class="icon icon-heart"></span>
-                                                <span class="tooltip">Add to Wishlist</span>
+                                                <span class="tooltip">Añadir a Favoritos</span>
                                                 <span class="icon icon-delete"></span>
                                             </a>
                                             <a href="#quick_view" data-bs-toggle="modal"
@@ -450,13 +442,9 @@
                         ${imgHover}
                     </a>
                     <div class="list-product-btn absolute-2">
-                        <a href="#quick_add" data-bs-toggle="modal" class="box-icon bg_white quick-add tf-btn-loading">
-                            <span class="icon icon-bag"></span>
-                            <span class="tooltip">Quick Add</span>
-                        </a>
-                        <a href="#" class="box-icon bg_white wishlist btn-icon-action">
+                        <a href="#" class="box-icon bg_white wishlist btn-icon-action" data-product-id="${p.id}">
                             <span class="icon icon-heart"></span>
-                            <span class="tooltip">Add to Wishlist</span>
+                            <span class="tooltip">Añadir a Favoritos</span>
                             <span class="icon icon-delete"></span>
                         </a>
                         <a href="#quick_view" data-bs-toggle="modal" data-product-id="${p.id}" class="box-icon bg_white quickview tf-btn-loading">

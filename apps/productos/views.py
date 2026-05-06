@@ -13,7 +13,7 @@ from .models import Producto, Categoria, Marca, Coleccion, CarritoItem
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 
-from .models import Marca, Producto, Categoria, Coleccion, CarritoItem, Imagen, AtributoProducto, ShopGramPost
+from .models import Marca, Producto, Categoria, Coleccion, CarritoItem, Imagen, AtributoProducto, ShopGramPost, Pedido, PedidoItem
 
 
 def _active_marcas():
@@ -718,114 +718,278 @@ class ColeccionListView(ListView):
 
 
 # ══════════════════════════════════════════════════════
-# CARRITO - CLASS BASED & FUNCTION BASED VIEWS
+# CARRITO - SESSION & DB BASED
 # ══════════════════════════════════════════════════════
+from .cart import Cart
+import json
 
-class CarritoView(ListView):
+def view_cart(request):
     """
-    Vista del carrito de compras.
-    Solo accesible para usuarios autenticados.
+    Vista de la página principal del carrito.
     """
-    model = CarritoItem
-    template_name = 'productos/carrito.html'
-    context_object_name = 'items'
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_queryset(self):
-        return CarritoItem.objects.filter(
-            usuario=self.request.user
-        ).select_related('producto', 'producto__marca').prefetch_related('producto__imagenes')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        items = self.get_queryset()
-        
-        # Calcula totales
-        total = sum(item.total_precio for item in items)
-        cantidad_items = items.count()
-        
-        context['total'] = total
-        context['cantidad_items'] = cantidad_items
-        context['hay_items'] = cantidad_items > 0
-        
-        return context
-
-
-@login_required
-def agregar_al_carrito(request, producto_id):
-    """
-    Añade un producto al carrito o incrementa su cantidad.
-    Responde con JSON para AJAX.
-    """
-    producto = get_object_or_404(Producto, pk=producto_id, activo=True)
-    
-    item, created = CarritoItem.objects.get_or_create(
-        usuario=request.user,
-        producto=producto,
-        defaults={
-            'precio': producto.precio_final(),
-            'cantidad': 1
-        }
-    )
-    
-    if not created:
-        item.cantidad += 1
-        item.precio = producto.precio_final()
-        item.save()
-    
-    # Calcula el contador total del carrito
-    carrito_count = CarritoItem.objects.filter(usuario=request.user).count()
-    
-    return JsonResponse({
-        'ok': True,
-        'cantidad': item.cantidad,
-        'carrito_count': carrito_count,
-        'total_item': str(item.total_precio),
-        'mensaje': f'Producto añadido al carrito (x{item.cantidad})'
+    cart = Cart(request)
+    # Recomendados: podríamos mostrar productos de la misma categoría o destacados
+    productos_recomendados = Producto.objects.filter(activo=True, destacado=True).prefetch_related('imagenes')[:8]
+    return render(request, 'view-cart.html', {
+        'cart': cart,
+        'cart_items': cart,
+        'productos_recomendados': productos_recomendados
     })
 
-
-@login_required
-def eliminar_del_carrito(request, item_id):
+@require_POST
+def cart_add(request):
     """
-    Elimina un item del carrito.
+    Añade un producto al carrito (AJAX).
     """
-    CarritoItem.objects.filter(pk=item_id, usuario=request.user).delete()
-    return redirect('productos:carrito')
-
-
-@login_required
-@require_http_methods(["POST"])
-def actualizar_cantidad(request):
-    """
-    Actualiza la cantidad de un item del carrito.
-    Acepta JSON o form data.
-    """
-    try:
-        item_id = int(request.POST.get('item_id', 0))
-        cantidad = int(request.POST.get('cantidad', 1))
-        
-        item = get_object_or_404(CarritoItem, pk=item_id, usuario=request.user)
-        
-        if cantidad > 0:
-            item.cantidad = cantidad
-            item.save()
-            resultado = {
-                'ok': True,
-                'cantidad': item.cantidad,
-                'total_item': str(item.total_precio)
-            }
-        else:
-            item.delete()
-            resultado = {'ok': True, 'eliminado': True}
-        
-        return JsonResponse(resultado)
+    cart = Cart(request)
+    producto_id = request.POST.get('product_id')
+    quantity = int(request.POST.get('quantity', 1))
     
-    except (ValueError, TypeError):
-        return JsonResponse({'ok': False, 'error': 'Datos inválidos'}, status=400)
+    try:
+        producto = get_object_or_404(Producto, id=producto_id, activo=True)
+        # Verificar stock
+        if not producto.tiene_stock():
+            return JsonResponse({'success': False, 'message': 'Producto sin stock.'})
+            
+        cart.add(producto=producto, quantity=quantity)
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Producto añadido correctamente.',
+            'cart_count': len(cart),
+            'cart_total': str(cart.get_total_price())
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+@require_POST
+def cart_update(request):
+    """
+    Actualiza la cantidad de un producto (AJAX).
+    """
+    cart = Cart(request)
+    producto_id = request.POST.get('product_id')
+    quantity = int(request.POST.get('quantity', 1))
+    
+    try:
+        if quantity > 0:
+            cart.update_quantity(producto_id, quantity)
+        else:
+            cart.remove(producto_id)
+            
+        # Calcular el total del item actualizado
+        item_total = '0.00'
+        for item in cart:
+            if str(item['producto_id']) == str(producto_id):
+                item_total = str(item['total'])
+                break
+                
+        return JsonResponse({
+            'success': True,
+            'message': 'Carrito actualizado.',
+            'cart_count': len(cart),
+            'cart_total': str(cart.get_total_price()),
+            'item_total': item_total
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+@require_POST
+def cart_remove(request):
+    """
+    Elimina un producto del carrito (AJAX).
+    """
+    cart = Cart(request)
+    producto_id = request.POST.get('product_id')
+    
+    try:
+        cart.remove(producto_id)
+        return JsonResponse({
+            'success': True,
+            'message': 'Producto eliminado.',
+            'cart_count': len(cart),
+            'cart_total': str(cart.get_total_price())
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+
+# ══════════════════════════════════════════════════════
+# CHECKOUT
+# ══════════════════════════════════════════════════════
+
+def checkout(request):
+    """
+    Vista de la página de Checkout.
+    """
+    cart = Cart(request)
+    if len(cart) == 0:
+        messages.warning(request, "Tu carrito está vacío. Añade productos para comprar.")
+        return redirect('productos:view_cart')
+
+    # Provincias y ciudades mockeadas para el formulario
+    provincias = [
+        {'id': 1, 'nombre': 'Pichincha'},
+        {'id': 2, 'nombre': 'Guayas'},
+        {'id': 3, 'nombre': 'Azuay'},
+        {'id': 4, 'nombre': 'El Oro'},
+    ]
+    ciudades = [
+        {'nombre': 'Quito', 'provincia': {'id': 1}},
+        {'nombre': 'Guayaquil', 'provincia': {'id': 2}},
+        {'nombre': 'Cuenca', 'provincia': {'id': 3}},
+        {'nombre': 'Machala', 'provincia': {'id': 4}},
+    ]
+
+    context = {
+        'cart': cart,
+        'cart_items': cart,
+        'provincias': provincias,
+        'ciudades': ciudades,
+    }
+    
+    # Pre-llenar datos si el usuario está autenticado
+    if request.user.is_authenticated:
+        context['user_nombre'] = getattr(request.user, 'nombres', '')
+        context['user_apellido'] = getattr(request.user, 'apellidos', '')
+        context['user_email'] = request.user.email
+        # Aquí podrías cargar teléfono u otros datos si los tienes en el modelo Usuario
+
+    return render(request, 'checkout.html', context)
+
+@require_POST
+def validate_discount_code(request):
+    """
+    Valida un cupón de descuento.
+    """
+    code = request.POST.get('discount_code', '').strip().upper()
+    cart = Cart(request)
+    subtotal = cart.get_total_price()
+    
+    # Mock de cupones válidos
+    if code == 'LIVEN10':
+        discount_amount = float(subtotal) * 0.10
+        return JsonResponse({
+            'valid': True,
+            'discount_type': 'percentage',
+            'discount_value': '10',
+            'discount_amount': discount_amount
+        })
+    elif code == 'BIENVENIDO5':
+        discount_amount = 5.00
+        return JsonResponse({
+            'valid': True,
+            'discount_type': 'fixed',
+            'discount_value': '5.00',
+            'discount_amount': discount_amount
+        })
+        
+    return JsonResponse({'valid': False, 'message': 'El cupón no es válido o ha expirado.'})
+
+@require_POST
+def checkout_process(request):
+    """
+    Procesa el formulario de checkout y simula la creación del pedido.
+    """
+    cart = Cart(request)
+    if len(cart) == 0:
+        return redirect('productos:view_cart')
+
+    # Aquí capturaríamos los datos de facturación
+    first_name = request.POST.get('first_name')
+    last_name = request.POST.get('last_name')
+    email = request.POST.get('email')
+    telefono = request.POST.get('phone')
+    pais = request.POST.get('country', 'Ecuador')
+    
+    ciudad = request.POST.get('city')
+    if ciudad == 'Otra':
+        ciudad = request.POST.get('other_city')
+        
+    direccion = request.POST.get('address')
+    codigo_postal = request.POST.get('postal_code')
+    notas = request.POST.get('order_note', '')
+    metodo_pago = request.POST.get('payment_method', 'bank_transfer')
+
+    # Crear el Pedido
+    pedido = Pedido.objects.create(
+        usuario=request.user if request.user.is_authenticated else None,
+        nombres=first_name,
+        apellidos=last_name,
+        email=email,
+        telefono=telefono,
+        pais=pais,
+        ciudad=ciudad,
+        direccion=direccion,
+        codigo_postal=codigo_postal,
+        notas=notas,
+        subtotal=cart.get_total_price(),
+        total=cart.get_total_price(),  # Se puede aplicar envío y descuento
+        estado='pendiente',
+        metodo_pago=metodo_pago
+    )
+
+    # Crear los PedidoItem
+    for item in cart:
+        producto_obj = item['producto']
+        PedidoItem.objects.create(
+            pedido=pedido,
+            producto=producto_obj,
+            nombre_producto=producto_obj.nombre,
+            precio=item['precio'],
+            cantidad=item['quantity']
+        )
+        # Opcional: reducir stock aquí o cuando el pedido sea pagado
+        if producto_obj.stock >= item['quantity']:
+            producto_obj.stock -= item['quantity']
+            producto_obj.save()
+    
+    # Limpiar el carrito después de la compra
+    cart.clear()
+    
+    if metodo_pago == 'bank_transfer':
+        # Redirigir a página de confirmación
+        return redirect('productos:order_confirmation', pedido_id=pedido.id)
+    else:
+        # Aquí irá la integración de Payphone luego
+        messages.success(request, f"¡Gracias por tu compra, {first_name}! Tu pedido #{pedido.id} ha sido registrado exitosamente.")
+        return redirect('home')
+
+def order_confirmation(request, pedido_id):
+    """
+    Vista para mostrar la confirmación del pedido.
+    Genera la URL de WhatsApp con factura profesional lista para el cliente.
+    """
+    from urllib.parse import quote
+    from .models import Pedido
+    from .whatsapp_utils import generar_mensaje_factura_cliente
+    
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+
+    # Verificar que el pedido pertenece al usuario (si está autenticado)
+    if request.user.is_authenticated and pedido.usuario and pedido.usuario != request.user:
+        messages.error(request, 'No tienes permiso para ver este pedido.')
+        return redirect('home')
+
+    # ── Generar URL de WhatsApp con mensaje de factura profesional ────────────
+    whatsapp_url = ''
+    try:
+        # Usamos el numero de WhatsApp del admin de LivenShop
+        numero_tienda = "593989387657"
+        
+        mensaje_factura = generar_mensaje_factura_cliente(pedido, request)
+        numero_limpio = numero_tienda.replace('+', '').replace(' ', '').replace('-', '')
+        mensaje_encoded = quote(mensaje_factura, encoding='utf-8')
+        whatsapp_url = f"https://wa.me/{numero_limpio}?text={mensaje_encoded}"
+    except Exception as e:
+        whatsapp_url = 'https://wa.me/593989387657'
+
+    context = {
+        'pedido': pedido,
+        'whatsapp_url': whatsapp_url,
+    }
+
+    return render(request, 'order-confirmation.html', context)
 
 
 # ══════════════════════════════════════════════════════
@@ -877,3 +1041,37 @@ def producto_quick_view(request, producto_id):
     }
     
     return JsonResponse(data)
+
+# ══════════════════════════════════════════════════════
+# WISHLIST (FAVORITOS)
+# ══════════════════════════════════════════════════════
+def view_wishlist(request):
+    wishlist = request.session.get('wishlist', [])
+    productos_favoritos = Producto.objects.filter(id__in=wishlist, activo=True).prefetch_related('imagenes')
+    return render(request, 'my-account-wishlist.html', {
+        'productos_favoritos': productos_favoritos
+    })
+
+@require_POST
+def wishlist_toggle(request):
+    producto_id = request.POST.get('product_id')
+    if not producto_id:
+        return JsonResponse({'success': False})
+        
+    try:
+        producto_id = int(producto_id)
+    except ValueError:
+        return JsonResponse({'success': False})
+
+    wishlist = request.session.get('wishlist', [])
+    if producto_id in wishlist:
+        wishlist.remove(producto_id)
+        added = False
+    else:
+        wishlist.append(producto_id)
+        added = True
+        
+    request.session['wishlist'] = wishlist
+    request.session.modified = True
+    
+    return JsonResponse({'success': True, 'added': added, 'count': len(wishlist)})

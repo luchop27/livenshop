@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
     Marca, Coleccion, Categoria, Producto, Imagen, Atributo, 
-    AtributoProducto, CarritoItem, ShippingInfo, ReturnPolicy
+    AtributoProducto, CarritoItem, ShippingInfo, ReturnPolicy,
+    Pedido, PedidoItem
 )
 
 
@@ -254,3 +255,44 @@ class ShopGramPostAdmin(admin.ModelAdmin):
     list_editable = ['activo']
     readonly_fields = ['created_at']
     list_per_page = 10
+
+
+# =====================
+# PEDIDOS ADMIN
+# =====================
+class PedidoItemInline(admin.TabularInline):
+    model = PedidoItem
+    extra = 0
+    readonly_fields = ['producto', 'nombre_producto', 'precio', 'cantidad', 'get_costo']
+    can_delete = False
+
+    def get_costo(self, obj):
+        return obj.get_costo()
+    get_costo.short_description = 'Costo'
+
+
+@admin.register(Pedido)
+class PedidoAdmin(admin.ModelAdmin):
+    list_display = ['id', 'nombres', 'apellidos', 'estado', 'total', 'created_at']
+    list_filter = ['estado', 'created_at']
+    search_fields = ['id', 'nombres', 'apellidos', 'email']
+    readonly_fields = ['subtotal', 'envio', 'descuento', 'total', 'created_at', 'updated_at']
+    inlines = [PedidoItemInline]
+    fieldsets = (
+        ('Cliente y Contacto', {
+            'fields': ('usuario', 'nombres', 'apellidos', 'email', 'telefono')
+        }),
+        ('Dirección de Envío', {
+            'fields': ('pais', 'ciudad', 'direccion', 'codigo_postal', 'notas')
+        }),
+        ('Detalles de Pago y Estado', {
+            'fields': ('estado', 'metodo_pago', 'transaccion_id')
+        }),
+        ('Totales', {
+            'fields': ('subtotal', 'envio', 'descuento', 'total')
+        }),
+        ('Fechas', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )

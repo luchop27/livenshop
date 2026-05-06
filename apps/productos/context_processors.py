@@ -9,8 +9,8 @@ def menu_categorias(request):
         'menu_marcas': Marca.objects.filter(activo=True).order_by('nombre'),
     }
 
+from .cart import Cart
+
 def carrito_count(request):
-    count = 0
-    if request.user.is_authenticated:
-        count = CarritoItem.objects.filter(usuario=request.user).count()
-    return {'carrito_count': count}
+    cart = Cart(request)
+    return {'cart': cart, 'carrito_count': len(cart)}

@@ -492,3 +492,77 @@ class ShopGramPost(models.Model):
 
     def __str__(self):
         return self.instagram_url
+
+
+# -----------------------------
+# PEDIDOS Y CHECKOUT
+# -----------------------------
+class Pedido(models.Model):
+    ESTADO_CHOICES = (
+        ('pendiente', 'Pendiente'),
+        ('pagado', 'Pagado'),
+        ('en_proceso', 'En Proceso'),
+        ('enviado', 'Enviado'),
+        ('entregado', 'Entregado'),
+        ('cancelado', 'Cancelado'),
+    )
+
+    usuario = models.ForeignKey(
+        'usuarios.Usuario',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pedidos'
+    )
+    # Datos de contacto y facturación
+    nombres = models.CharField(max_length=150)
+    apellidos = models.CharField(max_length=150)
+    email = models.EmailField()
+    telefono = models.CharField(max_length=20)
+    
+    # Dirección
+    pais = models.CharField(max_length=100, default='Ecuador')
+    ciudad = models.CharField(max_length=100)
+    direccion = models.CharField(max_length=250)
+    codigo_postal = models.CharField(max_length=20, blank=True, null=True)
+    notas = models.TextField(blank=True, null=True)
+
+    # Totales
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    envio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    descuento = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    # Estado y seguimiento
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
+    metodo_pago = models.CharField(max_length=50, blank=True, null=True)
+    transaccion_id = models.CharField(max_length=100, blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Pedido"
+        verbose_name_plural = "Pedidos"
+
+    def __str__(self):
+        return f"Pedido #{self.id} - {self.nombres} {self.apellidos}"
+
+
+class PedidoItem(models.Model):
+    pedido = models.ForeignKey(Pedido, related_name='items', on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True)
+    nombre_producto = models.CharField(max_length=200) # Guardamos el nombre por si el producto es eliminado
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    cantidad = models.PositiveIntegerField(default=1)
+    
+    class Meta:
+        verbose_name = "Item de Pedido"
+        verbose_name_plural = "Items de Pedido"
+
+    def __str__(self):
+        return f"{self.cantidad}x {self.nombre_producto}"
+    
+    def get_costo(self):
+        return self.precio * self.cantidad
