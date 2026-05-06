@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load static %}
+{% load l10n %}
+{% block content %}
+<div class="tf-page-title style-2">
+    <div class="container-full">
+        <div class="heading text-center">Portafolio</div>
+    </div>
+</div>
+
+<style>
+    /* Forzar dropdown hacia arriba */
+.pin-wrap .dropdown-menu {
+    bottom: 100% !important;
+    top: auto !important;
+    margin-bottom: 0 !important;
+    left: 50% !important;
+    transform: translateX(-49%) !important;
+    position: absolute !important;
+    inset: auto !important; /* neutraliza lo que Bootstrap pone via JS */
+    bottom: calc(100% + 14px) !important; /* 16px de separación del pin */
+}
+    .portfolio-image-wrap {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+    }
+    .portfolio-image-wrap > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+        display: block;
+    }
+    .portfolio-text {
+        padding: 3rem 4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+    .portfolio-item { align-items: stretch; min-height: 600px; }
+    .portfolio-item .w-50 { display: flex; flex-direction: column; justify-content: center; }
+
+    .pin-wrap {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+    }
+    /* Pin visible */
+.pin-wrap .tf-pin-btn {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.pin-wrap .tf-pin-btn span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: block;
+}
+
+
+
+    @media (max-width: 768px) {
+        .portfolio-item { flex-direction: column; min-height: auto; }
+        .portfolio-item .w-50 { width: 100% !important; }
+        .portfolio-item .w-50:has(.portfolio-image-wrap) { order: 1; }
+        .portfolio-item .w-50:has(.portfolio-text) { order: 2; }
+        .portfolio-image-wrap { height: 320px; aspect-ratio: unset; }
+        .portfolio-text { padding: 2rem 1.5rem; text-align: center; }
+    }
+</style>
+
+<section class="flat-spacing-12">
+    <div class="container-full px_15 lg-px_40">
+        <div class="d-flex flex-column">
+            {% for proyecto in proyectos %}
+            <div class="d-flex portfolio-item">
+
+                {% if proyecto.lado_imagen == 'izquierda' %}
+
+                <!-- IMAGEN CON PINES -->
+                <div class="w-50">
+                    <div class="portfolio-image-wrap">
+                        <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.titulo }}">
+                        {% for item in proyecto.items.all %}
+                        <div class="pin-wrap" style="left:{{ item.pos_x|unlocalize }}%; top:{{ item.pos_y|unlocalize }}%;">
+                            <div class="inner">
+                                <div class="btn-group dropdown dropup dropdown-center">
+                                    <button class="tf-pin-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span></span>
+                                    </button>
+                                    {% if item.producto %}
+                                    <ul class="dropdown-menu p-0 border-0">
+                                        <li>
+                                            <div class="lookbook-product">
+                                                <a href="#" class="image">
+                                                    {% with img=item.producto.imagenes.first %}
+                                                    {% if img %}<img class="lazyload" data-src="{{ img.src }}" alt="{{ item.producto.nombre }}">{% endif %}
+                                                    {% endwith %}
+                                                </a>
+                                                <div class="content-wrap">
+                                                    <div class="product-title"><a href="#">{{ item.producto.nombre }}</a></div>
+                                                    <div class="price">${{ item.producto.precio }}</div>
+                                                </div>
+                                                <a href="#quick_view" data-product-id="{{ item.producto.id }}" data-bs-toggle="modal"><i class="icon-view"></i></a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- TEXTO -->
+                <div class="w-50">
+                    <div class="portfolio-text">
+                        {% if proyecto.etiqueta %}<div class="fw-7 mb-2">{{ proyecto.etiqueta }}</div>{% endif %}
+                        <h4 class="mb-3">{{ proyecto.titulo }}</h4>
+                        {% if proyecto.subtitulo %}<p class="fw-6 mb-2">{{ proyecto.subtitulo }}</p>{% endif %}
+                        <p>{{ proyecto.descripcion }}</p>
+                    </div>
+                </div>
+
+                {% else %}
+
+                <!-- TEXTO -->
+                <div class="w-50">
+                    <div class="portfolio-text">
+                        {% if proyecto.etiqueta %}<div class="fw-7 mb-2">{{ proyecto.etiqueta }}</div>{% endif %}
+                        <h4 class="mb-3">{{ proyecto.titulo }}</h4>
+                        {% if proyecto.subtitulo %}<p class="fw-6 mb-2">{{ proyecto.subtitulo }}</p>{% endif %}
+                        <p>{{ proyecto.descripcion }}</p>
+                    </div>
+                </div>
+
+                <!-- IMAGEN CON PINES -->
+                <div class="w-50">
+                    <div class="portfolio-image-wrap">
+                        <img class="lazyload" data-src="{{ proyecto.imagen.url }}" alt="{{ proyecto.titulo }}">
+                        {% for item in proyecto.items.all %}
+                        <div class="pin-wrap" style="left:{{ item.pos_x|unlocalize }}%; top:{{ item.pos_y|unlocalize }}%;">
+                            <div class="inner">
+                                <div class="btn-group dropdown dropup dropdown-center">
+                                    <button class="tf-pin-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span></span>
+                                    </button>
+                                    {% if item.producto %}
+                                    <ul class="dropdown-menu p-0 border-0">
+                                        <li>
+                                            <div class="lookbook-product">
+                                                <a href="#" class="image">
+                                                    {% with img=item.producto.imagenes.first %}
+                                                    {% if img %}<img class="lazyload" data-src="{{ img.src }}" alt="{{ item.producto.nombre }}">{% endif %}
+                                                    {% endwith %}
+                                                </a>
+                                                <div class="content-wrap">
+                                                    <div class="product-title"><a href="#">{{ item.producto.nombre }}</a></div>
+                                                    <div class="price">${{ item.producto.precio }}</div>
+                                                </div>
+                                                <a href="#quick_view" data-product-id="{{ item.producto.id }}" data-bs-toggle="modal"><i class="icon-view"></i></a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% endif %}
+            </div>
+
+            {% empty %}
+            <p class="text-center text-muted py-5">No hay proyectos publicados aún.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

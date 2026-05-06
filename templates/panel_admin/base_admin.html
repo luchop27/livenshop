@@ -95,6 +95,24 @@
                                             <li class="sub-menu-item"><a href="{% url 'productos:panel_admin_category_add' %}"><div class="text">Nueva categoría</div></a></li>
                                         </ul>
                                     </li>
+                                    <li class="menu-item has-children {% block menu_portafolio %}{% endblock %}">
+                                        <a href="#" class="menu-item-button">
+                                            <div class="icon"><i class="icon-image"></i></div>
+                                            <div class="text">Portafolio</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'portafolio:list' %}">
+                                                    <div class="text">Lista de proyectos</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'portafolio:add' %}">
+                                                    <div class="text">Nuevo proyecto</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
 
                                     <li class="menu-item has-children {% block menu_orders %}{% endblock %}">
                                         <a href="#" class="menu-item-button">
