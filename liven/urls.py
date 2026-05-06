@@ -19,9 +19,9 @@ urlpatterns = [
     path('panel-admin/', panel_admin_demo, name='panel_admin_demo'),
     # ← Includes PRIMERO para que Django resuelva rutas específicas antes
     path('', include('apps.productos.urls')),
+    path('', include('apps.portafolio.urls', namespace='portafolio')),
     path('usuarios/', include('apps.usuarios.urls')),
     path('about/', TemplateView.as_view(template_name='about-us.html'), name='about'),
-    path('portfolio/', TemplateView.as_view(template_name='portfolio.html'), name='portfolio'),
     path('shop/', TemplateView.as_view(template_name='shop-fullwidth.html'), name='shop'),
     path('services/', TemplateView.as_view(template_name='services.html'), name='services'),
     path('contact/', TemplateView.as_view(template_name='contact.html'), name='contact'),

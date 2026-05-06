@@ -1,0 +1,242 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Nuevo Proyecto | Panel Admin LivenShop{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Nuevo Proyecto</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><a href="{% url 'portafolio:list' %}"><div class="text-tiny">Portafolio</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Nuevo</div></li>
+                </ul>
+            </div>
+
+            {% if messages %}{% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+            {% endfor %}{% endif %}
+
+            <div class="wg-box">
+                <form id="form-proyecto" class="form-new-product form-style-1" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">
+                            Etiqueta <span class="text-muted text-tiny">(ej: PROYECTO 1)</span>
+                        </div>
+                        <input class="flex-grow tf-input" type="text" name="etiqueta"
+                               placeholder="Ej: PROYECTO 1">
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Título <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow tf-input" type="text" name="titulo"
+                               placeholder="Ej: Diseño Nórdico Minimalista" required>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Subtítulo</div>
+                        <input class="flex-grow tf-input" type="text" name="subtitulo"
+                               placeholder="Ej: Inception and Brand Establishment">
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Descripción</div>
+                        <textarea class="flex-grow tf-input" name="descripcion" rows="4"
+                                  placeholder="Descripción del proyecto..."></textarea>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">
+                            Imagen del Proyecto <span class="tf-color-1">*</span>
+                        </div>
+                        <div class="up-load" id="upload-area"
+                             style="min-height:140px;border:2px dashed #ddd;border-radius:8px;padding:16px;text-align:center;">
+                            <label for="inputImagen" style="cursor:pointer;display:block;">
+                                <i class="icon-upload-cloud" style="font-size:1.8rem;"></i>
+                                <div class="text-tiny mt-6">Haz clic o arrastra la imagen aquí</div>
+                                <!-- Sin "required" porque el submit lo manejamos por JS -->
+                                <input type="file" id="inputImagen" accept="image/*" style="display:none;">
+                            </label>
+                        </div>
+                        <div id="imagen-preview" style="display:none;margin-top:12px;"></div>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Posición de la imagen</div>
+                        <div class="select flex-grow">
+                            <select name="lado_imagen" class="tf-input">
+                                <option value="izquierda">Imagen a la izquierda</option>
+                                <option value="derecha">Imagen a la derecha</option>
+                            </select>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Orden de aparición</div>
+                        <input class="flex-grow tf-input" type="number" name="posicion"
+                               value="0" min="0">
+                        <small class="text-muted">Los proyectos se muestran de menor a mayor orden.</small>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Estado</div>
+                        <div class="radio-buttons">
+                            <div class="item">
+                                <input type="radio" name="activo" value="on" id="activo-si" checked>
+                                <label for="activo-si"><span class="body-title-2">Activo</span></label>
+                            </div>
+                            <div class="item">
+                                <input type="radio" name="activo" value="off" id="activo-no">
+                                <label for="activo-no"><span class="body-title-2">Inactivo</span></label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="bot">
+                        <a href="{% url 'portafolio:list' %}" class="tf-button style-1 w208">Cancelar</a>
+                        <button id="btn-submit" class="tf-button w208" type="submit">
+                            Guardar y agregar pines
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const inputImagen    = document.getElementById('inputImagen');
+const uploadArea     = document.getElementById('upload-area');
+const preview        = document.getElementById('imagen-preview');
+const form           = document.getElementById('form-proyecto');
+const btnSubmit      = document.getElementById('btn-submit');
+
+// Imagen recortada lista para enviar
+let archivoRecortado = null;
+
+// ── Cuando el usuario elige una imagen ────────────────────────────────
+inputImagen.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (evt) {
+        const img = new Image();
+        img.onload = function () {
+            recortarImagen(img, file.name);
+        };
+        img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+// ── Recortar al ratio 4:3 centrado ───────────────────────────────────
+function recortarImagen(img, nombre) {
+    const RATIO   = 4 / 3;
+    const OUT_W   = 1200;
+    const OUT_H   = 900;
+
+    let srcX = 0, srcY = 0, srcW = img.width, srcH = img.height;
+
+    if (img.width / img.height > RATIO) {
+        // Imagen más ancha → recortar los lados
+        srcW = Math.round(img.height * RATIO);
+        srcX = Math.round((img.width - srcW) / 2);
+    } else {
+        // Imagen más alta → recortar arriba y abajo
+        srcH = Math.round(img.width / RATIO);
+        srcY = Math.round((img.height - srcH) / 2);
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width  = OUT_W;
+    canvas.height = OUT_H;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, OUT_W, OUT_H);
+
+    canvas.toBlob(function (blob) {
+        archivoRecortado = new File([blob], nombre, { type: 'image/jpeg' });
+
+        // Mostrar preview de la imagen ya recortada
+        uploadArea.style.display = 'none';
+        preview.style.display    = 'block';
+        preview.innerHTML = `
+            <div style="position:relative;border:1px solid #ddd;border-radius:8px;
+                        overflow:hidden;max-width:400px;">
+                <img src="${canvas.toDataURL('image/jpeg')}"
+                     style="width:100%;height:auto;display:block;">
+                <button type="button" onclick="quitarImagen()"
+                    style="position:absolute;top:8px;right:8px;
+                           background:rgba(220,53,69,.9);color:white;border:none;
+                           border-radius:50%;width:28px;height:28px;
+                           cursor:pointer;font-size:16px;">×</button>
+                <div style="position:absolute;bottom:8px;left:8px;
+                            background:rgba(0,0,0,.7);color:white;
+                            padding:3px 8px;border-radius:4px;font-size:11px;">
+                    ✓ Recortada automáticamente a 4:3
+                </div>
+            </div>`;
+    }, 'image/jpeg', 0.92);
+}
+
+// ── Quitar imagen seleccionada ────────────────────────────────────────
+function quitarImagen() {
+    archivoRecortado      = null;
+    inputImagen.value     = '';
+    preview.style.display = 'none';
+    preview.innerHTML     = '';
+    uploadArea.style.display = 'block';
+}
+
+// ── Submit: inyectar imagen recortada en el FormData ──────────────────
+form.addEventListener('submit', function (e) {
+    // Validar que haya imagen
+    if (!archivoRecortado) {
+        e.preventDefault();
+        alert('Por favor selecciona una imagen para el proyecto.');
+        return;
+    }
+
+    e.preventDefault();
+    btnSubmit.disabled        = true;
+    btnSubmit.textContent     = 'Guardando...';
+
+    const fd = new FormData(form);
+    fd.set('imagen', archivoRecortado, archivoRecortado.name);
+
+    fetch(window.location.href, {
+        method:  'POST',
+        body:    fd,
+        headers: { 'X-CSRFToken': fd.get('csrfmiddlewaretoken') },
+    })
+    .then(function (r) {
+        if (r.redirected) {
+            // Django redirigió (éxito) → seguir la redirección
+            window.location.href = r.url;
+        } else {
+            // Volvió a renderizar el form (errores de validación)
+            return r.text().then(function (html) {
+                document.open();
+                document.write(html);
+                document.close();
+            });
+        }
+    })
+    .catch(function () {
+        btnSubmit.disabled    = false;
+        btnSubmit.textContent = 'Guardar y agregar pines';
+        alert('Error de conexión. Intenta de nuevo.');
+    });
+});
+</script>
+{% endblock %}

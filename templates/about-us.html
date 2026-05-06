@@ -73,72 +73,29 @@
         <!-- Shop Gram -->
         <section class="pb-0 flat-spacing-18">
             <div class="container-full px-0">
-                <div class="flat-title wow fadeInUp" data-wow-delay="0s">
-                    <span class="title">Shop Gram</span>
-                    <p class="sub-title">Here’s some of our most popular products people are in love with.</p>
-                </div>
                 <div dir="ltr" class="swiper tf-sw-shop-gallery" data-preview="5" data-tablet="3" data-mobile="2"
                     data-space-lg="0" data-space-md="0">
                     <div class="swiper-wrapper">
+                        {% for post in shop_gram_posts %}
                         <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_01.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_01.jpg' %}" alt="image-gallery">
+                            <a href="{{ post.instagram_url }}" target="_blank" rel="noopener noreferrer">
+                                <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
+                                    <div class="img-style">
+                                        <img class="lazyload img-hover shopgram-img"
+                                            data-src="{{ post.imagen.url }}"
+                                            src="{{ post.imagen.url }}"
+                                            alt="Instagram post">
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
-                        <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".1s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_02.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_02.jpg' %}" alt="image-gallery">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".2s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_03.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_03.jpg' %}" alt="image-gallery">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".3s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_04.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_04.jpg' %}" alt="image-gallery">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".4s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_05.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_05.jpg' %}" alt="image-gallery">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay=".4s">
-                                <div class="img-style">
-                                    <img class="lazyload img-hover"
-                                        data-src="{% static 'images/shop/gallery/furniture-gallery_06.jpg' %}"
-                                        src="{% static 'images/shop/gallery/furniture-gallery_06.jpg' %}" alt="image-gallery">
-                                </div>
-                            </div>
-                        </div>
+                        {% empty %}
+                        <p class="text-center w-100 py-4">No hay publicaciones aún.</p>
+                        {% endfor %}
                     </div>
                     <div class="absolute-dots sw-dots sw-pagination-gallery justify-content-center"></div>
                 </div>
             </div>
         </section>
         <!-- /Shop Gram -->
-        
 {% endblock content %}

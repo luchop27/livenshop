@@ -1,0 +1,697 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Editar Proyecto | Panel Admin LivenShop{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Editar: {{ proyecto.titulo }}</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><a href="{% url 'portafolio:list' %}"><div class="text-tiny">Portafolio</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Editar</div></li>
+                </ul>
+            </div>
+
+            {% if messages %}{% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+            {% endfor %}{% endif %}
+
+            <!-- ══ DATOS DEL PROYECTO ══════════════════════════════ -->
+            <div class="wg-box mb-30">
+                <form class="form-new-product form-style-1" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">
+                            Etiqueta <span class="text-muted text-tiny">(ej: PROYECTO 1)</span>
+                        </div>
+                        <input class="flex-grow tf-input" type="text" name="etiqueta"
+                               value="{{ proyecto.etiqueta }}">
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Título <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow tf-input" type="text" name="titulo"
+                               value="{{ proyecto.titulo }}" required>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Subtítulo</div>
+                        <input class="flex-grow tf-input" type="text" name="subtitulo"
+                               value="{{ proyecto.subtitulo }}">
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Descripción</div>
+                        <textarea class="flex-grow tf-input" name="descripcion"
+                                  rows="4">{{ proyecto.descripcion }}</textarea>
+                    </fieldset>
+
+                    <!-- Imagen actual -->
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Imagen del Proyecto</div>
+                        {% if proyecto.imagen %}
+                        <div id="imagen-actual" style="margin-bottom:12px;">
+                            <div style="position:relative;border:1px solid #ddd;border-radius:8px;
+                                        overflow:hidden;max-width:300px;">
+                                <img src="{{ proyecto.imagen.url }}"
+                                     style="width:100%;height:auto;display:block;">
+                                <button type="button" onclick="mostrarCambioImagen()"
+                                    style="position:absolute;top:8px;right:8px;
+                                           background:rgba(220,53,69,.9);color:white;border:none;
+                                           border-radius:50%;width:28px;height:28px;
+                                           cursor:pointer;font-size:16px;">×</button>
+                                <div style="position:absolute;bottom:8px;left:8px;
+                                            background:rgba(0,0,0,.7);color:white;
+                                            padding:3px 8px;border-radius:4px;font-size:11px;">
+                                    Imagen actual
+                                </div>
+                            </div>
+                        </div>
+                        <div id="upload-container" style="display:none;">
+                        {% else %}
+                        <div id="upload-container">
+                        {% endif %}
+                            <div class="up-load" id="upload-area"
+                                 style="min-height:120px;border:2px dashed #ddd;border-radius:8px;
+                                        padding:16px;text-align:center;">
+                                <label for="inputImagen" style="cursor:pointer;display:block;">
+                                    <i class="icon-upload-cloud" style="font-size:1.8rem;"></i>
+                                    <div class="text-tiny mt-6">Haz clic o arrastra para cambiar imagen</div>
+                                    <input type="file" id="inputImagen" name="imagen"
+                                           accept="image/*" style="display:none;">
+                                </label>
+                            </div>
+                            <div id="imagen-preview-nueva" style="display:none;margin-top:10px;"></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Posición de la imagen</div>
+                        <div class="select flex-grow">
+                            <select name="lado_imagen" class="tf-input">
+                                <option value="izquierda"
+                                    {% if proyecto.lado_imagen == 'izquierda' %}selected{% endif %}>
+                                    Imagen a la izquierda
+                                </option>
+                                <option value="derecha"
+                                    {% if proyecto.lado_imagen == 'derecha' %}selected{% endif %}>
+                                    Imagen a la derecha
+                                </option>
+                            </select>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Orden de aparición</div>
+                        <input class="flex-grow tf-input" type="number" name="posicion"
+                               value="{{ proyecto.posicion }}" min="0">
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Estado</div>
+                        <div class="radio-buttons">
+                            <div class="item">
+                                <input type="radio" name="activo" value="on" id="activo-si"
+                                       {% if proyecto.activo %}checked{% endif %}>
+                                <label for="activo-si">
+                                    <span class="body-title-2">Activo</span>
+                                </label>
+                            </div>
+                            <div class="item">
+                                <input type="radio" name="activo" value="off" id="activo-no"
+                                       {% if not proyecto.activo %}checked{% endif %}>
+                                <label for="activo-no">
+                                    <span class="body-title-2">Inactivo</span>
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="bot">
+                        <a href="{% url 'portafolio:list' %}" class="tf-button style-1 w208">Cancelar</a>
+                        <button class="tf-button w208" type="submit">Guardar cambios</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ══ EDITOR DE PINES ════════════════════════════════ -->
+            <div class="wg-box mb-30">
+                <div class="flex items-center justify-between gap20 mb-20">
+                    <h5>Editor de pines</h5>
+                    <div class="text-tiny text-muted">
+                        Haz clic sobre la imagen para colocar un pin
+                    </div>
+                </div>
+
+                <div class="flex gap20 flex-wrap">
+
+                    <!-- Imagen interactiva -->
+                    <div style="flex:1;min-width:300px;">
+                        <!-- portafolio_edit.html — editor de pines -->
+                        <div id="pin-editor"
+                            style="position:relative; width:100%; aspect-ratio:4/3;
+                                    overflow:hidden; cursor:crosshair;
+                                    border-radius:8px; border:1px solid #e5e7eb;">
+                            <img id="imagen-proyecto" src="{{ proyecto.imagen.url }}"
+                                style="width:100%; height:100%; object-fit:cover;
+                                        object-position:center center;
+                                        display:block; user-select:none;"
+                                draggable="false">
+                        </div>
+                        <div class="text-tiny text-muted mt-10" style="text-align:center;">
+                            Haz clic en cualquier parte para agregar un pin
+                        </div>
+                    </div>
+
+                    <!-- Panel lateral -->
+                    <div style="width:270px;flex-shrink:0;">
+
+                        <!-- Pin seleccionado -->
+                        <div id="pin-panel" class="wg-box mb-20"
+                             style="display:none;padding:16px;">
+                            <div class="body-title mb-14">Pin seleccionado</div>
+
+                            <div class="mb-10">
+                                <div class="body-title mb-6 text-tiny">Filtrar por</div>
+
+                                <!-- Tabs Categoría / Marca -->
+                                <div style="display:flex;gap:0;margin-bottom:8px;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;">
+                                    <button type="button" id="tab-cat"
+                                        onclick="switchTab('cat')"
+                                        style="flex:1;padding:6px;font-size:11px;border:none;
+                                            background:#111;color:white;cursor:pointer;">
+                                        Categoría
+                                    </button>
+                                    <button type="button" id="tab-marca"
+                                        onclick="switchTab('marca')"
+                                        style="flex:1;padding:6px;font-size:11px;border:none;
+                                            background:#f9fafb;color:#374151;cursor:pointer;">
+                                        Marca
+                                    </button>
+                                </div>
+
+                                <!-- Filtro por Categoría -->
+                                <div id="panel-cat">
+                                    <select id="select-categoria" class="tf-input mb-6"
+                                            style="width:100%;margin-bottom:6px;"
+                                            onchange="cargarSubcategorias()">
+                                        <option value="">— Todas las categorías —</option>
+                                        {% for cat in categorias %}
+                                        <option value="{{ cat.pk }}">{{ cat.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <select id="select-subcategoria" class="tf-input mb-6"
+                                            style="width:100%;margin-bottom:6px;display:none;"
+                                            onchange="filtrarProductos()">
+                                        <option value="">— Todas las subcategorías —</option>
+                                    </select>
+                                </div>
+
+                                <!-- Filtro por Marca -->
+                                <div id="panel-marca" style="display:none;">
+                                    <select id="select-marca" class="tf-input mb-6"
+                                            style="width:100%;"
+                                            onchange="filtrarProductos()">
+                                        <option value="">— Todas las marcas —</option>
+                                        {% for marca in marcas %}
+                                        <option value="{{ marca.pk }}">{{ marca.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Buscador de texto -->
+                                <input type="text" id="buscar-producto" class="tf-input mb-6"
+                                    placeholder="Buscar producto..."
+                                    style="width:100%;margin-top:4px;"
+                                    oninput="filtrarProductos()">
+
+                                <!-- Lista de productos filtrados -->
+                                <div id="lista-productos-filtrada"
+                                    style="max-height:200px;overflow-y:auto;border:1px solid #e5e7eb;
+                                            border-radius:6px;margin-top:4px;">
+                                    <div style="padding:10px;text-align:center;color:#9ca3af;font-size:12px;">
+                                        Selecciona una categoría o marca
+                                    </div>
+                                </div>
+
+                                <!-- Producto seleccionado actualmente -->
+                                <div id="producto-seleccionado-info" style="display:none;margin-top:8px;
+                                    padding:8px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;">
+                                    <div class="text-tiny" style="color:#16a34a;font-weight:600;">
+                                        ✓ Producto asociado:
+                                    </div>
+                                    <div id="producto-seleccionado-nombre" class="text-tiny mt-4"></div>
+                                </div>
+                            </div>
+
+                            <div class="text-tiny text-muted mb-14">
+                                Posición: <span id="pin-coords">—</span>
+                            </div>
+
+                            <button type="button" id="btn-eliminar-pin"
+                                class="tf-button style-1 w-100"
+                                style="width:100%;justify-content:center;
+                                       border-color:#dc2626;color:#dc2626;">
+                                <i class="icon-trash-2"></i> Eliminar pin
+                            </button>
+                        </div>
+
+                        <!-- Hint vacío -->
+                        <div id="pin-hint" class="wg-box mb-20"
+                             style="padding:16px;text-align:center;color:#9ca3af;">
+                            <i class="icon-map-pin"
+                               style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                            <div class="text-tiny">
+                                Haz clic en la imagen para agregar un pin o selecciona uno existente
+                            </div>
+                        </div>
+
+                        <!-- Botón guardar -->
+                        <button type="button" id="btn-guardar-items" class="tf-button w-100"
+                                style="width:100%;justify-content:center;">
+                            Guardar pines
+                        </button>
+                        <div id="pin-feedback" class="text-tiny mt-10"
+                             style="display:none;text-align:center;"></div>
+
+                        <!-- Lista de pines -->
+                        <div class="mt-20">
+                            <div class="body-title mb-10 text-tiny">
+                                Pines activos (<span id="pin-count">0</span>)
+                            </div>
+                            <ul id="pin-list"
+                                style="list-style:none;padding:0;margin:0;
+                                       display:flex;flex-direction:column;gap:8px;">
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ ZONA DE PELIGRO ════════════════════════════════ -->
+            <div class="wg-box" style="border:1px solid #fca5a5;">
+                <div class="body-title mb-10" style="color:#dc2626;">Zona de Peligro</div>
+                <p class="text-tiny mb-14">
+                    Eliminar este proyecto borrará también todos sus pines. Acción irreversible.
+                </p>
+                <form method="post" action="{% url 'portafolio:delete' proyecto.pk %}"
+                      onsubmit="return confirm('¿Eliminar el proyecto {{ proyecto.titulo|escapejs }}?')">
+                    {% csrf_token %}
+                    <button type="submit" class="tf-button"
+                            style="background:#dc2626;border-color:#dc2626;">
+                        <i class="icon-trash-2"></i> Eliminar Proyecto
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+// ── Configuración ─────────────────────────────────────────────────────
+const GUARDAR_URL    = "{% url 'portafolio:guardar_items' proyecto.pk %}";
+const ITEMS_JSON_URL = "{% url 'portafolio:items_json' proyecto.pk %}";
+const CSRF_TOKEN     = "{{ csrf_token }}";
+
+// ── Estado ────────────────────────────────────────────────────────────
+let pines           = [];
+let pinSeleccionado = null;
+let idCounter       = 0;
+
+// ── Referencias DOM ───────────────────────────────────────────────────
+const editor    = document.getElementById('pin-editor');
+const panel     = document.getElementById('pin-panel');
+const hint      = document.getElementById('pin-hint');
+const feedback  = document.getElementById('pin-feedback');
+const pinList   = document.getElementById('pin-list');
+const pinCount  = document.getElementById('pin-count');
+const pinCoords = document.getElementById('pin-coords');
+
+// ── Cargar pines existentes ───────────────────────────────────────────
+fetch(ITEMS_JSON_URL)
+    .then(r => r.json())
+    .then(data => {
+        data.items.forEach(item => {
+            pines.push({
+                id_local:        ++idCounter,
+                pos_x:           item.pos_x,
+                pos_y:           item.pos_y,
+                producto_id:     item.producto_id,
+                producto_nombre: item.producto_nombre,
+                producto_precio: item.producto_precio,
+                producto_imagen: item.producto_imagen,
+            });
+        });
+        renderTodo();
+    });
+
+// ── Clic en imagen → nuevo pin ────────────────────────────────────────
+editor.addEventListener('click', function (e) {
+    if (e.target.closest('.pin-dot')) return;
+
+    const rect  = editor.getBoundingClientRect();
+    const pos_x = ((e.clientX - rect.left) / rect.width  * 100).toFixed(2);
+    const pos_y = ((e.clientY - rect.top)  / rect.height * 100).toFixed(2);
+
+    const pin = {
+        id_local: ++idCounter, pos_x, pos_y,
+        producto_id: null, producto_nombre: '',
+        producto_precio: '', producto_imagen: '',
+    };
+    pines.push(pin);
+    renderTodo();
+    seleccionarPin(pin.id_local);
+});
+
+// ── Render pines sobre la imagen ──────────────────────────────────────
+function renderPines() {
+    document.querySelectorAll('.pin-dot').forEach(el => el.remove());
+
+    pines.forEach(pin => {
+        const activo = pinSeleccionado === pin.id_local;
+        const dot    = document.createElement('div');
+        dot.className       = 'pin-dot';
+        dot.dataset.idLocal = pin.id_local;
+        dot.style.cssText   = `
+            position:absolute;
+            left:${pin.pos_x}%; top:${pin.pos_y}%;
+            transform:translate(-50%,-50%);
+            width:30px; height:30px; border-radius:50%;
+            border:3px solid ${activo ? '#dc2626' : '#222'};
+            background:white;
+            box-shadow:0 2px 8px rgba(0,0,0,${activo ? '.4' : '.25'});
+            cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            z-index:10; transition:transform .15s; overflow:hidden;
+        `;
+
+        dot.innerHTML = pin.producto_imagen
+            ? `<img src="${pin.producto_imagen}"
+                    style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+            : `<span style="width:10px;height:10px;display:block;border-radius:50%;
+                            background:${activo ? '#dc2626' : '#222'};"></span>`;
+
+        dot.addEventListener('click', e => {
+            e.stopPropagation();
+            seleccionarPin(pin.id_local);
+        });
+        editor.appendChild(dot);
+    });
+}
+
+// ── Render lista lateral ──────────────────────────────────────────────
+function renderLista() {
+    pinList.innerHTML    = '';
+    pinCount.textContent = pines.length;
+
+    pines.forEach(pin => {
+        const activo = pinSeleccionado === pin.id_local;
+        const li     = document.createElement('li');
+        li.style.cssText = `
+            display:flex; align-items:center; gap:10px;
+            padding:8px 10px; border-radius:6px; cursor:pointer;
+            background:${activo ? '#fef2f2' : '#f9fafb'};
+            border:1px solid ${activo ? '#fca5a5' : '#e5e7eb'};
+        `;
+
+        const thumb = pin.producto_imagen
+            ? `<img src="${pin.producto_imagen}"
+                    style="width:32px;height:32px;object-fit:cover;
+                           border-radius:4px;flex-shrink:0;">`
+            : `<div style="width:32px;height:32px;background:#e5e7eb;
+                           border-radius:4px;flex-shrink:0;
+                           display:flex;align-items:center;justify-content:center;">
+                   <i class="icon-map-pin" style="font-size:.8rem;color:#9ca3af;"></i>
+               </div>`;
+
+        li.innerHTML = `
+            ${thumb}
+            <div style="flex:1;min-width:0;">
+                <div class="body-text fw-6"
+                     style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    ${pin.producto_nombre || 'Sin producto'}
+                </div>
+                <div class="text-tiny text-muted">
+                    ${parseFloat(pin.pos_x).toFixed(1)}%, ${parseFloat(pin.pos_y).toFixed(1)}%
+                </div>
+            </div>`;
+
+        li.addEventListener('click', () => seleccionarPin(pin.id_local));
+        pinList.appendChild(li);
+    });
+}
+
+function renderTodo() { renderPines(); renderLista(); }
+
+// ── Seleccionar pin ───────────────────────────────────────────────────
+function seleccionarPin(id_local) {
+    pinSeleccionado = id_local;
+    const pin       = pines.find(p => p.id_local === id_local);
+
+    renderTodo();
+    panel.style.display = 'block';
+    hint.style.display  = 'none';
+
+    pinCoords.textContent = `${parseFloat(pin.pos_x).toFixed(1)}%, ${parseFloat(pin.pos_y).toFixed(1)}%`;
+
+    // Mostrar producto ya asociado si existe
+    const infoDiv   = document.getElementById('producto-seleccionado-info');
+    const nombreDiv = document.getElementById('producto-seleccionado-nombre');
+    if (pin.producto_nombre) {
+        infoDiv.style.display  = 'block';
+        nombreDiv.textContent  = `${pin.producto_nombre} — $${pin.producto_precio}`;
+    } else {
+        infoDiv.style.display  = 'none';
+        nombreDiv.textContent  = '';
+    }
+}
+
+// ── Eliminar pin ──────────────────────────────────────────────────────
+document.getElementById('btn-eliminar-pin').addEventListener('click', function () {
+    pines           = pines.filter(p => p.id_local !== pinSeleccionado);
+    pinSeleccionado = null;
+    panel.style.display = 'none';
+    hint.style.display  = 'block';
+    renderTodo();
+});
+
+// ── Guardar pines via AJAX ────────────────────────────────────────────
+document.getElementById('btn-guardar-items').addEventListener('click', function () {
+    const btn       = this;
+    btn.disabled    = true;
+    btn.textContent = 'Guardando...';
+
+    fetch(GUARDAR_URL, {
+        method:  'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken':  CSRF_TOKEN,
+        },
+        body: JSON.stringify({
+            items: pines.map(p => ({
+                pos_x:       p.pos_x,
+                pos_y:       p.pos_y,
+                producto_id: p.producto_id,
+            })),
+        }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.disabled    = false;
+        btn.textContent = 'Guardar pines';
+        feedback.style.display = 'block';
+        if (data.ok) {
+            feedback.style.color = '#16a34a';
+            feedback.textContent = `✓ ${data.total} pines guardados correctamente`;
+        } else {
+            feedback.style.color = '#dc2626';
+            feedback.textContent = 'Error al guardar. Intenta de nuevo.';
+        }
+        setTimeout(() => feedback.style.display = 'none', 3000);
+    })
+    .catch(() => {
+        btn.disabled    = false;
+        btn.textContent = 'Guardar pines';
+        feedback.style.display = 'block';
+        feedback.style.color   = '#dc2626';
+        feedback.textContent   = 'Error de conexión. Intenta de nuevo.';
+        setTimeout(() => feedback.style.display = 'none', 3000);
+    });
+});
+
+// ── Cambio / quitar imagen del proyecto ──────────────────────────────
+function mostrarCambioImagen() {
+    document.getElementById('imagen-actual').style.display    = 'none';
+    document.getElementById('upload-container').style.display = 'block';
+}
+
+const inputImagen = document.getElementById('inputImagen');
+if (inputImagen) {
+    inputImagen.addEventListener('change', function (e) {
+        if (!e.target.files || !e.target.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+            document.getElementById('upload-area').style.display = 'none';
+            const prev = document.getElementById('imagen-preview-nueva');
+            prev.style.display = 'block';
+            prev.innerHTML = `
+                <div style="position:relative;border:1px solid #ddd;border-radius:8px;
+                            overflow:hidden;max-width:300px;">
+                    <img src="${evt.target.result}"
+                         style="width:100%;height:auto;display:block;">
+                    <button type="button" onclick="quitarNuevaImagen()"
+                        style="position:absolute;top:8px;right:8px;
+                               background:rgba(220,53,69,.9);color:white;border:none;
+                               border-radius:50%;width:28px;height:28px;
+                               cursor:pointer;font-size:16px;">×</button>
+                </div>`;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    });
+}
+
+function quitarNuevaImagen() {
+    inputImagen.value = '';
+    document.getElementById('imagen-preview-nueva').style.display = 'none';
+    document.getElementById('imagen-preview-nueva').innerHTML     = '';
+    document.getElementById('upload-area').style.display          = 'block';
+}
+
+// ── Datos de productos desde Django ──────────────────────────────────
+const TODOS_PRODUCTOS = [
+    {% for prod in productos %}
+    {
+        id:       {{ prod.pk }},
+        nombre:   "{{ prod.nombre|escapejs }}",
+        precio:   "{{ prod.precio }}",
+        imagen:   "{% with prod.imagenes.first as img %}{% if img %}{{ img.src }}{% endif %}{% endwith %}",
+        cat_id:   {{ prod.categoria.pk|default:'null' }},
+        marca_id: {{ prod.marca.pk|default:'null' }},
+        padre_id: {{ prod.categoria.padre.pk|default:'null' }},
+    },
+    {% endfor %}
+];
+
+const SUBCATEGORIAS = {
+    {% for cat in categorias %}
+    {{ cat.pk }}: [
+        {% for sub in cat.subcategorias.all %}
+        { id: {{ sub.pk }}, nombre: "{{ sub.nombre|escapejs }}" },
+        {% endfor %}
+    ],
+    {% endfor %}
+};
+
+let tabActual = 'cat';
+
+function switchTab(tab) {
+    tabActual = tab;
+    document.getElementById('panel-cat').style.display    = tab === 'cat'   ? 'block' : 'none';
+    document.getElementById('panel-marca').style.display  = tab === 'marca' ? 'block' : 'none';
+    document.getElementById('tab-cat').style.background   = tab === 'cat'   ? '#111'   : '#f9fafb';
+    document.getElementById('tab-cat').style.color        = tab === 'cat'   ? 'white'  : '#374151';
+    document.getElementById('tab-marca').style.background = tab === 'marca' ? '#111'   : '#f9fafb';
+    document.getElementById('tab-marca').style.color      = tab === 'marca' ? 'white'  : '#374151';
+    filtrarProductos();
+}
+
+function cargarSubcategorias() {
+    const catId  = document.getElementById('select-categoria').value;
+    const subSel = document.getElementById('select-subcategoria');
+    subSel.innerHTML = '<option value="">— Todas las subcategorías —</option>';
+
+    if (catId && SUBCATEGORIAS[catId] && SUBCATEGORIAS[catId].length > 0) {
+        SUBCATEGORIAS[catId].forEach(sub => {
+            subSel.innerHTML += `<option value="${sub.id}">${sub.nombre}</option>`;
+        });
+        subSel.style.display = 'block';
+    } else {
+        subSel.style.display = 'none';
+    }
+    filtrarProductos();
+}
+
+function filtrarProductos() {
+    const buscar  = document.getElementById('buscar-producto').value.toLowerCase();
+    const catId   = parseInt(document.getElementById('select-categoria').value)   || null;
+    const subId   = parseInt(document.getElementById('select-subcategoria').value) || null;
+    const marcaId = parseInt(document.getElementById('select-marca').value)        || null;
+
+    let resultado = TODOS_PRODUCTOS;
+
+    if (tabActual === 'cat') {
+        if (subId) {
+            resultado = resultado.filter(p => p.cat_id === subId);
+        } else if (catId) {
+            const subIds = (SUBCATEGORIAS[catId] || []).map(s => s.id);
+            resultado = resultado.filter(p => p.cat_id === catId || subIds.includes(p.cat_id));
+        }
+    } else {
+        if (marcaId) {
+            resultado = resultado.filter(p => p.marca_id === marcaId);
+        }
+    }
+
+    if (buscar) {
+        resultado = resultado.filter(p => p.nombre.toLowerCase().includes(buscar));
+    }
+
+    renderListaProductos(resultado);
+}
+
+function renderListaProductos(productos) {
+    const contenedor = document.getElementById('lista-productos-filtrada');
+
+    if (productos.length === 0) {
+        contenedor.innerHTML = '<div style="padding:10px;text-align:center;color:#9ca3af;font-size:12px;">Sin resultados</div>';
+        return;
+    }
+
+    contenedor.innerHTML = productos.map(p => `
+        <div onclick="elegirProducto(${p.id})"
+             style="display:flex;align-items:center;gap:8px;padding:8px 10px;
+                    cursor:pointer;border-bottom:1px solid #f3f4f6;font-size:12px;background:white;"
+             onmouseover="this.style.background='#f9fafb'"
+             onmouseout="this.style.background='white'">
+            ${p.imagen
+                ? `<img src="${p.imagen}" style="width:32px;height:32px;object-fit:cover;border-radius:4px;flex-shrink:0;">`
+                : `<div style="width:32px;height:32px;background:#e5e7eb;border-radius:4px;flex-shrink:0;"></div>`}
+            <div>
+                <div style="font-weight:600;line-height:1.2;">${p.nombre}</div>
+                <div style="color:#6b7280;">$${p.precio}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function elegirProducto(productoId) {
+    if (pinSeleccionado === null) return;
+    const prod = TODOS_PRODUCTOS.find(p => p.id === productoId);
+    if (!prod) return;
+
+    const pin           = pines.find(p => p.id_local === pinSeleccionado);
+    pin.producto_id     = prod.id;
+    pin.producto_nombre = prod.nombre;
+    pin.producto_precio = prod.precio;
+    pin.producto_imagen = prod.imagen;
+
+    document.getElementById('producto-seleccionado-info').style.display = 'block';
+    document.getElementById('producto-seleccionado-nombre').textContent =
+        `${prod.nombre} — $${prod.precio}`;
+
+    renderTodo();
+}
+</script>
+{% endblock %}
