@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pago del Pedido #{{ pedido.id }}{% endblock %}
+
+{% block content %}
+<section class="flat-spacing-11">
+    <div class="container text-center">
+        <h2 class="mb-4">Pago del Pedido #{{ pedido.id }}</h2>
+        <p class="mb-5">El monto a pagar es de <strong>${{ pedido.total }}</strong>. Por favor haz clic en el botón de abajo para procesar tu pago de forma segura con Payphone.</p>
+        
+        <!-- Contenedor del Botón Payphone -->
+        <div id="pp-button" style="display: flex; justify-content: center;"></div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Script oficial de Payphone -->
+<script src="https://pay.payphonetodoesposible.com/api/button/js?appId=TU_APP_ID_AQUI"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar botón de Payphone
+        payphone.Button({
+            id: "pp-button",
+            token: "TU_TOKEN_AQUI", // Reemplazar con el token real de Payphone
+            btnHorizontal: true,
+            btnCard: true,
+
+            createOrder: function(actions) {
+                return actions.prepare({
+                    amount: {{ pedido.total|floatformat:"0" }} * 100, // Payphone usa centavos, multiplicar por 100
+                    amountWithoutTax: {{ pedido.total|floatformat:"0" }} * 100,
+                    clientTransactionId: "PEDIDO-{{ pedido.id }}-" + Date.now(),
+                    reference: "Pedido #{{ pedido.id }}"
+                });
+            },
+            onComplete: function(model, actions) {
+                // El pago se ha completado en Payphone
+                console.log("Pago exitoso", model);
+                
+                // Aquí podrías enviar una petición AJAX a una vista tuya para marcar el pedido como pagado.
+                // Como es una estructura inicial, simplemente redirigimos a la confirmación:
+                window.location.href = "{% url 'productos:order_confirmation' pedido.id %}";
+            }
+        }).render("#pp-button");
+    });
+</script>
+{% endblock %}

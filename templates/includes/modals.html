@@ -180,33 +180,31 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="header">
-                    <div class="demo-title">Log in</div>
+                    <div class="demo-title">Iniciar Sesión</div>
                     <span class="icon-close icon-close-popup" data-bs-dismiss="modal"></span>
                 </div>
                 <div class="tf-login-form">
-                    <form class="" action="{% url 'login' %}" method="post" accept-charset="utf-8">
+                    <form class="" action="{% url 'usuarios:login' %}" method="post" accept-charset="utf-8">
                         {% csrf_token %}
                         <div class="tf-field style-1">
                             <input class="tf-field-input tf-input" placeholder=" " type="email" name="email" required>
-                            <label class="tf-field-label" for="">Email *</label>
+                            <label class="tf-field-label" for="">Correo electrónico *</label>
                         </div>
                         <div class="tf-field style-1">
                             <input class="tf-field-input tf-input" placeholder=" " type="password" name="password" required>
-                            <label class="tf-field-label" for="">Password *</label>
+                            <label class="tf-field-label" for="">Contraseña *</label>
                         </div>
                         <div>
-                            <a href="#forgotPassword" data-bs-toggle="modal" class="btn-link link">Forgot your
-                                password?</a>
+                            <a href="#forgotPassword" data-bs-toggle="modal" class="btn-link link">¿Olvidaste tu contraseña?</a>
                         </div>
                         <div class="bottom">
                             <div class="w-100">
                                 <button type="submit"
-                                    class="tf-btn btn-fill animate-hover-btn radius-3 w-100 justify-content-center"><span>Log
-                                        in</span></button>
+                                    class="tf-btn btn-fill animate-hover-btn radius-3 w-100 justify-content-center"><span>Ingresar</span></button>
                             </div>
                             <div class="w-100">
-                                <a href="{% url 'register' %}" class="btn-link fw-6 w-100 link">
-                                    New customer? Create your account
+                                <a href="{% url 'usuarios:register' %}" class="btn-link fw-6 w-100 link">
+                                    ¿Cliente nuevo? Crea tu cuenta
                                     <i class="icon icon-arrow1-top-left"></i>
                                 </a>
                             </div>
@@ -220,27 +218,27 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="header">
-                    <div class="demo-title">Reset your password</div>
+                    <div class="demo-title">Restablecer tu contraseña</div>
                     <span class="icon-close icon-close-popup" data-bs-dismiss="modal"></span>
                 </div>
                 <div class="tf-login-form">
-                    <form class="">
+                    <form class="" action="{% url 'usuarios:password_reset_request' %}" method="post">
+                        {% csrf_token %}
                         <div>
-                            <p>Sign up for early Sale access plus tailored new arrivals, trends and promotions. To opt
-                                out, click unsubscribe in our emails</p>
+                            <p>Te enviaremos un correo electrónico para que restablezcas tu contraseña.</p>
                         </div>
                         <div class="tf-field style-1">
-                            <input class="tf-field-input tf-input" placeholder=" " type="email" name="">
-                            <label class="tf-field-label" for="">Email *</label>
+                            <input class="tf-field-input tf-input" placeholder=" " type="email" name="email" required>
+                            <label class="tf-field-label" for="">Correo electrónico *</label>
                         </div>
                         <div>
-                            <a href="#login" data-bs-toggle="modal" class="btn-link link">Cancel</a>
+                            <a href="#login" data-bs-toggle="modal" class="btn-link link">Cancelar</a>
                         </div>
                         <div class="bottom">
                             <div class="w-100">
                                 <button type="submit"
-                                    class="tf-btn btn-fill animate-hover-btn radius-3 w-100 justify-content-center"><span>Reset
-                                        password</span></button>
+                                    class="tf-btn btn-fill animate-hover-btn radius-3 w-100 justify-content-center"><span>Restablecer
+                                        contraseña</span></button>
                             </div>
                         </div>
                     </form>
@@ -252,40 +250,25 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="header">
-                    <div class="demo-title">Register</div>
+                    <div class="demo-title">Registrarse</div>
                     <span class="icon-close icon-close-popup" data-bs-dismiss="modal"></span>
                 </div>
                 <div class="tf-login-form">
-                    <form class="">
-                        <div class="tf-field style-1">
-                            <input class="tf-field-input tf-input" placeholder=" " type="text" name="">
-                            <label class="tf-field-label" for="">First name</label>
+                    <div class="text-center mb-4">
+                        <p>Para registrarte y disfrutar de beneficios exclusivos, ve a nuestra página de registro completo.</p>
+                    </div>
+                    <div class="bottom">
+                        <div class="w-100">
+                            <a href="{% url 'usuarios:register' %}"
+                                class="tf-btn btn-fill animate-hover-btn radius-3 w-100 justify-content-center"><span>Ir a Registrarse</span></a>
                         </div>
-                        <div class="tf-field style-1">
-                            <input class="tf-field-input tf-input" placeholder=" " type="text" name="">
-                            <label class="tf-field-label" for="">Last name</label>
+                        <div class="w-100 mt-3 text-center">
+                            <a href="#login" data-bs-toggle="modal" class="btn-link fw-6 w-100 link">
+                                ¿Ya tienes una cuenta? Inicia sesión aquí
+                                <i class="icon icon-arrow1-top-left"></i>
+                            </a>
                         </div>
-                        <div class="tf-field style-1">
-                            <input class="tf-field-input tf-input" placeholder=" " type="email" name="">
-                            <label class="tf-field-label" for="">Email *</label>
-                        </div>
-                        <div class="tf-field style-1">
-                            <input class="tf-field-input tf-input" placeholder=" " type="password" name="">
-                            <label class="tf-field-label" for="">Password *</label>
-                        </div>
-                        <div class="bottom">
-                            <div class="w-100">
-                                <a href="{% url 'register' %}"
-                                    class="tf-btn btn-fill animate-hover-btn radius-3 w-100 justify-content-center"><span>Register</span></a>
-                            </div>
-                            <div class="w-100">
-                                <a href="#login" data-bs-toggle="modal" class="btn-link fw-6 w-100 link">
-                                    Already have an account? Log in here
-                                    <i class="icon icon-arrow1-top-left"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,0 +1,111 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Pedidos | Panel Admin{% endblock %}
+{% block menu_orders %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Todos los pedidos</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li>
+                        <a href="{% url 'panel_admin_demo' %}">
+                            <div class="text-tiny">Dashboard</div>
+                        </a>
+                    </li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Pedidos</div></li>
+                </ul>
+            </div>
+
+            <div class="wg-box">
+                <div class="wg-table table-product-list">
+                    <ul class="table-title flex gap20 mb-14" style="grid-template-columns: 80px 150px 200px 100px 100px 120px 150px 100px; display: grid;">
+                        <li><div class="body-title">ID</div></li>
+                        <li><div class="body-title">Cliente</div></li>
+                        <li><div class="body-title">Email</div></li>
+                        <li><div class="body-title">Total</div></li>
+                        <li><div class="body-title">Método</div></li>
+                        <li><div class="body-title">Estado</div></li>
+                        <li><div class="body-title">Fecha</div></li>
+                        <li><div class="body-title">Acciones</div></li>
+                    </ul>
+
+                    <ul class="flex flex-column">
+                        {% for pedido in pedidos %}
+                        <li class="wg-product item-row gap20" style="grid-template-columns: 80px 150px 200px 100px 100px 120px 150px 100px; display: grid; align-items: center;">
+                            <div class="body-text text-main-dark fw-7">#{{ pedido.id }}</div>
+                            <div class="body-text text-main-dark">{{ pedido.nombres }} {{ pedido.apellidos }}</div>
+                            <div class="body-text text-main-dark">{{ pedido.email }}</div>
+                            <div class="body-text text-main-dark fw-7">${{ pedido.total|floatformat:2 }}</div>
+                            
+                            <div class="body-text text-main-dark">
+                                {% if pedido.metodo_pago == 'payphone' %}
+                                    <span class="badge" style="background:#f47a20;color:white;padding:3px 8px;border-radius:3px;font-size:11px;">Payphone</span>
+                                {% else %}
+                                    <span class="badge" style="background:#3b5998;color:white;padding:3px 8px;border-radius:3px;font-size:11px;">Transferencia</span>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {% if pedido.estado == 'pendiente' %}
+                                    <div class="block-warning bg-warning fw-7 text-white text-center" style="padding:4px;border-radius:4px;font-size:12px;">Pendiente</div>
+                                {% elif pedido.estado == 'pagado' %}
+                                    <div class="block-success bg-success fw-7 text-white text-center" style="padding:4px;border-radius:4px;font-size:12px;">Pagado</div>
+                                {% elif pedido.estado == 'enviado' %}
+                                    <div class="block-info bg-info fw-7 text-white text-center" style="padding:4px;border-radius:4px;font-size:12px;">Enviado</div>
+                                {% elif pedido.estado == 'completado' %}
+                                    <div class="block-primary bg-primary fw-7 text-white text-center" style="padding:4px;border-radius:4px;font-size:12px;">Completado</div>
+                                {% elif pedido.estado == 'cancelado' %}
+                                    <div class="block-danger bg-danger fw-7 text-white text-center" style="padding:4px;border-radius:4px;font-size:12px;">Cancelado</div>
+                                {% else %}
+                                    <div class="block-secondary bg-secondary fw-7 text-white text-center" style="padding:4px;border-radius:4px;font-size:12px;">{{ pedido.estado }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="body-text text-main-dark">{{ pedido.created_at|date:"d M Y H:i" }}</div>
+
+                            <div class="list-icon-function">
+                                <div class="item edit">
+                                    <a href="{% url 'productos:panel_admin_order_detail' pedido.id %}"><i class="icon-eye"></i> Ver Detalle</a>
+                                </div>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="item-row gap20">
+                            <div class="body-text">No hay pedidos registrados todavía.</div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                {% if pedidos.has_other_pages %}
+                <div class="divider"></div>
+                <div class="flex items-center justify-between flex-wrap gap10">
+                    <ul class="wg-pagination">
+                        {% if pedidos.has_previous %}
+                        <li><a href="?page={{ pedidos.previous_page_number }}"><i class="icon-chevron-left"></i></a></li>
+                        {% endif %}
+
+                        {% for num in pedidos.paginator.page_range %}
+                            {% if pedidos.number == num %}
+                            <li class="active"><a href="#">{{ num }}</a></li>
+                            {% elif num > pedidos.number|add:'-3' and num < pedidos.number|add:'3' %}
+                            <li><a href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if pedidos.has_next %}
+                        <li><a href="?page={{ pedidos.next_page_number }}"><i class="icon-chevron-right"></i></a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -100,7 +100,7 @@
 
         
         <!-- Animated Divider -->
-        <div class="divider-wrap"></div>
+        <!-- <div class="divider-wrap"></div> removed to fix white line -->
 
 
 
@@ -329,14 +329,21 @@
                             </a>
                             {% endif %}
                             <div style="height:1px;background:#f3f4f6;margin:4px 0;"></div>
-                            <a href="{% url 'logout' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#000000;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
+                            <a href="{% url 'usuarios:logout' %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;color:#000000;text-decoration:none;font-size:13px;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
                                 <i class="icon icon-log-out" style="font-size:15px;"></i> Cerrar Sesión
                             </a>
                         </div>
                     </li>
                     {% else %}
                     <li class="nav-account">
+                        {% url 'usuarios:login' as login_url %}
+                        {% url 'usuarios:register' as register_url %}
+                        {% url 'usuarios:password_reset_request' as reset_url %}
+                        {% if request.path == login_url or request.path == register_url or request.path == reset_url %}
+                        <a href="{{ login_url }}" class="link nav-icon-item">
+                        {% else %}
                         <a href="#login" data-bs-toggle="modal" class="link nav-icon-item">
+                        {% endif %}
                             <i class="icon icon-account"></i>
                         </a>
                     </li>
@@ -552,11 +559,18 @@
                     <i class="icon icon-account"></i>Mi Cuenta
                 </a>
                 {% endif %}
-                <a href="{% url 'logout' %}" class="site-nav-icon">
+                <a href="{% url 'usuarios:logout' %}" class="site-nav-icon">
                     <i class="icon icon-log-out"></i>Salir
                 </a>
             {% else %}
+                {% url 'usuarios:login' as login_url %}
+                {% url 'usuarios:register' as register_url %}
+                {% url 'usuarios:password_reset_request' as reset_url %}
+                {% if request.path == login_url or request.path == register_url or request.path == reset_url %}
+                <a href="{{ login_url }}" class="site-nav-icon">
+                {% else %}
                 <a href="#login" data-bs-toggle="modal" class="site-nav-icon">
+                {% endif %}
                     <i class="icon icon-account"></i>Login / Registro
                 </a>
             {% endif %}

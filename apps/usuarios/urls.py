@@ -5,9 +5,9 @@ app_name = 'usuarios'
 
 urlpatterns = [
     # Autenticación
-    path('login/', views.login_usuario, name='login'),
-    path('register/', views.registrar_usuario, name='register'),
-    path('logout/', views.logout_usuario, name='logout'),
+    path('iniciar-sesion/', views.login_usuario, name='login'),
+    path('registro/', views.registrar_usuario, name='register'),
+    path('cerrar-sesion/', views.logout_usuario, name='logout'),
     
     # API para ciudades por provincia (AJAX)
     path('api/ciudades-por-provincia/<int:provincia_id>/', views.api_ciudades_por_provincia, name='api_ciudades_por_provincia'),

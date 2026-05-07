@@ -121,13 +121,13 @@
                         </fieldset>
                         <fieldset class="price">
                             <div class="body-title mb-10">Precio <span class="tf-color-1">*</span></div>
-                            <input class="flex-grow tf-input" type="number" name="precio" step="0.01" min="0" value="{{ producto.precio }}" required>
+                            <input class="flex-grow tf-input" type="number" name="precio" step="0.01" min="0" value="{{ producto.precio|stringformat:'s' }}" required>
                         </fieldset>
                     </div>
                     <div class="cols-lg gap22 mb-20">
                         <fieldset>
                             <div class="body-title mb-10">Precio de Oferta</div>
-                            <input class="flex-grow tf-input" type="number" name="precio_oferta" step="0.01" min="0" value="{{ producto.precio_oferta|default:'' }}" placeholder="Vacío si no hay oferta">
+                            <input class="flex-grow tf-input" type="number" name="precio_oferta" step="0.01" min="0" value="{% if producto.precio_oferta %}{{ producto.precio_oferta|stringformat:'s' }}{% endif %}" placeholder="Vacío si no hay oferta">
                         </fieldset>
                         <fieldset>
                             <div class="body-title mb-10">Stock <span class="tf-color-1">*</span></div>
@@ -170,7 +170,7 @@
                     </div>
                     <fieldset>
                         <div class="body-title mb-10">Peso</div>
-                        <input class="flex-grow tf-input" type="number" name="peso" step="0.01" min="0" value="{{ producto.peso|default:'' }}" placeholder="Ej: 1.25">
+                        <input class="flex-grow tf-input" type="number" name="peso" step="0.01" min="0" value="{% if producto.peso %}{{ producto.peso|stringformat:'s' }}{% endif %}" placeholder="Ej: 1.25">
                     </fieldset>
                 </div>
 
