@@ -226,6 +226,12 @@ class Producto(models.Model):
         null=True,
         help_text="Ej: Cerámica, Madera, Vidrio"
     )
+    capacidad = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="Ej: 50 ml, 1 Litro, 500 gramos"
+    )
 
     destacado = models.BooleanField(default=False, help_text="Mostrar en página principal")
     activo = models.BooleanField(default=True)

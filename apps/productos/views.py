@@ -180,6 +180,7 @@ def panel_admin_product_add(request):
         marca_id = request.POST.get('marca') or None
         material = request.POST.get('material', '').strip()
         dimensiones = request.POST.get('dimensiones', '').strip()
+        capacidad = request.POST.get('capacidad', '').strip()
         peso = request.POST.get('peso') or None
         destacado = request.POST.get('destacado') == 'on'
         activo = request.POST.get('activo') == 'on'
@@ -208,6 +209,7 @@ def panel_admin_product_add(request):
                 descripcion_completa=descripcion_completa,
                 material=material,
                 dimensiones=dimensiones,
+                capacidad=capacidad,
                 peso=peso,
                 destacado=destacado,
                 activo=activo,
@@ -257,6 +259,7 @@ def panel_admin_product_edit(request, producto_id):
         marca_id = request.POST.get('marca') or None
         material = request.POST.get('material', '').strip()
         dimensiones = request.POST.get('dimensiones', '').strip()
+        capacidad = request.POST.get('capacidad', '').strip()
         peso = request.POST.get('peso') or None
         destacado = request.POST.get('destacado') == 'on'
         activo = request.POST.get('activo') == 'on'
@@ -285,6 +288,7 @@ def panel_admin_product_edit(request, producto_id):
             producto.descripcion_completa = descripcion_completa
             producto.material = material
             producto.dimensiones = dimensiones
+            producto.capacidad = capacidad
             producto.peso = peso
             producto.destacado = destacado
             producto.activo = activo

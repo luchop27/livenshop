@@ -210,6 +210,14 @@
                                                 </td>
                                             </tr>
                                             {% endif %}
+                                            {% if producto.capacidad %}
+                                            <tr class="tf-attr-pa-capacity">
+                                                <th class="tf-attr-label">Capacidad</th>
+                                                <td class="tf-attr-value">
+                                                    <p>{{ producto.capacidad }}</p>
+                                                </td>
+                                            </tr>
+                                            {% endif %}
                                             {% if producto.stock %}
                                             <tr class="tf-attr-pa-stock">
                                                 <th class="tf-attr-label">Stock</th>
