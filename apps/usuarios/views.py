@@ -61,9 +61,11 @@ def enviar_email_directo(destinatario, asunto, mensaje_html, incluir_logo=True):
         
         print("✅ Contexto SSL creado (sin verificación de certificados)")
         
+        sender_email = getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER)
+        
         msg = MIMEMultipart('related')
         msg['Subject'] = asunto
-        msg['From'] = settings.EMAIL_HOST_USER
+        msg['From'] = f"LivenShop <{sender_email}>"
         msg['To'] = destinatario
         
         msg_alternative = MIMEMultipart('alternative')
@@ -91,38 +93,37 @@ def enviar_email_directo(destinatario, asunto, mensaje_html, incluir_logo=True):
         print("✅ Mensaje creado")
         
         print(f"🔌 Conectando a {settings.EMAIL_HOST}:{settings.EMAIL_PORT}...")
-        with smtplib.SMTP_SSL(settings.EMAIL_HOST, settings.EMAIL_PORT, context=context) as server:
-            print("✅ Conexión establecida")
+        with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
+            server.ehlo()
+            server.starttls(context=context)
+            server.ehlo()
+            print("✅ Conexión TLS establecida")
             
             print("🔐 Autenticando...")
             server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
             print("✅ Autenticación exitosa")
             
             print("📤 Enviando mensaje...")
-            server.sendmail(settings.EMAIL_HOST_USER, destinatario, msg.as_string())
+            server.sendmail(sender_email, destinatario, msg.as_string())
             print("✅ Mensaje enviado")
         
         print(f"✅✅✅ Email enviado exitosamente a {destinatario}")
-        return True
+        return True, ""
         
     except smtplib.SMTPAuthenticationError as e:
         print(f"❌ Error de autenticación: {e}")
-        print("⚠️ Verifica que:")
-        print("   1. La verificación en 2 pasos esté activada en Gmail")
-        print("   2. Hayas generado una 'Contraseña de aplicación' en https://myaccount.google.com/apppasswords")
-        print("   3. La contraseña sea exactamente 16 caracteres SIN ESPACIOS")
-        return False
+        return False, f"Error de autenticación SMTP: Verifica tus credenciales de Amazon SES."
     except smtplib.SMTPException as e:
         print(f"❌ Error SMTP: {e}")
-        return False
+        return False, f"Error del servidor de correo: {e}"
     except ssl.SSLError as e:
         print(f"❌ Error SSL: {e}")
-        return False
+        return False, f"Error SSL: {e}"
     except Exception as e:
         print(f"❌ Error general enviando email: {type(e).__name__}: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        return False, f"Error inesperado: {str(e)}"
 
 
 def enviar_email_verificacion(request, usuario):
@@ -356,14 +357,13 @@ def enviar_email_verificacion(request, usuario):
         """
         
         asunto = '🎉 ¡Bienvenido a LivenShop! Verifica tu email'
-        resultado = enviar_email_directo(usuario.email, asunto, mensaje_html)
-        return resultado
+        return enviar_email_directo(usuario.email, asunto, mensaje_html)
         
     except Exception as e:
         print(f"Error en enviar_email_verificacion: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        return False, str(e)
 
 
 def login_usuario(request):
@@ -373,12 +373,14 @@ def login_usuario(request):
     if request.user.is_authenticated:
         if request.user.rol == 'admin_tienda' or request.user.is_staff:
             return redirect('panel_admin_demo')
-        return redirect('my-account')
+        return redirect('usuarios:my_account')
     
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '').strip()
         next_url = request.POST.get('next') or request.GET.get('next')
+        if next_url == 'None':
+            next_url = None
 
         if not email or not password:
             messages.error(request, 'Por favor, ingrese email y contraseña.')
@@ -396,7 +398,7 @@ def login_usuario(request):
             if user.rol == 'admin_tienda' or user.is_staff:
                 return redirect('panel_admin_demo')
             
-            return redirect('my-account')
+            return redirect('usuarios:my_account')
         else:
             messages.error(request, 'Email o contraseña incorrectos.')
             return render(request, 'login.html', {
@@ -433,20 +435,20 @@ def registrar_usuario(request):
         apellido = request.POST.get('apellido', '').strip()
         email = request.POST.get('email', '').strip()
         telefono = request.POST.get('telefono', '').strip()
-        provincia_id = request.POST.get('provincia')
-        ciudad_id = request.POST.get('ciudad')
+        provincia_nombre = request.POST.get('provincia')
+        ciudad_nombre = request.POST.get('ciudad')
         password = request.POST.get('password', '').strip()
         password_confirm = request.POST.get('password_confirm', '').strip()
 
-        if not provincia_id or not ciudad_id:
+        if not provincia_nombre or not ciudad_nombre:
             messages.error(request, 'Debes seleccionar una provincia y una ciudad/cantón.')
             return render(request, 'register.html', construir_contexto_registro(
                 nombre=nombre,
                 apellido=apellido,
                 email=email,
                 telefono=telefono,
-                provincia_id=provincia_id,
-                ciudad_id=ciudad_id,
+                provincia_id=provincia_nombre,
+                ciudad_id=ciudad_nombre,
             ))
         
         if not email or not password:
@@ -456,8 +458,8 @@ def registrar_usuario(request):
                 apellido=apellido,
                 email=email,
                 telefono=telefono,
-                provincia_id=provincia_id,
-                ciudad_id=ciudad_id,
+                provincia_id=provincia_nombre,
+                ciudad_id=ciudad_nombre,
             ))
         
         if password != password_confirm:
@@ -467,8 +469,8 @@ def registrar_usuario(request):
                 apellido=apellido,
                 email=email,
                 telefono=telefono,
-                provincia_id=provincia_id,
-                ciudad_id=ciudad_id,
+                provincia_id=provincia_nombre,
+                ciudad_id=ciudad_nombre,
             ))
         
         if len(password) < 6:
@@ -478,8 +480,8 @@ def registrar_usuario(request):
                 apellido=apellido,
                 email=email,
                 telefono=telefono,
-                provincia_id=provincia_id,
-                ciudad_id=ciudad_id,
+                provincia_id=provincia_nombre,
+                ciudad_id=ciudad_nombre,
             ))
         
         if Usuario.objects.filter(email=email).exists():
@@ -489,19 +491,16 @@ def registrar_usuario(request):
                 apellido=apellido,
                 email=email,
                 telefono=telefono,
-                provincia_id=provincia_id,
-                ciudad_id=ciudad_id,
+                provincia_id=provincia_nombre,
+                ciudad_id=ciudad_nombre,
             ))
         
         try:
             provincia = None
             ciudad = None
             
-            if provincia_id:
-                try:
-                    provincia = Provincia.objects.get(id=provincia_id, activa=True)
-                except Provincia.DoesNotExist:
-                    provincia = None
+            if provincia_nombre:
+                provincia, _ = Provincia.objects.get_or_create(nombre=provincia_nombre, defaults={'activa': True})
 
             if not provincia:
                 messages.error(request, 'La provincia seleccionada no es válida.')
@@ -510,15 +509,12 @@ def registrar_usuario(request):
                     apellido=apellido,
                     email=email,
                     telefono=telefono,
-                    provincia_id=provincia_id,
-                    ciudad_id=ciudad_id,
+                    provincia_id=provincia_nombre,
+                    ciudad_id=ciudad_nombre,
                 ))
             
-            if ciudad_id:
-                try:
-                    ciudad = Ciudad.objects.get(id=ciudad_id, provincia=provincia, activa=True)
-                except Ciudad.DoesNotExist:
-                    ciudad = None
+            if ciudad_nombre:
+                ciudad, _ = Ciudad.objects.get_or_create(nombre=ciudad_nombre, provincia=provincia, defaults={'activa': True})
 
             if not ciudad:
                 messages.error(request, 'La ciudad/cantón seleccionada no pertenece a la provincia elegida.')
@@ -527,8 +523,8 @@ def registrar_usuario(request):
                     apellido=apellido,
                     email=email,
                     telefono=telefono,
-                    provincia_id=provincia_id,
-                    ciudad_id=ciudad_id,
+                    provincia_id=provincia_nombre,
+                    ciudad_id=ciudad_nombre,
                 ))
             
             user = Usuario.objects.create_user(
@@ -860,7 +856,8 @@ def password_reset_request(request):
             
             asunto = '🔐 Restablece tu contraseña - LivenShop'
             
-            if enviar_email_directo(user.email, asunto, mensaje_html):
+            exito, mensaje_error = enviar_email_directo(user.email, asunto, mensaje_html)
+            if exito:
                 messages.success(
                     request, 
                     '✅ Se ha enviado un correo con las instrucciones para restablecer tu contraseña. '
@@ -869,7 +866,7 @@ def password_reset_request(request):
             else:
                 messages.error(
                     request, 
-                    '❌ Hubo un problema al enviar el correo. Por favor intenta nuevamente.'
+                    f'❌ Hubo un problema al enviar el correo. {mensaje_error}'
                 )
                 
         except Usuario.DoesNotExist:
@@ -994,7 +991,8 @@ def reenviar_verificacion(request):
     
     EmailVerificationToken.objects.filter(usuario=usuario, usado=False).update(usado=True)
     
-    if enviar_email_verificacion(request, usuario):
+    exito, msg_error = enviar_email_verificacion(request, usuario)
+    if exito:
         messages.success(
             request, 
             f'Hemos enviado un nuevo correo de verificación a {usuario.email}. '
@@ -1003,7 +1001,7 @@ def reenviar_verificacion(request):
     else:
         messages.error(
             request,
-            'Hubo un problema al enviar el correo. Por favor intenta más tarde.'
+            f'Hubo un problema al enviar el correo: {msg_error}'
         )
     
     return redirect('usuarios:my_account')

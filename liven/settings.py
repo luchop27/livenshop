@@ -136,21 +136,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
 # Login
-LOGIN_URL = 'login'
+LOGIN_URL = 'usuarios:login'
 
 # Cart Session ID
 CART_SESSION_ID = 'cart'
 
-# Email Configuration (IMPORTANTE: Configurar con valores reales en producción)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # En desarrollo, muestra emails en consola
-# Para producción, usar:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'tu_email@gmail.com'
-# EMAIL_HOST_PASSWORD = 'tu_app_password'
-DEFAULT_FROM_EMAIL = 'no-reply@livenshop.com'
+# ==============================================================================
+# CONFIGURACIÓN DE CORREO - AMAZON SES (Simple Email Service)
+# ==============================================================================
+# Para habilitar el envío real, comenta la línea de la "consola" y descomenta
+# las líneas de SMTP debajo. Luego llena con tus credenciales de AWS SES.
+
+# ── PARA PRODUCCIÓN CON AWS SES ──
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'AKIA6N2IG347PPEAQWHG'
+EMAIL_HOST_PASSWORD = 'BKYcRC5vWmZTqVn7B7B476X2/DSAq4B7/TwBYu3loMDS'
+DEFAULT_FROM_EMAIL = 'marcojaramillo0142@gmail.com'
 
 # Site URL (usado para generar links en emails)
 SITE_URL = 'http://localhost:8000'  # Cambiar en producción

@@ -1,56 +1,279 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-        <!-- page-title -->
-        <div class="tf-page-title style-2">
-            <div class="container-full">
-                <div class="heading text-center">Register</div>
+<!-- page-title -->
+<div class="tf-page-title style-2">
+    <div class="container-full">
+        <div class="heading text-center">Registrarse</div>
+    </div>
+</div>
+<!-- /page-title -->
+
+<section class="flat-spacing-10">
+    <div class="container">
+        <div class="form-register-wrap" style="max-width: 600px; margin: 0 auto;">
+            <div class="flat-title align-items-start gap-0 mb_30 px-0">
+                <h5 class="mb_18">Crear una cuenta</h5>
+                <p class="text_black-2">Regístrate para obtener acceso anticipado a ofertas y conocer las últimas
+                    tendencias y promociones. Puedes darte de baja de nuestros correos en cualquier momento.</p>
+            </div>
+            <div>
+                <form class="" id="register-form" action="{% url 'usuarios:register' %}" method="post"
+                    accept-charset="utf-8">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="tf-field style-1 mb_15">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="property_nombre"
+                                    name="nombre" value="{{ nombre|default:'' }}" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="property_nombre">Nombre *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1 mb_15">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text"
+                                    id="property_apellido" name="apellido" value="{{ apellido|default:'' }}" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="property_apellido">Apellido
+                                    *</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="tf-field style-1 mb_15">
+                                <input class="tf-field-input tf-input" placeholder=" " type="email" id="property_email"
+                                    name="email" value="{{ email|default:'' }}" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="property_email">Correo electrónico
+                                    *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1 mb_15">
+                                <input class="tf-field-input tf-input" placeholder=" " type="text"
+                                    id="property_telefono" name="telefono" value="{{ telefono|default:'' }}" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="property_telefono">Teléfono
+                                    *</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb_15">
+                        <div class="col-md-6">
+                            <label class="fw-4 text_black-2 mb-2">Provincia *</label>
+                            <div class="select-custom">
+                                <select name="provincia" id="id_provincia" class="tf-select w-100" required>
+                                    <option value="">Selecciona tu provincia</option>
+                                    <option value="Azuay">Azuay</option>
+                                    <option value="Bolívar">Bolívar</option>
+                                    <option value="Cañar">Cañar</option>
+                                    <option value="Carchi">Carchi</option>
+                                    <option value="Chimborazo">Chimborazo</option>
+                                    <option value="Cotopaxi">Cotopaxi</option>
+                                    <option value="El Oro">El Oro</option>
+                                    <option value="Esmeraldas">Esmeraldas</option>
+                                    <option value="Guayas">Guayas</option>
+                                    <option value="Imbabura">Imbabura</option>
+                                    <option value="Loja">Loja</option>
+                                    <option value="Los Ríos">Los Ríos</option>
+                                    <option value="Manabí">Manabí</option>
+                                    <option value="Morona Santiago">Morona Santiago</option>
+                                    <option value="Napo">Napo</option>
+                                    <option value="Orellana">Orellana</option>
+                                    <option value="Pastaza">Pastaza</option>
+                                    <option value="Pichincha">Pichincha</option>
+                                    <option value="Santa Elena">Santa Elena</option>
+                                    <option value="Santo Domingo de los Tsáchilas">Santo Domingo de los Tsáchilas
+                                    </option>
+                                    <option value="Sucumbíos">Sucumbíos</option>
+                                    <option value="Tungurahua">Tungurahua</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-4 text_black-2 mb-2">Ciudad/Cantón *</label>
+                            <div class="select-custom">
+                                <select name="ciudad" id="id_ciudad" class="tf-select w-100" required>
+                                    <option value="">Selecciona tu ciudad</option>
+                                    <optgroup label="Azuay">
+                                        <option value="Cuenca">Cuenca</option>
+                                        <option value="Gualaceo">Gualaceo</option>
+                                        <option value="Paute">Paute</option>
+                                        <option value="Sígsig">Sígsig</option>
+                                        <option value="Chordeleg">Chordeleg</option>
+                                    </optgroup>
+                                    <optgroup label="Bolívar">
+                                        <option value="Guaranda">Guaranda</option>
+                                        <option value="Caluma">Caluma</option>
+                                        <option value="Chillanes">Chillanes</option>
+                                        <option value="Echeandía">Echeandía</option>
+                                        <option value="San Miguel">San Miguel</option>
+                                    </optgroup>
+                                    <optgroup label="Cañar">
+                                        <option value="Azogues">Azogues</option>
+                                        <option value="La Troncal">La Troncal</option>
+                                        <option value="Cañar">Cañar</option>
+                                        <option value="El Tambo">El Tambo</option>
+                                    </optgroup>
+                                    <optgroup label="Carchi">
+                                        <option value="Tulcán">Tulcán</option>
+                                        <option value="San Gabriel">San Gabriel</option>
+                                        <option value="Espejo">Espejo</option>
+                                        <option value="Montúfar">Montúfar</option>
+                                    </optgroup>
+                                    <optgroup label="Chimborazo">
+                                        <option value="Riobamba">Riobamba</option>
+                                        <option value="Latacunga">Latacunga</option>
+                                        <option value="Ambato">Ambato</option>
+                                        <option value="Guaranda">Guaranda</option>
+                                        <option value="Penipe">Penipe</option>
+                                    </optgroup>
+                                    <optgroup label="Cotopaxi">
+                                        <option value="Latacunga">Latacunga</option>
+                                        <option value="La Maná">La Maná</option>
+                                        <option value="Pangua">Pangua</option>
+                                        <option value="Salcedo">Salcedo</option>
+                                    </optgroup>
+                                    <optgroup label="El Oro">
+                                        <option value="Machala">Machala</option>
+                                        <option value="Santa Rosa">Santa Rosa</option>
+                                        <option value="Huaquillas">Huaquillas</option>
+                                        <option value="Pasaje">Pasaje</option>
+                                        <option value="Piñas">Piñas</option>
+                                    </optgroup>
+                                    <optgroup label="Esmeraldas">
+                                        <option value="Esmeraldas">Esmeraldas</option>
+                                        <option value="Atacames">Atacames</option>
+                                        <option value="Muisne">Muisne</option>
+                                        <option value="Quinindé">Quinindé</option>
+                                        <option value="San Lorenzo">San Lorenzo</option>
+                                    </optgroup>
+                                    <optgroup label="Guayas">
+                                        <option value="Guayaquil">Guayaquil</option>
+                                        <option value="Durán">Durán</option>
+                                        <option value="Samborondón">Samborondón</option>
+                                        <option value="Daule">Daule</option>
+                                        <option value="Milagro">Milagro</option>
+                                        <option value="Balzar">Balzar</option>
+                                        <option value="Yaguachi">Yaguachi</option>
+                                    </optgroup>
+                                    <optgroup label="Imbabura">
+                                        <option value="Ibarra">Ibarra</option>
+                                        <option value="Otavalo">Otavalo</option>
+                                        <option value="Antonio Ante">Antonio Ante</option>
+                                        <option value="Cotacachi">Cotacachi</option>
+                                    </optgroup>
+                                    <optgroup label="Loja">
+                                        <option value="Loja">Loja</option>
+                                        <option value="Catamayo">Catamayo</option>
+                                        <option value="Macará">Macará</option>
+                                        <option value="Vilcabamba">Vilcabamba</option>
+                                        <option value="Saraguro">Saraguro</option>
+                                    </optgroup>
+                                    <optgroup label="Los Ríos">
+                                        <option value="Babahoyo">Babahoyo</option>
+                                        <option value="Quevedo">Quevedo</option>
+                                        <option value="Vinces">Vinces</option>
+                                        <option value="Baba">Baba</option>
+                                        <option value="Mocache">Mocache</option>
+                                    </optgroup>
+                                    <optgroup label="Manabí">
+                                        <option value="Manta">Manta</option>
+                                        <option value="Portoviejo">Portoviejo</option>
+                                        <option value="Bahía de Caráquez">Bahía de Caráquez</option>
+                                        <option value="Jipijapa">Jipijapa</option>
+                                        <option value="El Carmen">El Carmen</option>
+                                        <option value="Chone">Chone</option>
+                                    </optgroup>
+                                    <optgroup label="Morona Santiago">
+                                        <option value="Macas">Macas</option>
+                                        <option value="Sucúa">Sucúa</option>
+                                        <option value="Palora">Palora</option>
+                                        <option value="Tena">Tena</option>
+                                        <option value="Puyo">Puyo</option>
+                                    </optgroup>
+                                    <optgroup label="Napo">
+                                        <option value="Tena">Tena</option>
+                                        <option value="Archidona">Archidona</option>
+                                        <option value="Puerto Misahuallí">Puerto Misahuallí</option>
+                                    </optgroup>
+                                    <optgroup label="Orellana">
+                                        <option value="Puerto Francisco de Orellana">Puerto Francisco de Orellana</option>
+                                        <option value="Coca">Coca</option>
+                                        <option value="Joya de los Sachas">Joya de los Sachas</option>
+                                    </optgroup>
+                                    <optgroup label="Pastaza">
+                                        <option value="Puyo">Puyo</option>
+                                        <option value="Mera">Mera</option>
+                                        <option value="Santa Clara">Santa Clara</option>
+                                        <option value="Arajuno">Arajuno</option>
+                                    </optgroup>
+                                    <optgroup label="Pichincha">
+                                        <option value="Quito">Quito</option>
+                                        <option value="Cayambe">Cayambe</option>
+                                        <option value="Machachi">Machachi</option>
+                                        <option value="Sangolquí">Sangolquí</option>
+                                        <option value="Puembo">Puembo</option>
+                                    </optgroup>
+                                    <optgroup label="Santa Elena">
+                                        <option value="Santa Elena">Santa Elena</option>
+                                        <option value="La Libertad">La Libertad</option>
+                                        <option value="Salinas">Salinas</option>
+                                        <option value="Olon">Olon</option>
+                                    </optgroup>
+                                    <optgroup label="Santo Domingo de los Tsáchilas">
+                                        <option value="Santo Domingo">Santo Domingo</option>
+                                    </optgroup>
+                                    <optgroup label="Sucumbíos">
+                                        <option value="Nueva Loja">Nueva Loja</option>
+                                        <option value="Lago Agrio">Lago Agrio</option>
+                                        <option value="Cascales">Cascales</option>
+                                        <option value="Putumayo">Putumayo</option>
+                                    </optgroup>
+                                    <optgroup label="Tungurahua">
+                                        <option value="Ambato">Ambato</option>
+                                        <option value="Baños">Baños</option>
+                                        <option value="Pelileo">Pelileo</option>
+                                        <option value="Píllaro">Píllaro</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="tf-field style-1 mb_30">
+                                <input class="tf-field-input tf-input" placeholder=" " type="password"
+                                    id="property_password" name="password" required>
+                                <label class="tf-field-label fw-4 text_black-2" for="property_password">Contraseña
+                                    *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tf-field style-1 mb_30">
+                                <input class="tf-field-input tf-input" placeholder=" " type="password"
+                                    id="property_password_confirm" name="password_confirm" required>
+                                <label class="tf-field-label fw-4 text_black-2"
+                                    for="property_password_confirm">Confirmar Contraseña *</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb_20">
+                        <button type="submit"
+                            class="tf-btn w-100 radius-3 btn-fill animate-hover-btn justify-content-center">Registrarme</button>
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'usuarios:login' %}" class="tf-btn btn-line">¿Ya tienes una cuenta? Inicia
+                            sesión aquí<i class="icon icon-arrow1-top-left"></i></a>
+                    </div>
+                </form>
             </div>
         </div>
-        <!-- /page-title -->
+    </div>
+</section>
+{% endblock %}
 
-        <section class="flat-spacing-10">
-            <div class="container">
-                <div class="form-register-wrap">
-                    <div class="flat-title align-items-start gap-0 mb_30 px-0">
-                        <h5 class="mb_18">Register</h5>
-                        <p class="text_black-2">Sign up for early Sale access plus tailored new arrivals, trends and
-                            promotions. To opt out, click unsubscribe in our emails</p>
-                    </div>
-                    <div>
-                        <form class="" id="register-form" action="{% url 'register' %}" method="post" accept-charset="utf-8">
-                            {% csrf_token %}
-                            <div class="tf-field style-1 mb_15">
-                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="property1"
-                                    name="nombre" required>
-                                <label class="tf-field-label fw-4 text_black-2" for="property1">Nombre</label>
-                            </div>
-                            <div class="tf-field style-1 mb_15">
-                                <input class="tf-field-input tf-input" placeholder=" " type="text" id="property2"
-                                    name="apellido" required>
-                                <label class="tf-field-label fw-4 text_black-2" for="property2">Apellido</label>
-                            </div>
-                            <div class="tf-field style-1 mb_15">
-                                <input class="tf-field-input tf-input" placeholder=" " type="email" id="property3"
-                                    name="email" required>
-                                <label class="tf-field-label fw-4 text_black-2" for="property3">Email *</label>
-                            </div>
-                            <div class="tf-field style-1 mb_30">
-                                <input class="tf-field-input tf-input" placeholder=" " type="password" id="property4"
-                                    name="password" required>
-                                <label class="tf-field-label fw-4 text_black-2" for="property4">Password *</label>
-                            </div>
-                            <div class="mb_20">
-                                <button type="submit"
-                                    class="tf-btn w-100 radius-3 btn-fill animate-hover-btn justify-content-center">Register</button>
-                            </div>
-                            <div class="text-center">
-                                <a href="{% url 'login' %}" class="tf-btn btn-line">Already have an account? Log in here<i
-                                        class="icon icon-arrow1-top-left"></i></a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
+{% block extra_js %}
 {% endblock %}

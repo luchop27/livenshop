@@ -180,6 +180,7 @@ def panel_admin_product_add(request):
         marca_id = request.POST.get('marca') or None
         material = request.POST.get('material', '').strip()
         dimensiones = request.POST.get('dimensiones', '').strip()
+        capacidad = request.POST.get('capacidad', '').strip()
         peso = request.POST.get('peso') or None
         destacado = request.POST.get('destacado') == 'on'
         activo = request.POST.get('activo') == 'on'
@@ -208,6 +209,7 @@ def panel_admin_product_add(request):
                 descripcion_completa=descripcion_completa,
                 material=material,
                 dimensiones=dimensiones,
+                capacidad=capacidad,
                 peso=peso,
                 destacado=destacado,
                 activo=activo,
@@ -257,6 +259,7 @@ def panel_admin_product_edit(request, producto_id):
         marca_id = request.POST.get('marca') or None
         material = request.POST.get('material', '').strip()
         dimensiones = request.POST.get('dimensiones', '').strip()
+        capacidad = request.POST.get('capacidad', '').strip()
         peso = request.POST.get('peso') or None
         destacado = request.POST.get('destacado') == 'on'
         activo = request.POST.get('activo') == 'on'
@@ -285,6 +288,7 @@ def panel_admin_product_edit(request, producto_id):
             producto.descripcion_completa = descripcion_completa
             producto.material = material
             producto.dimensiones = dimensiones
+            producto.capacidad = capacidad
             producto.peso = peso
             producto.destacado = destacado
             producto.activo = activo
@@ -951,9 +955,22 @@ def checkout_process(request):
         # Redirigir a página de confirmación
         return redirect('productos:order_confirmation', pedido_id=pedido.id)
     else:
-        # Aquí irá la integración de Payphone luego
-        messages.success(request, f"¡Gracias por tu compra, {first_name}! Tu pedido #{pedido.id} ha sido registrado exitosamente.")
+        # Payphone redirect
+        return redirect('productos:order_payment_payphone', pedido_id=pedido.id)
+
+def order_payment_payphone(request, pedido_id):
+    """
+    Página de pago con botón Payphone.
+    """
+    from .models import Pedido
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+
+    # Si ya está pagado, no mostrar el botón
+    if pedido.estado == 'pagado':
+        messages.info(request, "Este pedido ya ha sido pagado.")
         return redirect('home')
+
+    return render(request, 'payphone_payment.html', {'pedido': pedido})
 
 def order_confirmation(request, pedido_id):
     """
@@ -1075,3 +1092,46 @@ def wishlist_toggle(request):
     request.session.modified = True
     
     return JsonResponse({'success': True, 'added': added, 'count': len(wishlist)})
+
+# ══════════════════════════════════════════════════════
+# PANEL ADMIN - PEDIDOS
+# ══════════════════════════════════════════════════════
+from django.core.paginator import Paginator
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_orders(request):
+    """
+    Lista de pedidos en el panel de administración.
+    """
+    from .models import Pedido
+    pedidos_list = Pedido.objects.all().order_by('-created_at')
+    paginator = Paginator(pedidos_list, 20)
+    page_number = request.GET.get('page')
+    pedidos = paginator.get_page(page_number)
+    return render(request, 'panel_admin/order_list.html', {'pedidos': pedidos})
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_order_detail(request, pedido_id):
+    """
+    Detalle de un pedido específico.
+    """
+    from .models import Pedido
+    pedido = get_object_or_404(Pedido, pk=pedido_id)
+    return render(request, 'panel_admin/order_detail.html', {'pedido': pedido})
+
+@staff_member_required(login_url='usuarios:login')
+@require_POST
+def panel_admin_order_update_status(request, pedido_id):
+    """
+    Actualiza el estado de un pedido (ej. pendiente -> pagado).
+    """
+    from .models import Pedido
+    pedido = get_object_or_404(Pedido, pk=pedido_id)
+    nuevo_estado = request.POST.get('estado')
+    if nuevo_estado in dict(Pedido.ESTADO_CHOICES):
+        pedido.estado = nuevo_estado
+        pedido.save()
+        messages.success(request, f'Estado del pedido #{pedido.id} actualizado a {pedido.get_estado_display()}.')
+    else:
+        messages.error(request, 'Estado no válido.')
+    return redirect('productos:panel_admin_order_detail', pedido_id=pedido.id)

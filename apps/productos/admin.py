@@ -70,7 +70,7 @@ class ProductoAdmin(admin.ModelAdmin):
             'fields': ('precio', 'precio_oferta', 'stock')
         }),
         ('Detalles del Producto', {
-            'fields': ('peso', 'dimensiones', 'material'),
+            'fields': ('peso', 'dimensiones', 'material', 'capacidad'),
             'classes': ('collapse',)
         }),
         ('Estado', {
