@@ -39,9 +39,9 @@
 /*--------- Abstracts variable ---------- */
 @import url(./bootstrap-select.min.css);
 :root {
-  --main: #000000;
+  --main: #0C2038;
   --white: #ffffff;
-  --primary: #db1215;
+  --primary: #000000;
   --red_1: #db1215;
   --backdrop: rgba(0, 0, 0, 0.5);
   --yellow: #ffb321;
@@ -5131,8 +5131,8 @@ header.header-bg {
   color: rgba(0, 0, 0, 0.55);
 }
 .tf-form-search .search-suggests-results-inner .search-result-item .box-content .new-price {
-  color: rgb(219, 18, 21);
-  font-weight: 600;
+  color: #000;
+  font-weight: 700;
 }
 .tf-form-search .search-suggests-results-inner .search-result-item .img-box {
   width: 60px;
@@ -9004,7 +9004,7 @@ header.header-bg {
   text-decoration: line-through;
 }
 .tf-product-info-price .badges-on-sale {
-  background-color: rgb(252, 87, 50);
+  background-color: #0C2038;
   border-radius: 28px;
   padding: 0 10px;
   display: flex;
@@ -10045,7 +10045,7 @@ header.header-bg {
   line-height: 21px;
   font-size: 12px;
   padding: 0 10px;
-  background-color: #fc5732;
+  background-color: #0C2038;
   color: var(--white);
 }
 .card-product .marquee-product .marquee-wrapper {
@@ -10173,7 +10173,7 @@ header.header-bg {
   text-align: center;
   line-height: 22px;
   position: relative;
-  background-color: #fc5732;
+  background-color: #0C2038;
   color: var(--white);
   border-radius: 999px;
 }
@@ -10243,7 +10243,8 @@ header.header-bg {
   color: rgba(0, 0, 0, 0.5);
 }
 .card-product .card-product-info .new-price {
-  color: var(--red_1);
+  color: #000;
+  font-weight: 700;
 }
 .card-product .card-product-info.has-padding {
   padding-right: 15px;
