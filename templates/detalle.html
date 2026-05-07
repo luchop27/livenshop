@@ -105,6 +105,12 @@
                                             <span style="font-size: 14px; color: #444;">{{ producto.material }}</span>
                                         </div>
                                         {% endif %}
+                                        {% if producto.capacidad %}
+                                        <div class="tf-attr-row" style="display: flex; padding: 10px 0; border-top: 1px solid #e8e8e8;">
+                                            <span style="font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; min-width: 140px; color: #111;">Capacidad</span>
+                                            <span style="font-size: 14px; color: #444;">{{ producto.capacidad }}</span>
+                                        </div>
+                                        {% endif %}
                                         {% if producto.dimensiones %}
                                         <div class="tf-attr-row" style="display: flex; padding: 10px 0; border-top: 1px solid #e8e8e8;">
                                             <span style="font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; min-width: 140px; color: #111;">Dimensiones</span>
