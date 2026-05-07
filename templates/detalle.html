@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+
+<style>
+.tf-product-media-main,
+.tf-product-media-thumbs {
+    overflow: hidden !important;
+}
+#gallery-swiper-started .swiper-slide {
+    width: 100% !important;
+}
+
+#gallery-swiper-started {
+    overflow: hidden !important;
+    width: 100% !important;
+}
+
+#gallery-swiper-started .swiper-wrapper {
+    width: 100% !important;
+}
+</style>
         <!-- breadcrumb -->
         <div class="tf-breadcrumb">
             <div class="container">
@@ -37,7 +56,7 @@
                                             {% endfor %}
                                         </div>
                                     </div>
-                                    <div dir="ltr" class="swiper tf-product-media-main" id="gallery-swiper-started">
+                                    <div dir="ltr" class="swiper tf-product-media-main" id="gallery-swiper-started" style="overflow: hidden !important;">
                                         <div class="swiper-wrapper">
                                             {% for imagen in producto.imagenes.all %}
                                             <div class="swiper-slide">
@@ -60,20 +79,41 @@
                                     <div class="tf-product-info-title">
                                         <h5>{{ producto.nombre }}</h5>
                                     </div>
-                                    {% if producto.marca %}
-                                    <div class="tf-product-info-badges">
-                                        <div class="badges">{{ producto.marca.nombre }}</div>
-                                    </div>
-                                    {% endif %}
+
                                     <div class="tf-product-info-price">
                                         {% if producto.tiene_oferta %}
-                                            <div class="price-on-sale">${{ producto.precio_oferta|floatformat:2 }}</div>
                                             <div class="compare-at-price">${{ producto.precio|floatformat:2 }}</div>
+                                            <div class="price-on-sale">${{ producto.precio_oferta|floatformat:2 }}</div>
                                             <div class="badges-on-sale"><span>{{ producto.porcentaje_descuento }}</span>% OFF</div>
                                         {% else %}
                                             <div class="price-on-sale">${{ producto.precio|floatformat:2 }}</div>
                                         {% endif %}
                                     </div>
+
+                                    <!-- Descripción corta -->
+                                    {% if producto.descripcion_corta %}
+                                    <div class="tf-product-info-desc" style="margin-bottom: 16px;">
+                                        <p style="color: #555; font-size: 14px; line-height: 1.6; margin: 0;">{{ producto.descripcion_corta }}</p>
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Tabla de atributos rápidos (Material, Dimensiones, Stock) -->
+                                    <div class="tf-product-info-attrs" style="margin-bottom: 20px;">
+                                        {% if producto.material %}
+                                        <div class="tf-attr-row" style="display: flex; padding: 10px 0; border-top: 1px solid #e8e8e8;">
+                                            <span style="font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; min-width: 140px; color: #111;">Material</span>
+                                            <span style="font-size: 14px; color: #444;">{{ producto.material }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if producto.dimensiones %}
+                                        <div class="tf-attr-row" style="display: flex; padding: 10px 0; border-top: 1px solid #e8e8e8;">
+                                            <span style="font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; min-width: 140px; color: #111;">Dimensiones</span>
+                                            <span style="font-size: 14px; color: #444;">{{ producto.dimensiones }}</span>
+                                        </div>
+                                        {% endif %}
+                                        
+                                    </div>
+
                                     {% if producto.stock > 0 %}
                                     <div class="tf-product-info-quantity">
                                         <div class="quantity-title fw-6">Cantidad</div>
@@ -98,28 +138,30 @@
                                         <div class="quantity-title fw-6" style="color: red;">Producto Agotado</div>
                                     </div>
                                     {% endif %}
-                                    <div class="tf-product-info-extra-link">
-                                        <a href="#ask_question" data-bs-toggle="modal" class="tf-product-extra-icon">
-                                            <div class="icon">
-                                                <i class="icon-question"></i>
-                                            </div>
-                                            <div class="text fw-6">Haz una pregunta</div>
-                                        </a>
-                                        <a href="#delivery_return" data-bs-toggle="modal" class="tf-product-extra-icon">
-                                            <div class="icon">
-                                                <svg class="d-inline-block" xmlns="http://www.w3.org/2000/svg" width="22" height="18" viewBox="0 0 22 18" fill="currentColor">
-                                                    <path d="M21.7872 10.4724C21.7872 9.73685 21.5432 9.00864 21.1002 8.4217L18.7221 5.27043C18.2421 4.63481 17.4804 4.25532 16.684 4.25532H14.9787V2.54885C14.9787 1.14111 13.8334 0 12.4255 0H9.95745V1.69779H12.4255C12.8948 1.69779 13.2766 2.07962 13.2766 2.54885V14.5957H8.15145C7.80021 13.6052 6.85421 12.8936 5.74468 12.8936C4.63515 12.8936 3.68915 13.6052 3.33792 14.5957H2.55319C2.08396 14.5957 1.70213 14.2139 1.70213 13.7447V2.54885C1.70213 2.07962 2.08396 1.69779 2.55319 1.69779H9.95745V0H2.55319C1.14528 0 0 1.14111 0 2.54885V13.7447C0 15.1526 1.14528 16.2979 2.55319 16.2979H3.33792C3.68915 17.2884 4.63515 18 5.74468 18C6.85421 18 7.80021 17.2884 8.15145 16.2979H13.423C13.7742 17.2884 14.7202 18 15.8297 18C16.9393 18 17.8853 17.2884 18.2365 16.2979H21.7872V10.4724ZM16.684 5.95745C16.9494 5.95745 17.2034 6.08396 17.3634 6.29574L19.5166 9.14894H14.9787V5.95745H16.684ZM5.74468 16.2979C5.27545 16.2979 4.89362 15.916 4.89362 15.4468C4.89362 14.9776 5.27545 14.5957 5.74468 14.5957C6.21392 14.5957 6.59575 14.9776 6.59575 15.4468C6.59575 15.916 6.21392 16.2979 5.74468 16.2979ZM15.8298 16.2979C15.3606 16.2979 14.9787 15.916 14.9787 15.4468C14.9787 14.9776 15.3606 14.5957 15.8298 14.5957C16.299 14.5957 16.6809 14.9776 16.6809 15.4468C16.6809 15.916 16.299 16.2979 15.8298 16.2979ZM18.2366 14.5957C17.8853 13.6052 16.9393 12.8936 15.8298 12.8936C15.5398 12.8935 15.252 12.943 14.9787 13.04V10.8511H20.0851V14.5957H18.2366Z"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="text fw-6">Entregas</div>
-                                        </a>
-                                        <a href="#share_social" data-bs-toggle="modal" class="tf-product-extra-icon">
-                                            <div class="icon">
-                                                <i class="icon-share"></i>
-                                            </div>
-                                            <div class="text fw-6">Compartir</div>
-                                        </a>
+
+                                    <!-- SKU y Categorías/Marca — estilo referencia -->
+                                    <div class="tf-product-info-meta" style="margin-top: 20px; border-top: 1px solid #e8e8e8; padding-top: 16px;">
+                                        {% if producto.slug %}
+                                        <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; font-size: 13px;">
+                                            <span style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #111; min-width: 110px;">SKU</span>
+                                            <span style="color: #555;">{{ producto.slug|upper }}</span>
+                                        </div>
+                                        {% endif %}
+                                        <div style="display: flex; align-items: baseline; gap: 12px; font-size: 13px;">
+                                            <span style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #111; min-width: 110px;">Categorías</span>
+                                            <span style="color: #555;">
+                                                {% if producto.marca %}{{ producto.marca.nombre }}{% endif %}{% if producto.marca and producto.categoria %}, {% endif %}{% if producto.categoria %}{{ producto.categoria.nombre }}{% endif %}
+                                            </span>
+                                        </div>
                                     </div>
+
+                                    <!-- Descripción completa (si existe) -->
+                                    {% if producto.descripcion_completa %}
+                                    <div class="tf-product-info-desc-full" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e8e8e8;">
+                                        <p style="color: #555; font-size: 14px; line-height: 1.7; margin: 0;">{{ producto.descripcion_completa|linebreaks }}</p>
+                                    </div>
+                                    {% endif %}
+
                                 </div>
                             </div>
                         </div>
@@ -156,84 +198,8 @@
             </div>
         </section>
         <!-- /default -->
-        <!-- accordion -->
-        <section class="flat-spacing-12 pt_0">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="widget-tabs style-two-col">
-                            <ul class="widget-menu-tab">
-                                <li class="item-title active">
-                                    <span class="inner">Descripción</span>
-                                </li>
-                                <li class="item-title">
-                                    <span class="inner">Información Adicional</span>
-                                </li>
-                                <li class="item-title">
-                                    <span class="inner">Reseñas</span>
-                                </li>
-                            </ul>
-                            <div class="widget-content-tab">
-                                <div class="widget-content-inner active">
-                                    <div class="">
-                                        {% if producto.descripcion_completa %}
-                                        <p class="mb_30">
-                                            {{ producto.descripcion_completa|linebreaks }}
-                                        </p>
-                                        {% elif producto.descripcion_corta %}
-                                        <p class="mb_30">
-                                            {{ producto.descripcion_corta|linebreaks }}
-                                        </p>
-                                        {% else %}
-                                        <p class="mb_30">
-                                            No hay descripción disponible para este producto.
-                                        </p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="widget-content-inner">
-                                    <table class="tf-pr-attrs">
-                                        <tbody>
-                                            {% if producto.material %}
-                                            <tr class="tf-attr-pa-material">
-                                                <th class="tf-attr-label">Material</th>
-                                                <td class="tf-attr-value">
-                                                    <p>{{ producto.material }}</p>
-                                                </td>
-                                            </tr>
-                                            {% endif %}
-                                            {% if producto.dimensiones %}
-                                            <tr class="tf-attr-pa-dimensions">
-                                                <th class="tf-attr-label">Dimensiones</th>
-                                                <td class="tf-attr-value">
-                                                    <p>{{ producto.dimensiones }}</p>
-                                                </td>
-                                            </tr>
-                                            {% endif %}
-                                            {% if producto.stock %}
-                                            <tr class="tf-attr-pa-stock">
-                                                <th class="tf-attr-label">Stock</th>
-                                                <td class="tf-attr-value">
-                                                    <p>{{ producto.stock }} unidades disponibles</p>
-                                                </td>
-                                            </tr>
-                                            {% endif %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="widget-content-inner">
-                                    <div class="tab-reviews">
-                                        <p>Las reseñas no están disponibles en este momento.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- /accordion -->
-        <!-- product -->
+
+        <!-- Productos relacionados -->
         <section class="flat-spacing-1 pt_0">
             <div class="container">
                 <div class="flat-title">
@@ -292,6 +258,20 @@
                 </div>
             </div>
         </section>
-        <!-- /product -->
-       
+        <!-- /productos relacionados -->
+
+
+        <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ocultar slides sobrantes si solo hay una imagen
+    const mainSwiper = document.querySelector('#gallery-swiper-started');
+    if (mainSwiper) {
+        const slides = mainSwiper.querySelectorAll('.swiper-slide');
+        if (slides.length <= 1) {
+            mainSwiper.querySelector('.swiper-button-next')?.style.setProperty('display', 'none');
+            mainSwiper.querySelector('.swiper-button-prev')?.style.setProperty('display', 'none');
+        }
+    }
+});
+</script>
 {% endblock content %}
