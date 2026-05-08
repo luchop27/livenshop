@@ -1,5 +1,6 @@
 # apps/productos/models.py
 from django.db import models
+from django.db.models import Count, Q, F  # ← agregar F aquí
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
@@ -571,4 +572,4 @@ class PedidoItem(models.Model):
         return f"{self.cantidad}x {self.nombre_producto}"
     
     def get_costo(self):
-        return self.precio * self.cantidad
+        return self.precio * self.cantidad

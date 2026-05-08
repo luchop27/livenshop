@@ -16,8 +16,8 @@
     <link rel="stylesheet" href="{% static 'panel_admin/fonts/fonts.css' %}">
     <link rel="stylesheet" href="{% static 'panel_admin/icon/style.css' %}">
 
-    <link rel="shortcut icon" href="{% static 'panel_admin/images/favicon.png' %}">
-    <link rel="apple-touch-icon-precomposed" href="{% static 'panel_admin/images/favicon.png' %}">
+    <link rel="shortcut icon" href="{% static 'images/logo/iconlogolivenwhite.png' %}">
+    <link rel="apple-touch-icon-precomposed" href="{% static 'images/logo/iconlogolivenwhite.png' %}">
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -109,6 +109,24 @@
                                             <li class="sub-menu-item">
                                                 <a href="{% url 'portafolio:add' %}">
                                                     <div class="text">Nuevo proyecto</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="menu-item has-children {% block menu_planes %}{% endblock %}">
+                                        <a href="#" class="menu-item-button">
+                                            <div class="icon"><i class="icon-clipboard"></i></div>
+                                            <div class="text">Planes</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'planes:panel_admin_planes' %}">
+                                                    <div class="text">Lista de planes</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'planes:panel_admin_plan_add' %}">
+                                                    <div class="text">Nuevo plan</div>
                                                 </a>
                                             </li>
                                         </ul>

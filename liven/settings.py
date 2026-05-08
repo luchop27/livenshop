@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'apps.usuarios',
     'apps.productos',
     'apps.portafolio',
+    'apps.planes',
     'storages',
 ]
 

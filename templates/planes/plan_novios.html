@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ plan.nombre }}{% endblock %}
+
+{% block content %}
+
+<!-- Page Title -->
+<div class="tf-page-title">
+    <div class="container-full">
+        <div class="row">
+            <div class="col-12">
+                <div class="heading text-center">{{ plan.nombre }}</div>
+                <p class="text-center mt-2" style="color: var(--color-text-secondary);">
+                    A continuación encontrarás la información sobre el plan de novios que ofrecemos
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-60">
+
+    <!-- TÉRMINOS -->
+    <div class="row justify-content-center mb-60">
+        <div class="col-lg-8">
+            <h2 class="mb-24">{{ plan.titulo_terminos }}</h2>
+            <p>Te brindamos el servicio de separación de regalos para tu matrimonio</p>
+            <div class="mb-32">
+                {{ plan.contenido_terminos|linebreaks }}
+            </div>
+            <div class="d-flex gap-12 flex-wrap">
+                {% if plan.url_boton_secundario %}
+                <a href="{{ plan.url_boton_secundario }}" class="tf-btn btn-outline">
+                    {{ plan.texto_boton_secundario }}
+                </a>
+                {% endif %}
+                {% if plan.url_boton_principal %}
+                <a href="{{ plan.url_boton_principal }}" class="tf-btn btn-fill">
+                    {{ plan.texto_boton_principal }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-60">
+
+    <!-- BENEFICIOS -->
+    <div class="row justify-content-center mb-60">
+        <div class="col-lg-8">
+            <h2 class="mb-24">{{ plan.titulo_beneficios }}</h2>
+            <p>Nuestros beneficios:</p>
+            <div class="mb-32">
+                {{ plan.contenido_beneficios|linebreaks }}
+            </div>
+            <div class="d-flex gap-12 flex-wrap">
+                {% if plan.url_boton_secundario %}
+                <a href="{{ plan.url_boton_secundario }}" class="tf-btn btn-outline">
+                    {{ plan.texto_boton_secundario }}
+                </a>
+                {% endif %}
+                {% if plan.url_boton_principal %}
+                <a href="{{ plan.url_boton_principal }}" class="tf-btn btn-fill">
+                    {{ plan.texto_boton_principal }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIONES ADICIONALES -->
+    {% for seccion in plan.secciones.all %}
+    <hr class="my-60">
+    <div class="row justify-content-center mb-60">
+        <div class="col-lg-8">
+            <h2 class="mb-24">{{ seccion.titulo }}</h2>
+            <div>{{ seccion.contenido|linebreaks }}</div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

@@ -24,8 +24,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/custom-overrides.css' %}" />
 
     <!-- Favicon and Touch Icons  -->
-    <link rel="shortcut icon" href="{% static 'images/logo/logolivenblanco.png' %}">
-    <link rel="apple-touch-icon-precomposed" href="{% static 'images/logo/logolivenblanco.png' %}">
+    <link rel="shortcut icon" href="{% static 'images/logo/iconlogolivenwhite.png' %}">
+    <link rel="apple-touch-icon-precomposed" href="{% static 'images/logo/iconlogolivenwhite.png' %}">
 
 </head>
 
@@ -234,7 +234,7 @@
                             {% endif %}
                         </li>
                         <li class="menu-item position-relative">
-                            <a href="{% url 'shop' %}" class="item-link">Shop<i class="icon icon-arrow-down"></i></a>
+                            <a href="{% url 'categorias' %}" class="item-link">Categorias<i class="icon icon-arrow-down"></i></a>
                             {% if menu_categorias %}
                             <div class="sub-menu submenu-default">
                                 <ul class="menu-list">
@@ -262,7 +262,28 @@
                             </div>
                             {% endif %}
                         </li>
-
+                        <li class="menu-item position-relative">
+                            <a href="#" class="item-link">Planes<i class="icon icon-arrow-down"></i></a>
+                            <div class="sub-menu submenu-default">
+                                <ul class="menu-list">
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:detalle' 'novios' %}" class="menu-link-text link text_black-2">Plan Novios</a>
+                                    </li>
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:detalle' 'eventos' %}" class="menu-link-text link text_black-2">Plan Eventos</a>
+                                    </li>
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:detalle' 'decoradores' %}" class="menu-link-text link text_black-2">Inscripción Decoradores</a>
+                                    </li>
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:detalle' 'restaurantes' %}" class="menu-link-text link text_black-2">Restaurantes</a>
+                                    </li>
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:detalle' 'casa_nueva' %}" class="menu-link-text link text_black-2">Casa Nueva</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
                         <li class="menu-item">
                             <a href="{% url 'portafolio:portafolio' %}" class="item-link">Portafolio</a>
                         </li>
@@ -481,7 +502,7 @@
                 <li class="nav-mb-item">
                     <a href="#mb-dropdown-shop" class="collapsed mb-menu-link current force-menu-liven"
                         data-bs-toggle="collapse" aria-expanded="false" aria-controls="mb-dropdown-shop">
-                        <span>Shop</span>
+                        <span>Categorias</span>
                         <span class="btn-open-sub"></span>
                     </a>
                     <div id="mb-dropdown-shop" class="collapse">
@@ -517,6 +538,32 @@
                             {% endif %}
                             {% endwith %}
                             {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-mb-item">
+                    <a href="#mb-dropdown-planes" class="collapsed mb-menu-link force-menu-liven"
+                        data-bs-toggle="collapse" aria-expanded="false" aria-controls="mb-dropdown-planes">
+                        <span>Planes</span>
+                        <span class="btn-open-sub"></span>
+                    </a>
+                    <div id="mb-dropdown-planes" class="collapse">
+                        <ul class="sub-nav-menu">
+                            <li>
+                                <a href="{% url 'planes:detalle' 'novios' %}" class="sub-nav-link force-menu-liven">Plan Novios</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'planes:detalle' 'eventos' %}" class="sub-nav-link force-menu-liven">Plan Eventos</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'planes:detalle' 'decoradores' %}" class="sub-nav-link force-menu-liven">Inscripción Decoradores</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'planes:detalle' 'restaurantes' %}" class="sub-nav-link force-menu-liven">Restaurantes</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'planes:detalle' 'casa_nueva' %}" class="sub-nav-link force-menu-liven">Casa Nueva</a>
+                            </li>
                         </ul>
                     </div>
                 </li>

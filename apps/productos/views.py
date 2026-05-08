@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods, require_POST
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F
 from django.contrib import messages
 from django.utils.text import slugify
 from .models import Producto, Categoria, Marca, Coleccion, CarritoItem
@@ -601,7 +601,7 @@ def panel_admin_category_delete(request, categoria_id):
 
 class MarcaListView(ListView):
     model = Producto
-    template_name = 'shop-fullwidth.html'  # el mismo template que usas para categoría
+    template_name = 'shop-fullwidth.html'
     context_object_name = 'productos'
 
     def get_queryset(self):
@@ -609,34 +609,109 @@ class MarcaListView(ListView):
         return Producto.objects.filter(marca=self.marca, activo=True)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['marca'] = self.marca
-        context['titulo'] = self.marca.nombre
-        return context
+        context = super().get_context_data(**kwargs)  # ← 8 espacios
+        context['marca_actual'] = self.marca           # ← 8 espacios
+        context['titulo'] = self.marca.nombre          # ← 8 espacios
+        return context                                 # ← 8 espacios
 # ══════════════════════════════════════════════════════
 # CATÁLOGO - CLASS BASED VIEWS
 # ══════════════════════════════════════════════════════
 
 class ProductoListView(ListView):
-    """
-    Lista todos los productos activos.
-    """
     model = Producto
     template_name = 'shop-fullwidth.html'
     context_object_name = 'productos'
     paginate_by = 12
 
     def get_queryset(self):
-        return Producto.objects.filter(
+        qs = Producto.objects.filter(
             activo=True
         ).prefetch_related('imagenes').select_related('categoria', 'coleccion', 'marca')
+
+        # --- Categoría (incluye subcategorías) ---
+        categoria_slug = self.request.GET.get('categoria')
+        if categoria_slug:
+            try:
+                cat = Categoria.objects.get(slug=categoria_slug, activo=True)
+                subcats = cat.subcategorias.values_list('id', flat=True)
+                qs = qs.filter(Q(categoria=cat) | Q(categoria__id__in=subcats))
+            except Categoria.DoesNotExist:
+                pass
+
+        # --- Marca ---
+        marca_slug = self.request.GET.get('marca')
+        if marca_slug:
+            qs = qs.filter(marca__slug=marca_slug)
+
+        # --- Material ---
+        material = self.request.GET.get('material')
+        if material:
+            qs = qs.filter(material__iexact=material)
+
+        # --- Oferta ---
+        oferta = self.request.GET.get('oferta')
+        if oferta == 'si':
+            qs = qs.exclude(precio_oferta__isnull=True).filter(
+                precio_oferta__lt=models.F('precio')
+            )
+        elif oferta == 'no':
+            qs = qs.filter(
+                Q(precio_oferta__isnull=True) | Q(precio_oferta__gte=models.F('precio'))
+            )
+
+        orden = self.request.GET.get('orden', '')
+        orden_map = {
+            'a-z':        'nombre',
+            'z-a':        '-nombre',
+            'precio-asc': 'precio',
+            'precio-desc':'-precio',
+        }
+        qs = qs.order_by(orden_map.get(orden, '-created_at'))
+
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Todos los Productos'
-        context['categorias'] = Categoria.objects.filter(activo=True, padre=None)
-        return context
 
+        # ← NUEVO: objetos para el título
+        categoria_slug = self.request.GET.get('categoria')
+        if categoria_slug:
+            try:
+                context['categoria_actual'] = Categoria.objects.get(slug=categoria_slug, activo=True)
+            except Categoria.DoesNotExist:
+                pass
+
+        marca_slug = self.request.GET.get('marca')
+        if marca_slug:
+            try:
+                context['marca_actual'] = Marca.objects.get(slug=marca_slug, activo=True)
+            except Marca.DoesNotExist:
+                pass
+
+        # Datos para el panel de filtros
+        context['categorias'] = (
+            Categoria.objects
+            .filter(activo=True, padre=None)
+            .prefetch_related('subcategorias')
+        )
+        context['marcas'] = Marca.objects.filter(activo=True).order_by('nombre')
+        context['materiales'] = (
+            Producto.objects
+            .filter(activo=True, material__isnull=False)
+            .exclude(material='')
+            .values_list('material', flat=True)
+            .distinct()
+            .order_by('material')
+        )
+
+        # Para que el template sepa qué filtro está activo
+        context['categoria_activa'] = self.request.GET.get('categoria', '')
+        context['marca_activa']     = self.request.GET.get('marca', '')
+        context['material_activo']  = self.request.GET.get('material', '')
+        context['oferta_activa']    = self.request.GET.get('oferta', '')
+
+        return context
 
 class ProductoDetailView(DetailView):
     """
