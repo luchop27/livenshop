@@ -130,7 +130,7 @@
         <!-- brand -->
         <section class="flat-spacing-2 pb_0">
             <div class="container">
-                <div class="mb_30 fw-7 text_green-2 text-center">MARCAS</div>
+                <div class="mb_30 fw-7 text-center">MARCAS</div>
                 <div dir="ltr" class="swiper tf-sw-brand border-0" data-loop="false" data-play="false" data-preview="4"
                     data-tablet="2" data-mobile="1" data-space-lg="0" data-space-md="0">
                     <div class="swiper-wrapper">
@@ -160,7 +160,7 @@
                     <div class="nav-brand-list d-flex gap-2">
                         <!-- Botón "Todos" -->
                         {% for marca in marcas %}
-                            <a href="#" class="brand-item" data-slug="{{ marca.slug }}">
+                            <a href="#" class="brand-item mb_30 fw-7 text-center" data-slug="{{ marca.slug }}">
                                 {{ marca.nombre }}
                             </a>
                         {% endfor %}
@@ -234,13 +234,13 @@
             <div class="container">
                 <div class="flat-title wow fadeInUp" data-wow-delay="0s">
                     <span class="title">NUEVOS PRODUCTOS</span>
-                    <div class="d-flex gap-16 align-items-center">
+                    <!-- <div class="d-flex gap-16 align-items-center">
                         <div class="nav-sw-arrow nav-next-slider nav-next-product"><span
                                 class="icon icon-arrow1-left"></span></div>
                         <a href="product-style-05.html" class="tf-btn btn-line fs-12 fw-6">VER TODOS</a>
                         <div class="nav-sw-arrow nav-prev-slider nav-prev-product"><span
                                 class="icon icon-arrow1-right"></span></div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="hover-sw-nav hover-sw-2">
                     <div dir="ltr" class="swiper tf-sw-product-sell wrap-sw-over" data-preview="4" data-tablet="3"
@@ -340,8 +340,7 @@
                                                 <p class="subheading">{{ categoria.descripcion|truncatewords:5 }}</p>
                                             </div>
                                             <div class="bottom wow fadeInUp" data-wow-delay="0s">
-                                                <button class="tf-btn btn-line collection-other-link fw-6"><span>Shop
-                                                        now</span><i class="icon icon-arrow1-top-left"></i></button>
+                                                <button class="tf-btn btn-line collection-other-link fw-6"><span>Comprar ahora</span><i class="icon icon-arrow1-top-left"></i></button>
                                             </div>
                                         </div>
                                     </a>

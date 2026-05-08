@@ -1,0 +1,125 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Editar Plan | Panel Admin{% endblock %}
+{% block menu_planes %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Editar: {{ plan.nombre }}</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><a href="{% url 'planes:panel_admin_planes' %}"><div class="text-tiny">Planes</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Editar</div></li>
+                </ul>
+            </div>
+
+            {% if messages %}{% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+            {% endfor %}{% endif %}
+
+            <div class="wg-box">
+                <form class="form-new-product form-style-1" method="post">
+                    {% csrf_token %}
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Tipo de Plan</div>
+                        <input class="flex-grow tf-input" type="text" value="{{ plan.get_tipo_display }}" disabled>
+                        <small class="text-muted">El tipo no se puede cambiar — define la URL pública.</small>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Nombre del Plan <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow tf-input" type="text" name="nombre" value="{{ plan.nombre }}" required>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Título sección Términos</div>
+                        <input class="flex-grow tf-input" type="text" name="titulo_terminos" value="{{ plan.titulo_terminos }}">
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Contenido Términos</div>
+                        <textarea class="flex-grow tf-input" name="contenido_terminos" rows="6">{{ plan.contenido_terminos }}</textarea>
+                        <small class="text-muted">Puedes usar saltos de línea para separar puntos.</small>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Título sección Beneficios</div>
+                        <input class="flex-grow tf-input" type="text" name="titulo_beneficios" value="{{ plan.titulo_beneficios }}">
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Contenido Beneficios</div>
+                        <textarea class="flex-grow tf-input" name="contenido_beneficios" rows="6">{{ plan.contenido_beneficios }}</textarea>
+                    </fieldset>
+
+                    <div class="wg-box mt-0 mb-20" style="background:#f9fafb;border:1px solid #e5e7eb;">
+                        <div class="body-title mb-16">Botones (opcionales)</div>
+                        <div class="row gap20">
+                            <fieldset class="mb-20">
+                                <div class="body-title mb-10">Texto Botón Principal</div>
+                                <input class="flex-grow tf-input" type="text" name="texto_boton_principal"
+                                    value="{{ plan.texto_boton_principal }}" placeholder="Ej: Registra tu Plan">
+                            </fieldset>
+                            <fieldset class="mb-20">
+                                <div class="body-title mb-10">URL Botón Principal</div>
+                                <input class="flex-grow tf-input" type="text" name="url_boton_principal"
+                                    value="{{ plan.url_boton_principal }}" placeholder="Ej: /contacto/">
+                            </fieldset>
+                            <fieldset class="mb-20">
+                                <div class="body-title mb-10">Texto Botón Secundario</div>
+                                <input class="flex-grow tf-input" type="text" name="texto_boton_secundario"
+                                    value="{{ plan.texto_boton_secundario }}" placeholder="Ej: Ver Beneficios">
+                            </fieldset>
+                            <fieldset class="mb-20">
+                                <div class="body-title mb-10">URL Botón Secundario</div>
+                                <input class="flex-grow tf-input" type="text" name="url_boton_secundario"
+                                    value="{{ plan.url_boton_secundario }}" placeholder="Ej: /beneficios/">
+                            </fieldset>
+                        </div>
+                    </div>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Estado</div>
+                        <div class="radio-buttons">
+                            <div class="item">
+                                <input type="radio" name="activo" value="True" id="plan-activo" {% if plan.activo %}checked{% endif %}>
+                                <label for="plan-activo"><span class="body-title-2">Activo</span></label>
+                            </div>
+                            <div class="item">
+                                <input type="radio" name="activo" value="False" id="plan-inactivo" {% if not plan.activo %}checked{% endif %}>
+                                <label for="plan-inactivo"><span class="body-title-2">Inactivo</span></label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="bot">
+                        <a href="{% url 'planes:panel_admin_planes' %}" class="tf-button style-1 w208">Cancelar</a>
+                        <button class="tf-button w208" type="submit">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Zona de peligro -->
+            <div class="wg-box mt-30" style="border:1px solid #fca5a5;">
+                <div class="body-title mb-10" style="color:#dc2626;">Zona de Peligro</div>
+                <p class="text-tiny mb-14">Eliminar este plan es una acción irreversible.</p>
+                <form method="post" action="{% url 'planes:panel_admin_plan_delete' plan.pk %}"
+                      onsubmit="return confirm('¿Eliminar el plan {{ plan.nombre|escapejs }}?')">
+                    {% csrf_token %}
+                    <button type="submit" class="tf-button" style="background:#dc2626;border-color:#dc2626;">
+                        <i class="icon-trash-2"></i> Eliminar Plan
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

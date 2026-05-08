@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
@@ -8,14 +9,14 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="heading text-center">
-                            {% if titulo_filtro_categoria %}
-                                {{ titulo_filtro_categoria }}
-                            {% elif categoria_actual %}
+                            {% if categoria_actual %}
                                 {{ categoria_actual.nombre }}
                             {% elif coleccion_actual %}
                                 {{ coleccion_actual.nombre }}
+                            {% elif marca_actual %}
+                                {{ marca_actual.nombre }}
                             {% else %}
-                                Shop
+                                Todos los Productos
                             {% endif %}
                         </div>
                     </div>
@@ -29,7 +30,7 @@
                     <div class="tf-control-filter">
                         <a href="#filterShop" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft"
                             class="tf-btn-filter"><span class="icon icon-filter"></span><span
-                                class="text">Filter</span></a>
+                                class="text">Filtrar</span></a>
                     </div>
                     <ul class="tf-control-layout d-flex justify-content-center">
                         <li class="tf-view-layout-switch sw-layout-list list-layout" data-value-layout="list">
@@ -51,37 +52,47 @@
                             <div class="item"><span class="icon icon-grid-6"></span></div>
                         </li>
                     </ul>
+                    <!-- Reemplaza el bloque tf-control-sorting en tu template -->
                     <div class="tf-control-sorting d-flex justify-content-end">
                         <div class="tf-dropdown-sort" data-bs-toggle="dropdown">
                             <div class="btn-select">
-                                <span class="text-sort-value">Featured</span>
+                                <span class="text-sort-value">
+                                    {% if request.GET.orden == 'a-z' %}A - Z
+                                    {% elif request.GET.orden == 'z-a' %}Z - A
+                                    {% elif request.GET.orden == 'precio-asc' %}Precio: menor a mayor
+                                    {% elif request.GET.orden == 'precio-desc' %}Precio: mayor a menor
+                                    {% else %}Ordenar por
+                                    {% endif %}
+                                </span>
                                 <span class="icon icon-arrow-down"></span>
                             </div>
                             <div class="dropdown-menu">
-                                <div class="select-item active">
-                                    <span class="text-value-item">Featured</span>
-                                </div>
-                                <div class="select-item">
-                                    <span class="text-value-item">Best selling</span>
-                                </div>
-                                <div class="select-item" data-sort-value="a-z">
-                                    <span class="text-value-item">Alphabetically, A-Z</span>
-                                </div>
-                                <div class="select-item" data-sort-value="z-a">
-                                    <span class="text-value-item">Alphabetically, Z-A</span>
-                                </div>
-                                <div class="select-item" data-sort-value="price-low-high">
-                                    <span class="text-value-item">Price, low to high</span>
-                                </div>
-                                <div class="select-item" data-sort-value="price-high-low">
-                                    <span class="text-value-item">Price, high to low</span>
-                                </div>
-                                <div class="select-item">
-                                    <span class="text-value-item">Date, old to new</span>
-                                </div>
-                                <div class="select-item">
-                                    <span class="text-value-item">Date, new to old</span>
-                                </div>
+
+                                <a class="select-item {% if not request.GET.orden %}active{% endif %}"
+                                href="?{% for key, value in request.GET.items %}{% if key != 'orden' and key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}">
+                                    <span class="text-value-item">Por defecto</span>
+                                </a>
+
+                                <a class="select-item {% if request.GET.orden == 'a-z' %}active{% endif %}"
+                                href="?{% for key, value in request.GET.items %}{% if key != 'orden' and key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}orden=a-z">
+                                    <span class="text-value-item">Alfabético, A - Z</span>
+                                </a>
+
+                                <a class="select-item {% if request.GET.orden == 'z-a' %}active{% endif %}"
+                                href="?{% for key, value in request.GET.items %}{% if key != 'orden' and key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}orden=z-a">
+                                    <span class="text-value-item">Alfabético, Z - A</span>
+                                </a>
+
+                                <a class="select-item {% if request.GET.orden == 'precio-asc' %}active{% endif %}"
+                                href="?{% for key, value in request.GET.items %}{% if key != 'orden' and key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}orden=precio-asc">
+                                    <span class="text-value-item">Precio: menor a mayor</span>
+                                </a>
+
+                                <a class="select-item {% if request.GET.orden == 'precio-desc' %}active{% endif %}"
+                                href="?{% for key, value in request.GET.items %}{% if key != 'orden' and key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}orden=precio-desc">
+                                    <span class="text-value-item">Precio: mayor a menor</span>
+                                </a>
+
                             </div>
                         </div>
                     </div>
@@ -285,250 +296,158 @@
     </div>
 
     <!-- Filter -->
-    <div class="offcanvas offcanvas-start canvas-filter" id="filterShop">
-        <div class="canvas-wrapper">
-            <header class="canvas-header">
-                <div class="filter-icon">
-                    <span class="icon icon-filter"></span>
-                    <span>Filter</span>
-                </div>
-                <span class="icon-close icon-close-popup" data-bs-dismiss="offcanvas" aria-label="Close"></span>
-            </header>
-            <div class="canvas-body">
+<div class="offcanvas offcanvas-start canvas-filter" id="filterShop">
+    <div class="canvas-wrapper">
+        <header class="canvas-header">
+            <div class="filter-icon">
+                <span class="icon icon-filter"></span>
+                <span>Filtrar</span>
+            </div>
+            <span class="icon-close icon-close-popup" data-bs-dismiss="offcanvas" aria-label="Close"></span>
+        </header>
+
+        <div class="canvas-body">
+            <form action="{% url 'productos:lista_productos' %}" method="GET" id="facet-filter-form" class="facet-filter-form">
+
+                <!-- ================================
+                     CATEGORÍA
+                ================================ -->
                 <div class="widget-facet wd-categories">
-                    <div class="facet-title" data-bs-target="#categories" data-bs-toggle="collapse" aria-expanded="true"
-                        aria-controls="categories">
-                        <span>Product categories</span>
+                    <div class="facet-title" data-bs-target="#categorias" data-bs-toggle="collapse"
+                        aria-expanded="true" aria-controls="categorias">
+                        <span>Categoría</span>
                         <span class="icon icon-arrow-up"></span>
                     </div>
-                    <div id="categories" class="collapse show">
+                    <div id="categorias" class="collapse show">
                         <ul class="list-categoris current-scrollbar mb_36">
-                            <li class="cate-item current"><a href="shop-default.html"><span>Fashion</span></a></li>
-                            <li class="cate-item"><a href="shop-default.html"><span>Men</span></a></li>
-                            <li class="cate-item"><a href="shop-default.html"><span>Women</span></a></li>
-                            <li class="cate-item"><a href="shop-default.html"><span>Denim</span></a></li>
-                            <li class="cate-item"><a href="shop-default.html"><span>Dress</span></a></li>
+                            {% for categoria in categorias %}
+                                {% if categoria.es_principal %}
+                                    <li class="cate-item {% if categoria.slug == categoria_activa %}current{% endif %}">
+                                        <a href="?categoria={{ categoria.slug }}">
+                                            <span>{{ categoria.nombre }}</span>
+                                        </a>
+                                        {% if categoria.subcategorias.exists %}
+                                            <ul class="sub-categoris">
+                                                {% for sub in categoria.subcategorias.all %}
+                                                    <li class="cate-item {% if sub.slug == categoria_activa %}current{% endif %}">
+                                                        <a href="?categoria={{ sub.slug }}">
+                                                            <span>{{ sub.nombre }}</span>
+                                                        </a>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            {% empty %}
+                                <li class="cate-item"><span>Sin categorías</span></li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>
-                <form action="#" id="facet-filter-form" class="facet-filter-form">
-                    <div class="widget-facet">
-                        <div class="facet-title" data-bs-target="#availability" data-bs-toggle="collapse"
-                            aria-expanded="true" aria-controls="availability">
-                            <span>Availability</span>
-                            <span class="icon icon-arrow-up"></span>
-                        </div>
-                        <div id="availability" class="collapse show">
-                            <ul class="tf-filter-group current-scrollbar mb_36">
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="availability" class="tf-check" id="inStock">
-                                    <label for="inStock" class="label"><span>In
-                                            stock</span>&nbsp;<span>(14)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="availability" class="tf-check" id="outStock">
-                                    <label for="outStock" class="label"><span>Out of
-                                            stock</span>&nbsp;<span>(2)</span></label>
-                                </li>
-                            </ul>
-                        </div>
+
+                <!-- ================================
+                     MARCA
+                ================================ -->
+                <div class="widget-facet">
+                    <div class="facet-title" data-bs-target="#marcas" data-bs-toggle="collapse"
+                        aria-expanded="true" aria-controls="marcas">
+                        <span>Marca</span>
+                        <span class="icon icon-arrow-up"></span>
                     </div>
-                    <div class="widget-facet">
-                        <div class="facet-title" data-bs-target="#price" data-bs-toggle="collapse" aria-expanded="true"
-                            aria-controls="price">
-                            <span>Price</span>
-                            <span class="icon icon-arrow-up"></span>
-                        </div>
-                        <div id="price" class="collapse show">
-                            <div class="widget-price filter-price">
-                                <div class="price-val-range" id="price-value-range" data-min="0" data-max="500"></div>
-                                <div class="box-title-price">
-                                    <span class="title-price">Price :</span>
-                                    <div class="caption-price">
-                                        <div class="price-val" id="price-min-value" data-currency="$"></div>
-                                        <span>-</span>
-                                        <div class="price-val" id="price-max-value" data-currency="$"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div id="marcas" class="collapse show">
+                        <ul class="tf-filter-group current-scrollbar mb_36">
+                            {% for marca in marcas %}
+                                <li class="list-item d-flex gap-12 align-items-center">
+                                    <input type="radio" name="marca" class="tf-check"
+                                        id="marca-{{ marca.slug }}"
+                                        value="{{ marca.slug }}"
+                                        {% if request.GET.marca == marca.slug %}checked{% endif %}>
+                                    <label for="marca-{{ marca.slug }}" class="label">
+                                        <span>{{ marca.nombre }}</span>
+                                        <span>({{ marca.productos.count }})</span>
+                                    </label>
+                                </li>
+                            {% empty %}
+                                <li class="list-item"><span>Sin marcas</span></li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                    <div class="widget-facet">
-                        <div class="facet-title" data-bs-target="#brand" data-bs-toggle="collapse" aria-expanded="true"
-                            aria-controls="brand">
-                            <span>Brand</span>
-                            <span class="icon icon-arrow-up"></span>
-                        </div>
-                        <div id="brand" class="collapse show">
-                            <ul class="tf-filter-group current-scrollbar mb_36">
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="brand" class="tf-check" id="Ecomus">
-                                    <label for="Ecomus" class="label"><span>Ecomus</span>&nbsp;<span>(8)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="brand" class="tf-check" id="M&H">
-                                    <label for="M&H" class="label"><span>M&H</span>&nbsp;<span>(8)</span></label>
-                                </li>
-                            </ul>
-                        </div>
+                </div>
+
+                <!-- ================================
+                     MATERIAL
+                ================================ -->
+                <div class="widget-facet">
+                    <div class="facet-title" data-bs-target="#materiales" data-bs-toggle="collapse"
+                        aria-expanded="true" aria-controls="materiales">
+                        <span>Material</span>
+                        <span class="icon icon-arrow-up"></span>
                     </div>
-                    <div class="widget-facet">
-                        <div class="facet-title" data-bs-target="#color" data-bs-toggle="collapse" aria-expanded="true"
-                            aria-controls="color">
-                            <span>Color</span>
-                            <span class="icon icon-arrow-up"></span>
-                        </div>
-                        <div id="color" class="collapse show">
-                            <ul class="tf-filter-group filter-color current-scrollbar mb_36">
+                    <div id="materiales" class="collapse show">
+                        <ul class="tf-filter-group current-scrollbar mb_36">
+                            {% for material in materiales %}
                                 <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_beige" id="Beige"
-                                        value="Beige">
-                                    <label for="Beige" class="label"><span>Beige</span>&nbsp;<span>(3)</span></label>
+                                    <input type="radio" name="material" class="tf-check"
+                                        id="material-{{ forloop.counter }}"
+                                        value="{{ material }}"
+                                        {% if request.GET.material == material %}checked{% endif %}>
+                                    <label for="material-{{ forloop.counter }}" class="label">
+                                        <span>{{ material }}</span>
+                                    </label>
                                 </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_dark" id="Black"
-                                        value="Black">
-                                    <label for="Black" class="label"><span>Black</span>&nbsp;<span>(18)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_blue-2" id="Blue"
-                                        value="Blue">
-                                    <label for="Blue" class="label"><span>Blue</span>&nbsp;<span>(3)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_brown" id="Brown"
-                                        value="Brown">
-                                    <label for="Brown" class="label"><span>Brown</span>&nbsp;<span>(3)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_cream" id="Cream"
-                                        value="Cream">
-                                    <label for="Cream" class="label"><span>Cream</span>&nbsp;<span>(1)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_dark-beige"
-                                        id="Dark Beige" value="Dark Beige">
-                                    <label for="Dark Beige" class="label"><span>Dark
-                                            Beige</span>&nbsp;<span>(1)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_dark-blue" id="Dark Blue"
-                                        value="Dark Blue">
-                                    <label for="Dark Blue" class="label"><span>Dark
-                                            Blue</span>&nbsp;<span>(3)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_dark-green"
-                                        id="Dark Green" value="Dark Green">
-                                    <label for="Dark Green" class="label"><span>Dark
-                                            Green</span>&nbsp;<span>(1)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_dark-grey" id="Dark Grey"
-                                        value="Dark Grey">
-                                    <label for="Dark Grey" class="label"><span>Dark
-                                            Grey</span>&nbsp;<span>(1)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_grey" id="Grey"
-                                        value="Grey">
-                                    <label for="Grey" class="label"><span>Grey</span>&nbsp;<span>(2)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_light-blue"
-                                        id="Light Blue" value="Light Blue">
-                                    <label for="Light Blue" class="label"><span>Light
-                                            Blue</span>&nbsp;<span>(5)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_light-green"
-                                        id="Light Green" value="Light Green">
-                                    <label for="Light Green" class="label"><span>Light
-                                            Green</span>&nbsp;<span>(3)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_light-grey"
-                                        id="Light Grey" value="Light Grey">
-                                    <label for="Light Grey" class="label"><span>Light
-                                            Grey</span>&nbsp;<span>(1)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_light-pink"
-                                        id="Light Pink" value="Light Pink">
-                                    <label for="Light Pink" class="label"><span>Light
-                                            Pink</span>&nbsp;<span>(2)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_purple" id="Light Purple"
-                                        value="Light Purple">
-                                    <label for="Light Purple" class="label"><span>Light
-                                            Purple</span>&nbsp;<span>(2)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_light-yellow"
-                                        id="Light Yellow" value="Light Yellow">
-                                    <label for="Light Yellow" class="label"><span>Light
-                                            Yellow</span>&nbsp;<span>(1)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_orange" id="Orange"
-                                        value="Orange">
-                                    <label for="Orange" class="label"><span>Orange</span>&nbsp;<span>(1)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_pink" id="Pink"
-                                        value="Pink">
-                                    <label for="Pink" class="label"><span>Pink</span>&nbsp;<span>(2)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_taupe" id="Taupe"
-                                        value="Taupe">
-                                    <label for="Taupe" class="label"><span>Taupe</span>&nbsp;<span>(1)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_white" id="White"
-                                        value="White">
-                                    <label for="White" class="label"><span>White</span>&nbsp;<span>(14)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="color" class="tf-check-color bg_yellow" id="Yellow"
-                                        value="Yellow">
-                                    <label for="Yellow" class="label"><span>Yellow</span>&nbsp;<span>(1)</span></label>
-                                </li>
-                            </ul>
-                        </div>
+                            {% empty %}
+                                <li class="list-item"><span>Sin materiales</span></li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                    <div class="widget-facet">
-                        <div class="facet-title" data-bs-target="#size" data-bs-toggle="collapse" aria-expanded="true"
-                            aria-controls="size">
-                            <span>Size</span>
-                            <span class="icon icon-arrow-up"></span>
-                        </div>
-                        <div id="size" class="collapse show">
-                            <ul class="tf-filter-group current-scrollbar">
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="size" class="tf-check tf-check-size" value="S" id="S">
-                                    <label for="S" class="label"><span>S</span>&nbsp;<span>(7)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="size" class="tf-check tf-check-size" value="M" id="M">
-                                    <label for="M" class="label"><span>M</span>&nbsp;<span>(8)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="size" class="tf-check tf-check-size" value="L" id="L">
-                                    <label for="L" class="label"><span>L</span>&nbsp;<span>(8)</span></label>
-                                </li>
-                                <li class="list-item d-flex gap-12 align-items-center">
-                                    <input type="radio" name="size" class="tf-check tf-check-size" value="XL" id="XL">
-                                    <label for="XL" class="label"><span>XL</span>&nbsp;<span>(6)</span></label>
-                                </li>
-                            </ul>
-                        </div>
+                </div>
+
+                <!-- ================================
+                     DESCUENTO / OFERTA
+                ================================ -->
+                <div class="widget-facet">
+                    <div class="facet-title" data-bs-target="#descuento" data-bs-toggle="collapse"
+                        aria-expanded="true" aria-controls="descuento">
+                        <span>Descuento</span>
+                        <span class="icon icon-arrow-up"></span>
                     </div>
-                </form>
-            </div>
+                    <div id="descuento" class="collapse show">
+                        <ul class="tf-filter-group current-scrollbar mb_36">
+                            <li class="list-item d-flex gap-12 align-items-center">
+                                <input type="radio" name="oferta" class="tf-check" id="oferta-si"
+                                    value="si" {% if request.GET.oferta == 'si' %}checked{% endif %}>
+                                <label for="oferta-si" class="label">
+                                    <span>En oferta</span>
+                                </label>
+                            </li>
+                            <li class="list-item d-flex gap-12 align-items-center">
+                                <input type="radio" name="oferta" class="tf-check" id="oferta-no"
+                                    value="no" {% if request.GET.oferta == 'no' %}checked{% endif %}>
+                                <label for="oferta-no" class="label">
+                                    <span>Precio regular</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- ================================
+                     BOTONES
+                ================================ -->
+                <div class="d-flex gap-12 mt_24">
+                    <button type="submit" class="tf-btn btn-fill w-100">
+                        Aplicar filtros
+                    </button>
+                    <a href="{{ request.path }}" class="tf-btn btn-outline w-100">
+                        Limpiar
+                    </a>
+                </div>
+
+            </form>
         </div>
     </div>
-    <!-- End Filter -->
+</div>
+<!-- End Filter -->
 
 {% endblock content %}
