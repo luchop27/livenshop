@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Portal Novios — Consulta tu Saldo{% endblock %}
+
+{% block content %}
+
+<style>
+.portal-wrap {
+    min-height: 80vh;
+    background: linear-gradient(135deg, #0d1b2a 0%, #1a2a3a 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 80px 24px;
+}
+.portal-card {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%; max-width: 500px;
+    padding: 48px 40px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.25);
+}
+.portal-logo {
+    text-align: center; margin-bottom: 32px;
+}
+.portal-logo img { max-width: 120px; }
+.portal-tag {
+    display: inline-block;
+    font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    color: #c9a96e; border: 1px solid rgba(201,169,110,.4);
+    padding: 4px 14px; border-radius: 20px; margin-bottom: 16px;
+}
+.portal-card h2 { font-size: 1.5rem; font-weight: 300; color: #1a1a1a; margin-bottom: 6px; }
+.portal-card h2 strong { font-weight: 700; }
+.portal-card p { font-size: 13px; color: #888; margin-bottom: 28px; line-height: 1.6; }
+.portal-field { margin-bottom: 18px; }
+.portal-field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #555; margin-bottom: 6px; }
+.portal-field input {
+    width: 100%; padding: 12px 16px;
+    border: 1.5px solid #e0dbd3; border-radius: 10px;
+    font-size: 14px; color: #1a1a1a; outline: none; transition: border .2s;
+}
+.portal-field input:focus { border-color: #c9a96e; }
+.portal-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #c9a96e, #b8925a);
+    color: #fff; border: none; border-radius: 50px;
+    font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase;
+    cursor: pointer; transition: all .25s;
+    box-shadow: 0 4px 18px rgba(201,169,110,.35);
+    margin-top: 8px;
+}
+.portal-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(201,169,110,.45); }
+.portal-error {
+    background: #fef2f2; border: 1px solid #fca5a5; border-radius: 10px;
+    padding: 12px 16px; font-size: 13px; color: #dc2626; margin-bottom: 20px;
+}
+
+/* Dashboard del saldo */
+.saldo-dashboard { padding: 0; }
+.saldo-header { text-align: center; margin-bottom: 32px; }
+.saldo-tag {
+    display: inline-block;
+    font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    color: #c9a96e; border: 1px solid rgba(201,169,110,.4);
+    padding: 4px 14px; border-radius: 20px; margin-bottom: 14px;
+}
+.saldo-nombres { font-size: 1.4rem; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.saldo-sub { font-size: 13px; color: #888; }
+.saldo-box {
+    background: linear-gradient(135deg, #0d1b2a, #1a2a3a);
+    border-radius: 16px; padding: 28px;
+    text-align: center; margin-bottom: 24px;
+    color: #fff;
+}
+.saldo-box .monto {
+    font-size: 3rem; font-weight: 700; color: #c9a96e;
+    line-height: 1;
+}
+.saldo-box .monto-label { font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.6); margin-top: 8px; }
+.movimiento-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid #f0ece6;
+    font-size: 13px;
+}
+.movimiento-item:last-child { border: none; }
+.mov-tipo {
+    display: inline-block; padding: 2px 10px; border-radius: 20px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+}
+.mov-aporte  { background: #dcfce7; color: #16a34a; }
+.mov-anticipo { background: #fef3c7; color: #d97706; }
+.mov-devolucion { background: #fee2e2; color: #dc2626; }
+.mov-ajuste  { background: #e0e7ff; color: #4338ca; }
+.portal-back { display: block; text-align: center; margin-top: 24px; font-size: 13px; color: #c9a96e; text-decoration: none; }
+.portal-back:hover { text-decoration: underline; }
+</style>
+
+<div class="portal-wrap">
+    <div class="portal-card">
+        <div class="portal-logo">
+            <img src="{% static 'images/logo/logolivenblanco.png' %}" alt="Liven" style="filter:invert(1);max-width:100px;">
+        </div>
+
+        {% if plan_data %}
+        <!-- ── DASHBOARD DEL SALDO ─────────── -->
+        <div class="saldo-dashboard">
+            <div class="saldo-header">
+                <div class="saldo-tag">💍 Plan de Novios</div>
+                <div class="saldo-nombres">{{ plan_data.nombres }}</div>
+                {% if plan_data.fecha_boda %}
+                <div class="saldo-sub">Fecha de boda: {{ plan_data.fecha_boda|date:"d/m/Y" }}</div>
+                {% endif %}
+            </div>
+
+            <div class="saldo-box">
+                <div class="monto">${{ plan_data.saldo_acumulado }}</div>
+                <div class="monto-label">Saldo Acumulado</div>
+            </div>
+
+            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#c9a96e;font-weight:700;margin-bottom:12px;">
+                Últimos Movimientos
+            </div>
+
+            {% for mov in plan_data.movimientos.all|slice:":10" %}
+            <div class="movimiento-item">
+                <div>
+                    <span class="mov-tipo mov-{{ mov.tipo }}">{{ mov.get_tipo_display }}</span>
+                    {% if mov.descripcion %}
+                    <span style="margin-left:8px;color:#555;">{{ mov.descripcion }}</span>
+                    {% endif %}
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <span style="color:#888;font-size:11px;">{{ mov.fecha|date:"d/m/Y" }}</span>
+                    <span style="font-weight:700;color:{% if mov.tipo == 'aporte' %}#16a34a{% elif mov.tipo == 'anticipo' %}#d97706{% else %}#dc2626{% endif %};">
+                        {% if mov.tipo == 'aporte' %}+{% else %}-{% endif %}${{ mov.monto }}
+                    </span>
+                </div>
+            </div>
+            {% empty %}
+            <div style="text-align:center;color:#bbb;font-size:13px;padding:20px 0;">
+                Aún no hay movimientos registrados.
+            </div>
+            {% endfor %}
+
+            <div style="background:#fff7ed;border:1px solid #f4d39a;border-radius:10px;padding:14px 16px;margin-top:20px;font-size:12px;color:#7a5c28;">
+                💡 Puedes solicitar un <strong>anticipo de hasta el 50%</strong> de tu saldo acumulado contactando a Liven directamente.
+            </div>
+
+            <a href="https://wa.me/593{{ plan.url_boton_principal|default:'0999999999' }}" target="_blank"
+               style="display:block;text-align:center;margin-top:20px;padding:12px;background:#25D366;color:#fff!important;border-radius:50px;font-weight:700;font-size:13px;text-decoration:none;">
+                Consultar por WhatsApp
+            </a>
+
+            <a href="{% url 'planes:portal_novios' %}" class="portal-back">← Cerrar sesión</a>
+        </div>
+
+        {% else %}
+        <!-- ── FORMULARIO DE ACCESO ─────────── -->
+        <div class="text-center mb-4">
+            <div class="portal-tag">Portal 24/7</div>
+            <h2>Consulta tu <strong>saldo</strong></h2>
+            <p>Ingresa con las credenciales que te proporcionó Liven al registrar tu plan</p>
+        </div>
+
+        {% if error %}
+        <div class="portal-error">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="{% url 'planes:portal_novios' %}">
+            {% csrf_token %}
+            <div class="portal-field">
+                <label for="portal-email">Email de tu Plan</label>
+                <input type="email" id="portal-email" name="email" placeholder="correo@ejemplo.com" required>
+            </div>
+            <div class="portal-field">
+                <label for="portal-clave">Clave Personal</label>
+                <input type="password" id="portal-clave" name="clave" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="portal-btn">🔐 Ingresar</button>
+        </form>
+
+        <div style="text-align:center;margin-top:20px;font-size:12px;color:#bbb;">
+            ¿No tienes tu clave?
+            <a href="https://wa.me/593{{ plan.url_boton_principal|default:'0999999999' }}?text=Hola%20Liven!%20Necesito%20mi%20clave%20para%20el%20Portal%20de%20Novios"
+               target="_blank" style="color:#c9a96e;">Contacta a Liven</a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

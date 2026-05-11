@@ -1,116 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
 
         <!-- page-title -->
         <div class="tf-page-title">
             <div class="container-full">
-                <div class="heading text-center">My Orders</div>
+                <div class="heading text-center">Mis Pedidos</div>
             </div>
         </div>
         <!-- /page-title -->
 
-        <!-- page-cart -->
-        <section class="flat-spacing-11">
+        <section class="flat-spacing-11 page-my-account">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-3">
                         <div class="wrap-sidebar-account">
-                            <ul class="my-account-nav">
-                                <li><a href="my-account.html" class="my-account-nav-item ">Dashboard</a></li>
-                                <li><span class="my-account-nav-item active">Orders</span></li>
-                                <li><a href="my-account-address.html" class="my-account-nav-item">Address</a></li>
-                                <li><a href="my-account-edit.html" class="my-account-nav-item">Account Details</a></li>
-                                <li><a href="my-account-wishlist.html" class="my-account-nav-item">Wishlist</a></li>
-                                <li><a href="login.html" class="my-account-nav-item">Logout</a></li>
-                            </ul>
+                            {% include "includes/my-account-sidebar.html" with active_tab='pedidos' %}
                         </div>
                     </div>
                     <div class="col-lg-9">
                         <div class="my-account-content account-order">
                             <div class="wrap-account-order">
+                                {% if ordenes %}
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th class="fw-6">Order</th>
-                                            <th class="fw-6">Date</th>
-                                            <th class="fw-6">Status</th>
+                                            <th class="fw-6">Pedido</th>
+                                            <th class="fw-6">Fecha</th>
+                                            <th class="fw-6">Estado</th>
                                             <th class="fw-6">Total</th>
-                                            <th class="fw-6">Actions</th>
+                                            <th class="fw-6">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {% for orden in ordenes %}
                                         <tr class="tf-order-item">
+                                            <td><strong>#{{ orden.id }}</strong></td>
+                                            <td>{{ orden.created_at|date:"d M, Y" }}</td>
                                             <td>
-                                                #123
+                                                <span class="badge {% if orden.estado == 'entregado' %}bg-success{% elif orden.estado == 'cancelado' %}bg-danger{% elif orden.estado == 'enviado' %}bg-primary{% elif orden.estado == 'pagado' %}bg-info{% else %}bg-warning text-dark{% endif %}">
+                                                    {{ orden.get_estado_display }}
+                                                </span>
                                             </td>
+                                            <td><strong>${{ orden.total }}</strong></td>
                                             <td>
-                                                August 1, 2024
-                                            </td>
-                                            <td>
-                                                On hold
-                                            </td>
-                                            <td>
-                                                $200.0 for 1 items
-                                            </td>
-                                            <td>
-                                                <a href="my-account-orders-details.html"
-                                                    class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center">
-                                                    <span>View</span>
+                                                <a href="{% url 'usuarios:my_account_orders_details' orden.id %}"
+                                                   class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center">
+                                                    <span>Ver detalle</span>
                                                 </a>
                                             </td>
                                         </tr>
-                                        <tr class="tf-order-item">
-                                            <td>
-                                                #345
-                                            </td>
-                                            <td>
-                                                August 2, 2024
-                                            </td>
-                                            <td>
-                                                On hold
-                                            </td>
-                                            <td>
-                                                $300.0 for 1 items
-                                            </td>
-                                            <td>
-                                                <a href="my-account-orders-details.html"
-                                                    class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center">
-                                                    <span>View</span>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr class="tf-order-item">
-                                            <td>
-                                                #567
-                                            </td>
-                                            <td>
-                                                August 3, 2024
-                                            </td>
-                                            <td>
-                                                On hold
-                                            </td>
-                                            <td>
-                                                $400.0 for 1 items
-                                            </td>
-                                            <td>
-                                                <a href="my-account-orders-details.html"
-                                                    class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center">
-                                                    <span>View</span>
-                                                </a>
-                                            </td>
-                                        </tr>
-
+                                        {% endfor %}
                                     </tbody>
                                 </table>
+
+                                <!-- Paginación -->
+                                {% if ordenes.has_other_pages %}
+                                <div class="mt-4 d-flex justify-content-center">
+                                    <nav>
+                                        <ul class="pagination">
+                                            {% if ordenes.has_previous %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=1">Primera</a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ ordenes.previous_page_number }}">Anterior</a>
+                                            </li>
+                                            {% endif %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ ordenes.number }} de {{ ordenes.paginator.num_pages }}</span>
+                                            </li>
+                                            {% if ordenes.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ ordenes.next_page_number }}">Siguiente</a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ ordenes.paginator.num_pages }}">Última</a>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </nav>
+                                </div>
+                                {% endif %}
+
+                                {% else %}
+                                <div class="text-center py-5">
+                                    <i class="icon icon-bag" style="font-size:3rem;opacity:.3;display:block;margin-bottom:16px;"></i>
+                                    <p class="mb-3">Aún no tienes pedidos registrados.</p>
+                                    <a href="{% url 'productos:lista_productos' %}" class="tf-btn btn-fill animate-hover-btn rounded-0 justify-content-center">
+                                        <span>¡Comenzar a comprar!</span>
+                                    </a>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <!-- page-cart -->
-
 
         <div class="btn-sidebar-account">
-            <button data-bs-toggle="offcanvas" data-bs-target="#mbAccount" aria-controls="offcanvas"><i
-                    class="icon icon-sidebar-2"></i></button>
+            <button data-bs-toggle="offcanvas" data-bs-target="#mbAccount" aria-controls="offcanvas">
+                <i class="icon icon-sidebar-2"></i>
+            </button>
         </div>
+
 {% endblock %}

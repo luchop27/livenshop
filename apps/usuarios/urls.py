@@ -14,7 +14,9 @@ urlpatterns = [
     
     # Recuperación de contraseña con CÓDIGO DE 6 DÍGITOS
     path('password-reset/', views.password_reset_request, name='password_reset_request'),
-    path('password-reset/confirm/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
+    path('password-reset/verify/', views.password_reset_verify, name='password_reset_verify'),
+    path('password-reset/complete/', views.password_reset_complete, name='password_reset_complete'),
+    path('password-reset/resend/', views.password_reset_resend, name='password_reset_resend'),
     
     # Verificación de email
     path('verificar-email/<uuid:token>/', views.verificar_email, name='verificar_email'),
@@ -23,7 +25,7 @@ urlpatterns = [
     # Panel de usuario (rutas principales en español)
     path('mi-cuenta/', views.my_account, name='my_account'),
     path('mi-cuenta/pedidos/', views.my_account_orders, name='my_account_orders'),
-    path('mi-cuenta/pedidos/<str:numero_pedido>/', views.my_account_orders_details, name='my_account_orders_details'),
+    path('mi-cuenta/pedidos/<int:pedido_id>/', views.my_account_orders_details, name='my_account_orders_details'),
     path('mi-cuenta/direcciones/', views.my_account_address, name='my_account_address'),
     path('mi-cuenta/detalles/', views.my_account_edit, name='my_account_edit'),
     path('mi-cuenta/favoritos/', views.my_account_wishlist, name='my_account_wishlist'),
@@ -31,7 +33,7 @@ urlpatterns = [
     # Compatibilidad con rutas antiguas en inglés
     path('my-account/', views.my_account),
     path('my-account/orders/', views.my_account_orders),
-    path('my-account/orders/<str:numero_pedido>/', views.my_account_orders_details),
+    path('my-account/orders/<int:pedido_id>/', views.my_account_orders_details),
     path('my-account/address/', views.my_account_address),
     path('my-account/edit/', views.my_account_edit),
     path('my-account/wishlist/', views.my_account_wishlist),

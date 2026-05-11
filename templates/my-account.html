@@ -1,51 +1,70 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+
         <!-- page-title -->
         <div class="tf-page-title">
             <div class="container-full">
-                <div class="heading text-center">My Account</div>
+                <div class="heading text-center">Mi Cuenta</div>
             </div>
         </div>
         <!-- /page-title -->
 
-        <!-- page-cart -->
-        <section class="flat-spacing-11">
+        <!-- page-content -->
+        <section class="flat-spacing-11 page-my-account">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-3">
                         <div class="wrap-sidebar-account">
-                            <ul class="my-account-nav">
-                                <li><span class="my-account-nav-item active">Panel de control</span></li>
-                                <li><a href="{% url 'my-account-orders' %}" class="my-account-nav-item">Pedidos</a></li>
-                                <li><a href="{% url 'my-account-address' %}" class="my-account-nav-item">Direcciones</a></li>
-                                <li><a href="{% url 'my-account-edit' %}" class="my-account-nav-item">Detalles de cuenta</a></li>
-                                <li><a href="{% url 'my-account-wishlist' %}" class="my-account-nav-item">Favoritos</a></li>
-                                <li><a href="{% url 'usuarios:logout' %}" class="my-account-nav-item">Cerrar Sesión</a></li>
-                            </ul>
+                            {% include "includes/my-account-sidebar.html" with active_tab='panel' %}
                         </div>
                     </div>
                     <div class="col-lg-9">
                         <div class="my-account-content account-dashboard">
                             <div class="mb_60">
-                                <h5 class="fw-5 mb_20">Hola {{ user.nombre|default:user.email }}</h5>
+                                <h5 class="fw-5 mb_20">¡Hola, {{ user.nombre|default:user.email }}!</h5>
                                 <p>
-                                    Desde el panel de control de tu cuenta, puedes ver tus <a class="text_primary"
-                                        href="{% url 'my-account-orders' %}">pedidos recientes</a>, gestionar tus <a
-                                        class="text_primary" href="{% url 'my-account-address' %}">direcciones de envío y facturación</a>, y <a class="text_primary" href="{% url 'my-account-edit' %}">editar tu
-                                        contraseña y detalles de la cuenta</a>.
+                                    Desde el panel de tu cuenta puedes ver tus
+                                    <a class="text_primary" href="{% url 'usuarios:my_account_orders' %}">pedidos recientes</a>,
+                                    y <a class="text_primary" href="{% url 'usuarios:my_account_edit' %}">editar tu contraseña y detalles de cuenta</a>.
                                 </p>
+                            </div>
+
+                            <!-- Resumen rápido -->
+                            <div class="row g-3 mt-2">
+                                <div class="col-sm-4">
+                                    <a href="{% url 'usuarios:my_account_orders' %}" class="d-block text-center p-4 border rounded-3 text-decoration-none" style="transition:.2s;" onmouseover="this.style.borderColor='#222'" onmouseout="this.style.borderColor='#dee2e6'">
+                                        <i class="icon icon-bag" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                                        <div class="fw-5">Mis Pedidos</div>
+                                        <div class="text-secondary" style="font-size:13px;">Ver historial</div>
+                                    </a>
+                                </div>
+                                <div class="col-sm-4">
+                                    <a href="{% url 'usuarios:my_account_wishlist' %}" class="d-block text-center p-4 border rounded-3 text-decoration-none" style="transition:.2s;" onmouseover="this.style.borderColor='#222'" onmouseout="this.style.borderColor='#dee2e6'">
+                                        <i class="icon icon-heart" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                                        <div class="fw-5">Mis Favoritos</div>
+                                        <div class="text-secondary" style="font-size:13px;">Lista de deseos</div>
+                                    </a>
+                                </div>
+                                <div class="col-sm-4">
+                                    <a href="{% url 'usuarios:my_account_edit' %}" class="d-block text-center p-4 border rounded-3 text-decoration-none" style="transition:.2s;" onmouseover="this.style.borderColor='#222'" onmouseout="this.style.borderColor='#dee2e6'">
+                                        <i class="icon icon-user" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                                        <div class="fw-5">Mi Perfil</div>
+                                        <div class="text-secondary" style="font-size:13px;">Editar datos</div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <!-- page-cart -->
+        <!-- /page-content -->
 
         <div class="btn-sidebar-account">
-            <button data-bs-toggle="offcanvas" data-bs-target="#mbAccount" aria-controls="offcanvas"><i
-                    class="icon icon-sidebar-2"></i></button>
+            <button data-bs-toggle="offcanvas" data-bs-target="#mbAccount" aria-controls="offcanvas">
+                <i class="icon icon-sidebar-2"></i>
+            </button>
         </div>
 
 {% endblock %}

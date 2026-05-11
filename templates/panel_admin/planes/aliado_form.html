@@ -1,0 +1,160 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}{{ accion }} Aliado | Panel Admin LivenShop{% endblock %}
+{% block menu_planes %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>{{ accion }} Aliado / Beneficio</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><a href="{% url 'planes:panel_admin_aliados' %}"><div class="text-tiny">Aliados</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">{{ accion }}</div></li>
+                </ul>
+            </div>
+
+            {% if messages %}{% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+            {% endfor %}{% endif %}
+
+            <div class="wg-box">
+                <form class="form-new-product form-style-1" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <fieldset class="name mb-24">
+                                <div class="body-title mb-10">Nombre de la Marca <span class="tf-color-1">*</span></div>
+                                <input class="flex-grow tf-input" type="text" name="nombre" value="{{ aliado.nombre|default:'' }}" placeholder="Ej: Diorvett" required>
+                            </fieldset>
+
+                            <fieldset class="mb-24">
+                                <div class="body-title mb-10">Categoría <span class="tf-color-1">*</span></div>
+                                <select class="flex-grow tf-input" name="categoria" required>
+                                    {% for val, label in categorias %}
+                                    <option value="{{ val }}" {% if aliado.categoria == val %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </fieldset>
+
+                            <fieldset class="mb-24">
+                                <div class="body-title mb-10">Descripción del Beneficio <span class="tf-color-1">*</span></div>
+                                <textarea class="flex-grow tf-input" name="descripcion_beneficio" rows="5" placeholder="Ej: 10% de descuento en todos sus servicios..." required>{{ aliado.descripcion_beneficio|default:'' }}</textarea>
+                                <small class="text-muted">Describe detalladamente los beneficios para los novios.</small>
+                            </fieldset>
+                        </div>
+
+                        <div class="col-md-4">
+                            <fieldset class="mb-24">
+                                <div class="body-title mb-10">Logo del Aliado</div>
+                                <div class="up-load" id="upload-area-aliado" style="min-height:160px;border:2px dashed #ddd;border-radius:12px;padding:24px;text-align:center; {% if aliado.logo %}display:none;{% endif %}">
+                                    <label for="aliadoLogo" style="cursor:pointer;display:block;">
+                                        <i class="icon-upload-cloud" style="font-size:2.4rem;color:#c9a96e;"></i>
+                                        <div class="text-tiny mt-10">Haz clic para subir logo</div>
+                                        <input type="file" id="aliadoLogo" name="logo" accept="image/*" style="display:none;">
+                                    </label>
+                                </div>
+                                <div id="logo-preview-aliado" style="{% if not aliado.logo %}display:none;{% endif %}margin-top:12px;">
+                                    {% if aliado.logo %}
+                                    <div style="position:relative;border:1px solid #ddd;border-radius:12px;padding:12px;background:#f8f8f8;text-align:center;">
+                                        <img src="{{ aliado.logo.url }}" style="max-width:100%;max-height:120px;object-fit:contain;">
+                                        <button type="button" onclick="removeAliadoLogo()"
+                                            style="position:absolute;top:10px;right:10px;background:#dc2626;color:white;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">×</button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="mb-24">
+                                <div class="body-title mb-10">Orden de Visualización</div>
+                                <input class="flex-grow tf-input" type="number" name="orden" value="{{ aliado.orden|default:'0' }}">
+                            </fieldset>
+
+                            <fieldset class="mb-24">
+                                <div class="body-title mb-10">Estado</div>
+                                <div class="flex items-center gap10">
+                                    <input type="checkbox" name="activo" id="aliado-activo" {% if aliado.activo|default:True %}checked{% endif %} style="width:20px;height:20px;">
+                                    <label for="aliado-activo" class="mb-0">Activo (Visible en tienda)</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+
+                    <div class="row mt-10">
+                        <div class="col-12">
+                            <h4 class="mb-20">Información de Contacto</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <fieldset class="mb-24">
+                                <div class="body-title mb-10">Email</div>
+                                <input class="flex-grow tf-input" type="email" name="email" value="{{ aliado.email|default:'' }}" placeholder="correo@aliado.com">
+                            </fieldset>
+                        </div>
+                        <div class="col-md-4">
+                            <fieldset class="mb-24">
+                                <div class="body-title mb-10">Teléfono / WhatsApp</div>
+                                <input class="flex-grow tf-input" type="text" name="telefono" value="{{ aliado.telefono|default:'' }}" placeholder="0999999999">
+                            </fieldset>
+                        </div>
+                        <div class="col-md-4">
+                            <fieldset class="mb-24">
+                                <div class="body-title mb-10">Instagram (sin @)</div>
+                                <input class="flex-grow tf-input" type="text" name="instagram" value="{{ aliado.instagram|default:'' }}" placeholder="usuario_instagram">
+                            </fieldset>
+                        </div>
+                        <div class="col-md-12">
+                            <fieldset class="mb-24">
+                                <div class="body-title mb-10">Sitio Web (URL completa)</div>
+                                <input class="flex-grow tf-input" type="url" name="sitio_web" value="{{ aliado.sitio_web|default:'' }}" placeholder="https://www.aliado.com">
+                            </fieldset>
+                        </div>
+                    </div>
+
+                    <div class="bot pt-20 border-top mt-20">
+                        <a href="{% url 'planes:panel_admin_aliados' %}" class="tf-button style-1 w208">Cancelar</a>
+                        <button class="tf-button w208" type="submit">Guardar Aliado</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const logoInput = document.getElementById('aliadoLogo');
+const logoPreview = document.getElementById('logo-preview-aliado');
+const uploadArea = document.getElementById('upload-area-aliado');
+
+logoInput.addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            uploadArea.style.display = 'none';
+            logoPreview.style.display = 'block';
+            logoPreview.innerHTML = `
+                <div style="position:relative;border:1px solid #ddd;border-radius:12px;padding:12px;background:#f8f8f8;text-align:center;">
+                    <img src="${e.target.result}" style="max-width:100%;max-height:120px;object-fit:contain;">
+                    <button type="button" onclick="removeAliadoLogo()"
+                        style="position:absolute;top:10px;right:10px;background:#dc2626;color:white;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">×</button>
+                </div>`;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
+
+function removeAliadoLogo() {
+    logoInput.value = '';
+    logoPreview.style.display = 'none';
+    logoPreview.innerHTML = '';
+    uploadArea.style.display = 'block';
+}
+</script>
+{% endblock %}

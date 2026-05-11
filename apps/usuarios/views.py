@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
 from django.http import JsonResponse
-from .models import Usuario, EmailVerificationToken, Provincia, Ciudad, Wishlist
+from .models import Usuario, EmailVerificationToken, Provincia, Ciudad, Wishlist, PasswordResetCode
 from apps.productos.models import Producto
 import base64
 import os
@@ -40,10 +40,49 @@ def obtener_logo_base64():
 
 def enviar_email_directo(destinatario, asunto, mensaje_html, incluir_logo=True):
     """
-    Función para enviar emails usando smtplib directamente con SSL
-    Evita problemas de certificados en Windows
-    Adjunta el logo como imagen embebida usando Content-ID
+    Envía emails usando Resend API (prioritario) o SMTP (fallback).
     """
+    import json
+    import urllib.request
+    
+    # 1. Intentar con RESEND API
+    if hasattr(settings, 'RESEND_API_KEY') and settings.RESEND_API_KEY:
+        try:
+            print(f"🚀 Iniciando envío vía Resend API a {destinatario}")
+            api_key = settings.RESEND_API_KEY
+            url = "https://api.resend.com/emails"
+            
+            # Si el dominio no está verificado en Resend, usar el email de onboarding
+            # o el remitente configurado si ya verificaron dominio.
+            sender_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'onboarding@resend.dev')
+            
+            payload = {
+                "from": f"LivenShop <{sender_email}>",
+                "to": [destinatario],
+                "subject": asunto,
+                "html": mensaje_html
+            }
+            
+            req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), method='POST')
+            req.add_header('Authorization', f'Bearer {api_key}')
+            req.add_header('Content-Type', 'application/json')
+            
+            with urllib.request.urlopen(req) as response:
+                res_status = response.getcode()
+                res_body = response.read().decode('utf-8')
+                if 200 <= res_status < 300:
+                    print(f"✅ Email enviado exitosamente vía Resend: {res_body}")
+                    return True, ""
+                else:
+                    print(f"❌ Error en respuesta de Resend ({res_status}): {res_body}")
+                    return False, f"Resend Error {res_status}: {res_body}"
+                    
+        except Exception as e:
+            print(f"❌ Excepción en Resend API: {e}")
+            # Si falla Resend, intentamos seguir con SMTP como respaldo o retornar error
+            return False, f"Error en Resend: {str(e)}"
+
+    # 2. Fallback a SMTP (Original)
     import smtplib
     import ssl
     from email.mime.text import MIMEText
@@ -51,18 +90,12 @@ def enviar_email_directo(destinatario, asunto, mensaje_html, incluir_logo=True):
     from email.mime.image import MIMEImage
     
     try:
-        print(f"🔧 Iniciando envío de email a {destinatario}")
-        print(f"📧 Host: {settings.EMAIL_HOST}:{settings.EMAIL_PORT}")
-        print(f"👤 Usuario: {settings.EMAIL_HOST_USER}")
-        
+        print(f"🔌 Fallback: Iniciando envío de email SMTP a {destinatario}")
         context = ssl.create_default_context()
         context.check_hostname = False
         context.verify_mode = ssl.CERT_NONE
         
-        print("✅ Contexto SSL creado (sin verificación de certificados)")
-        
         sender_email = getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER)
-        
         msg = MIMEMultipart('related')
         msg['Subject'] = asunto
         msg['From'] = f"LivenShop <{sender_email}>"
@@ -70,60 +103,21 @@ def enviar_email_directo(destinatario, asunto, mensaje_html, incluir_logo=True):
         
         msg_alternative = MIMEMultipart('alternative')
         msg.attach(msg_alternative)
+        msg_alternative.attach(MIMEText(mensaje_html, 'html', 'utf-8'))
         
-        html_part = MIMEText(mensaje_html, 'html', 'utf-8')
-        msg_alternative.attach(html_part)
-        
-        if incluir_logo:
-            try:
-                logo_path = os.path.join(settings.STATIC_ROOT or settings.BASE_DIR, 'static', 'images', 'logo', 'logoselena.png')
-                if not os.path.exists(logo_path):
-                    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo', 'logoselena.png')
-                
-                with open(logo_path, 'rb') as img_file:
-                    img_data = img_file.read()
-                    img = MIMEImage(img_data, 'png')
-                    img.add_header('Content-ID', '<logoselena>')
-                    img.add_header('Content-Disposition', 'inline', filename='logoselena.png')
-                    msg.attach(img)
-                    print("✅ Logo adjuntado como imagen embebida")
-            except Exception as e:
-                print(f"⚠️ No se pudo adjuntar el logo: {e}")
-        
-        print("✅ Mensaje creado")
-        
-        print(f"🔌 Conectando a {settings.EMAIL_HOST}:{settings.EMAIL_PORT}...")
         with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
             server.ehlo()
             server.starttls(context=context)
             server.ehlo()
-            print("✅ Conexión TLS establecida")
-            
-            print("🔐 Autenticando...")
             server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-            print("✅ Autenticación exitosa")
-            
-            print("📤 Enviando mensaje...")
             server.sendmail(sender_email, destinatario, msg.as_string())
-            print("✅ Mensaje enviado")
         
-        print(f"✅✅✅ Email enviado exitosamente a {destinatario}")
+        print(f"✅ Email enviado exitosamente vía SMTP a {destinatario}")
         return True, ""
         
-    except smtplib.SMTPAuthenticationError as e:
-        print(f"❌ Error de autenticación: {e}")
-        return False, f"Error de autenticación SMTP: Verifica tus credenciales de Amazon SES."
-    except smtplib.SMTPException as e:
-        print(f"❌ Error SMTP: {e}")
-        return False, f"Error del servidor de correo: {e}"
-    except ssl.SSLError as e:
-        print(f"❌ Error SSL: {e}")
-        return False, f"Error SSL: {e}"
     except Exception as e:
-        print(f"❌ Error general enviando email: {type(e).__name__}: {e}")
-        import traceback
-        traceback.print_exc()
-        return False, f"Error inesperado: {str(e)}"
+        print(f"❌ Error crítico en envío SMTP: {e}")
+        return False, f"Error SMTP: {str(e)}"
 
 
 def enviar_email_verificacion(request, usuario):
@@ -366,6 +360,53 @@ def enviar_email_verificacion(request, usuario):
         return False, str(e)
 
 
+def enviar_email_codigo_recuperacion(request, usuario, codigo):
+    """Envía el email con el código de 6 dígitos para recuperación de contraseña"""
+    try:
+        logo_src = "cid:logoselena"
+        nombre_usuario = usuario.nombre or usuario.email.split('@')[0]
+        
+        mensaje_html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {{ font-family: sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }}
+                .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }}
+                .header {{ background: #000; padding: 30px; text-align: center; color: white; }}
+                .content {{ padding: 40px; text-align: center; }}
+                .code-box {{ background: #f8f8f8; border: 2px dashed #c9a96e; padding: 20px; font-size: 32px; font-weight: bold; letter-spacing: 10px; margin: 30px 0; color: #000; display: inline-block; }}
+                .footer {{ background: #f8f8f8; padding: 20px; text-align: center; font-size: 12px; color: #888; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h2 style="margin:0;">Restablecer Contraseña</h2>
+                </div>
+                <div class="content">
+                    <p>Hola <strong>{nombre_usuario}</strong>,</p>
+                    <p>Has solicitado restablecer tu contraseña en LivenShop. Tu código de verificación de 6 dígitos es:</p>
+                    <div class="code-box">{codigo}</div>
+                    <p>Este código expira en 15 minutos. Si no solicitaste este cambio, puedes ignorar este correo.</p>
+                </div>
+                <div class="footer">
+                    © 2026 LivenShop — Todos los derechos reservados.
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        asunto = f'🔐 {codigo} es tu código de recuperación - LivenShop'
+        return enviar_email_directo(usuario.email, asunto, mensaje_html)
+    except Exception as e:
+        print(f"Error enviando código: {e}")
+        return False, str(e)
+
+
+
 def login_usuario(request):
     """Vista de login para usuarios"""
     limpiar_mensajes_pendientes(request)
@@ -593,13 +634,14 @@ def my_account(request):
 @login_required(login_url='/')
 def my_account_orders(request):
     """Historial de órdenes del usuario"""
-    ordenes = request.user.pedidos.all().order_by('-created_at')
-    
+    from apps.productos.models import Pedido
+    ordenes = Pedido.objects.filter(usuario=request.user).order_by('-created_at')
+
     from django.core.paginator import Paginator
     paginator = Paginator(ordenes, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     return render(request, 'my-account-orders.html', {
         'user': request.user,
         'ordenes': page_obj,
@@ -607,15 +649,43 @@ def my_account_orders(request):
 
 
 @login_required(login_url='/')
-def my_account_orders_details(request, numero_pedido):
-    """Detalles de una orden específica"""
-    from apps.core.models import Pedido
-    
-    orden = get_object_or_404(Pedido, numero_pedido=numero_pedido, usuario=request.user)
-    
+def my_account_orders_details(request, pedido_id):
+    """Detalles de un pedido específico con enlace opcional de WhatsApp."""
+    from apps.productos.models import Pedido
+    from urllib.parse import quote
+
+    orden = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
+
+    whatsapp_url = ''
+    try:
+        items_txt = ''
+        for item in orden.items.all():
+            costo = item.precio * item.cantidad
+            items_txt += f'\n  • {item.nombre_producto} x{item.cantidad} — ${costo}'
+        msg = (
+            f'Hola, quiero consultar mi pedido *#{orden.id}*\n'
+            f'Fecha: {orden.created_at.strftime("%d/%m/%Y")}\n'
+            f'Estado: {orden.get_estado_display()}\n'
+            f'Productos:{items_txt}\n'
+            f'Total: *${orden.total}*'
+        )
+        # Intentar obtener número desde configuración de la tienda
+        try:
+            from apps.ayudas.models import DatosContacto
+            contacto = DatosContacto.objects.first()
+            numero = contacto.whatsapp_pedidos if (contacto and hasattr(contacto, 'whatsapp_pedidos')) else ''
+        except Exception:
+            numero = ''
+        numero_limpio = numero.replace('+', '').replace(' ', '').replace('-', '') if numero else ''
+        if numero_limpio:
+            whatsapp_url = f'https://wa.me/{numero_limpio}?text={quote(msg, encoding="utf-8")}'
+    except Exception:
+        pass
+
     return render(request, 'my-account-orders-details.html', {
         'user': request.user,
         'orden': orden,
+        'whatsapp_url': whatsapp_url,
     })
 
 
@@ -629,308 +699,217 @@ def my_account_address(request):
 
 @login_required(login_url='/')
 def my_account_edit(request):
-    """Edición de detalles de la cuenta"""
+    """Edición de nombre, apellido, email, teléfono y cambio opcional de contraseña."""
+    from django.contrib.auth import update_session_auth_hash
+    from django.core.exceptions import ValidationError
+    from django.contrib.auth.password_validation import validate_password
+
+    user = request.user
+    nombre_val   = user.nombre   or ''
+    apellido_val = user.apellido or ''
+    email_val    = user.email    or ''
+    telefono_val = user.telefono or ''
+
     if request.method == 'POST':
-        messages.success(request, 'Información actualizada correctamente.')
+        nombre_val   = request.POST.get('first_name', '').strip()
+        apellido_val = request.POST.get('last_name', '').strip()
+        email_val    = request.POST.get('email', '').strip().lower()
+        telefono_val = request.POST.get('telefono', '').strip()
+
+        current_password = request.POST.get('current_password', '').strip()
+        new_password     = request.POST.get('new_password', '').strip()
+        confirm_password = request.POST.get('confirm_password', '').strip()
+        wants_password   = any([current_password, new_password, confirm_password])
+
+        has_errors = False
+
+        # Validar email
+        if not email_val:
+            messages.error(request, 'El email es obligatorio.')
+            has_errors = True
+        elif Usuario.objects.filter(email__iexact=email_val).exclude(pk=user.pk).exists():
+            messages.error(request, 'Este email ya pertenece a otra cuenta.')
+            has_errors = True
+
+        # Validar cambio de contraseña (solo si se intenta)
+        if wants_password:
+            if not current_password:
+                messages.error(request, 'Debes ingresar tu contraseña actual.')
+                has_errors = True
+            elif not user.check_password(current_password):
+                messages.error(request, 'La contraseña actual es incorrecta.')
+                has_errors = True
+            if not new_password:
+                messages.error(request, 'Debes ingresar la nueva contraseña.')
+                has_errors = True
+            elif new_password != confirm_password:
+                messages.error(request, 'Las nuevas contraseñas no coinciden.')
+                has_errors = True
+            elif not has_errors:
+                try:
+                    validate_password(new_password, user=user)
+                except ValidationError as exc:
+                    has_errors = True
+                    for msg in exc.messages:
+                        messages.error(request, msg)
+
+        if has_errors:
+            return render(request, 'my-account-edit.html', {
+                'user': user,
+                'first_name': nombre_val,
+                'last_name': apellido_val,
+                'email': email_val,
+                'telefono': telefono_val,
+            })
+
+        # Guardar datos de perfil
+        user.nombre   = nombre_val
+        user.apellido = apellido_val
+        user.email    = email_val
+        user.username = email_val  # por si acaso
+        user.telefono = telefono_val
+        user.save()
+
+        # Cambio de contraseña
+        if wants_password and not has_errors:
+            user.set_password(new_password)
+            user.save()
+            update_session_auth_hash(request, user)  # mantener sesión activa
+            messages.success(request, '✅ Contraseña actualizada exitosamente.')
+        else:
+            messages.success(request, '✅ Tus datos han sido actualizados correctamente.')
+
         return redirect('usuarios:my_account_edit')
-    
+
     return render(request, 'my-account-edit.html', {
-        'user': request.user
+        'user': user,
+        'first_name': nombre_val,
+        'last_name': apellido_val,
+        'email': email_val,
+        'telefono': telefono_val,
     })
 
 
 def password_reset_request(request):
-    """Vista para solicitar restablecimiento de contraseña"""
+    """Etapa A: Solicitar código de recuperación"""
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
-        
-        if not email:
-            messages.error(request, 'Por favor ingresa tu email.')
-            return redirect('usuarios:login')
+        try:
+            user = Usuario.objects.get(email=email)
+            # Invalida códigos anteriores
+            PasswordResetCode.objects.filter(usuario=user, usado=False).update(usado=True)
+            # Genera nuevo código
+            codigo = PasswordResetCode.generar_codigo()
+            PasswordResetCode.objects.create(usuario=user, codigo=codigo)
+            
+            # Enviar email
+            exito, error_msg = enviar_email_codigo_recuperacion(request, user, codigo)
+            
+            if exito:
+                request.session['reset_email'] = email
+                return redirect('usuarios:password_reset_verify')
+            else:
+                messages.error(request, f'No se pudo enviar el correo: {error_msg}')
+                return redirect('usuarios:password_reset_request')
+            
+        except Usuario.DoesNotExist:
+            # Por seguridad, no decimos si el email existe o no
+            # pero como estamos depurando, si no llega nada es frustrante.
+            # En producción esto debería ser más sutil.
+            messages.success(request, 'Si el correo está registrado, recibirás un código.')
+            request.session['reset_email'] = email
+            return redirect('usuarios:password_reset_verify')
+            
+    return render(request, 'password_reset_request.html')
+
+
+def password_reset_verify(request):
+    """Etapa B: Verificar el código de 6 dígitos"""
+    email = request.session.get('reset_email')
+    if not email:
+        return redirect('usuarios:password_reset_request')
+
+    if request.method == 'POST':
+        # Combinar los 6 inputs
+        codigo_enviado = "".join([
+            request.POST.get('c1', ''), request.POST.get('c2', ''),
+            request.POST.get('c3', ''), request.POST.get('c4', ''),
+            request.POST.get('c5', ''), request.POST.get('c6', '')
+        ])
         
         try:
             user = Usuario.objects.get(email=email)
+            code_obj = PasswordResetCode.objects.filter(
+                usuario=user, codigo=codigo_enviado, usado=False
+            ).first()
             
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            
-            from django.urls import reverse
-            reset_path = reverse('usuarios:password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
-            reset_url = request.build_absolute_uri(reset_path)
-            
-            logo_src = "cid:logoselena"
-            nombre_usuario = user.nombre or user.email.split('@')[0]
-            
-            mensaje_html = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    body {{
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                        background-color: #f8f9fa;
-                        margin: 0;
-                        padding: 20px;
-                    }}
-                    .email-container {{
-                        max-width: 600px;
-                        margin: 0 auto;
-                        background: white;
-                        border-radius: 16px;
-                        overflow: hidden;
-                        box-shadow: 0 10px 40px rgba(145, 133, 103, 0.15);
-                    }}
-                    .header {{
-                        background: linear-gradient(135deg, #918567 0%, #a89878 100%);
-                        padding: 50px 30px;
-                        text-align: center;
-                    }}
-                    .logo-container {{
-                        text-align: center;
-                        margin-bottom: 25px;
-                    }}
-                    .logo {{
-                        max-width: 150px;
-                        height: auto;
-                        background: white;
-                        padding: 15px;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                    }}
-                    .header-title {{
-                        color: white;
-                        margin: 0;
-                        font-size: 28px;
-                        font-weight: 700;
-                        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                    }}
-                    .header-subtitle {{
-                        color: rgba(255,255,255,0.95);
-                        margin: 10px 0 0;
-                        font-size: 16px;
-                    }}
-                    .content {{
-                        padding: 50px 40px;
-                    }}
-                    .greeting {{
-                        font-size: 20px;
-                        color: #333;
-                        margin-bottom: 20px;
-                        font-weight: 600;
-                    }}
-                    .message {{
-                        color: #555;
-                        line-height: 1.8;
-                        margin-bottom: 30px;
-                        font-size: 16px;
-                    }}
-                    .btn-container {{
-                        text-align: center;
-                        margin: 40px 0;
-                    }}
-                    .btn {{
-                        display: inline-block;
-                        background: linear-gradient(135deg, #918567 0%, #a89878 100%);
-                        color: white !important;
-                        padding: 18px 50px;
-                        text-decoration: none;
-                        border-radius: 50px;
-                        font-weight: bold;
-                        font-size: 16px;
-                        box-shadow: 0 8px 20px rgba(145, 133, 103, 0.3);
-                        transition: all 0.3s ease;
-                    }}
-                    .btn:hover {{
-                        transform: translateY(-2px);
-                        box-shadow: 0 12px 24px rgba(145, 133, 103, 0.4);
-                    }}
-                    .divider {{
-                        height: 1px;
-                        background: linear-gradient(to right, transparent, #d4cfc4, transparent);
-                        margin: 30px 0;
-                    }}
-                    .security-info {{
-                        background: linear-gradient(to bottom, #faf9f7, #ffffff);
-                        border: 2px solid #e8e3da;
-                        border-left: 4px solid #918567;
-                        padding: 20px;
-                        margin: 30px 0;
-                        border-radius: 8px;
-                    }}
-                    .security-info h3 {{
-                        color: #918567;
-                        margin: 0 0 10px;
-                        font-size: 16px;
-                    }}
-                    .security-info p {{
-                        margin: 5px 0;
-                        color: #666;
-                        font-size: 14px;
-                    }}
-                    .footer {{
-                        background: linear-gradient(to bottom, #faf9f7, #f5f3f0);
-                        padding: 30px;
-                        text-align: center;
-                        border-top: 2px solid #e8e3da;
-                    }}
-                    .footer-text {{
-                        color: #999;
-                        font-size: 13px;
-                        margin: 5px 0;
-                    }}
-                    .footer-text a {{
-                        color: #918567;
-                        text-decoration: none;
-                    }}
-                    .link-alternative {{
-                        margin-top: 20px;
-                        padding: 15px;
-                        background: #faf9f7;
-                        border: 1px solid #e8e3da;
-                        border-radius: 8px;
-                        word-break: break-all;
-                    }}
-                    .link-alternative p {{
-                        color: #888;
-                        font-size: 12px;
-                        margin: 0 0 10px;
-                    }}
-                    .link-alternative a {{
-                        color: #918567;
-                        font-size: 13px;
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class="email-container">
-                    <div class="header">
-                        <div class="logo-container">
-                            <img src="{logo_src}" alt="LivenShop" class="logo">
-                        </div>
-                        <h1 class="header-title">🔐 Restablecer Contraseña</h1>
-                        <p class="header-subtitle">Solicitud de cambio de contraseña</p>
-                    </div>
-                    
-                    <div class="content">
-                        <p class="greeting">Hola <strong>{nombre_usuario}</strong>,</p>
-                        
-                        <p class="message">
-                            Recibimos una solicitud para restablecer la contraseña de tu cuenta en <strong>LivenShop</strong>. 
-                            Si realizaste esta solicitud, haz clic en el botón de abajo para crear una nueva contraseña.
-                        </p>
-                        
-                        <div class="btn-container">
-                            <a href="{reset_url}" class="btn">
-                                🔑 Restablecer mi Contraseña
-                            </a>
-                        </div>
-                        
-                        <div class="security-info">
-                            <h3>🛡️ Información de Seguridad</h3>
-                            <p>• Este enlace expira en <strong>24 horas</strong></p>
-                            <p>• Solo funciona una vez</p>
-                            <p>• Si no solicitaste este cambio, ignora este correo y tu contraseña permanecerá segura</p>
-                        </div>
-                        
-                        <div class="divider"></div>
-                        
-                        <div class="link-alternative">
-                            <p>Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
-                            <a href="{reset_url}">{reset_url}</a>
-                        </div>
-                    </div>
-                    
-                    <div class="footer">
-                        <p class="footer-text">Este correo fue enviado automáticamente. Por favor no respondas.</p>
-                        <p class="footer-text">© 2026 LivenShop - Todos los derechos reservados</p>
-                        <p class="footer-text" style="margin-top: 15px;">
-                            ¿No solicitaste este cambio? <a href="mailto:soporte@livenshop.com">Contáctanos</a>
-                        </p>
-                    </div>
-                </div>
-            </body>
-            </html>
-            """
-            
-            asunto = '🔐 Restablece tu contraseña - LivenShop'
-            
-            exito, mensaje_error = enviar_email_directo(user.email, asunto, mensaje_html)
-            if exito:
-                messages.success(
-                    request, 
-                    '✅ Se ha enviado un correo con las instrucciones para restablecer tu contraseña. '
-                    'Revisa tu bandeja de entrada.'
-                )
+            if code_obj and code_obj.es_valido():
+                request.session['reset_code_id'] = code_obj.id
+                return redirect('usuarios:password_reset_complete')
             else:
-                messages.error(
-                    request, 
-                    f'❌ Hubo un problema al enviar el correo. {mensaje_error}'
-                )
-                
-        except Usuario.DoesNotExist:
-            messages.success(
-                request, 
-                '✅ Si el email existe en nuestro sistema, recibirás un correo con las instrucciones.'
-            )
+                messages.error(request, 'Código inválido o expirado.')
+        except Exception:
+            messages.error(request, 'Error al verificar el código.')
+
+    return render(request, 'password_reset_verify.html', {'email': email})
+
+
+def password_reset_complete(request):
+    """Etapa C: Establecer nueva contraseña"""
+    code_id = request.session.get('reset_code_id')
+    if not code_id:
+        return redirect('usuarios:password_reset_request')
+
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm = request.POST.get('password_confirm')
         
-        return redirect('usuarios:login')
-    
-    return redirect('usuarios:login')
+        if password != confirm:
+            messages.error(request, 'Las contraseñas no coinciden.')
+            return render(request, 'password_reset_complete.html')
+            
+        if len(password) < 6:
+            messages.error(request, 'La contraseña debe tener al menos 6 caracteres.')
+            return render(request, 'password_reset_complete.html')
 
-
-def password_reset_confirm(request, uidb64, token):
-    """Vista para confirmar y establecer nueva contraseña"""
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = Usuario.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, Usuario.DoesNotExist):
-        user = None
-    
-    if user is not None and default_token_generator.check_token(user, token):
-        if request.method == 'POST':
-            password = request.POST.get('password', '').strip()
-            password_confirm = request.POST.get('password_confirm', '').strip()
-            
-            if not password:
-                messages.error(request, 'La contraseña es obligatoria.')
-                return render(request, 'password_reset_confirm.html', {
-                    'validlink': True,
-                    'uidb64': uidb64,
-                    'token': token
-                })
-            
-            if password != password_confirm:
-                messages.error(request, 'Las contraseñas no coinciden.')
-                return render(request, 'password_reset_confirm.html', {
-                    'validlink': True,
-                    'uidb64': uidb64,
-                    'token': token
-                })
-            
-            if len(password) < 6:
-                messages.error(request, 'La contraseña debe tener al menos 6 caracteres.')
-                return render(request, 'password_reset_confirm.html', {
-                    'validlink': True,
-                    'uidb64': uidb64,
-                    'token': token
-                })
-            
+        try:
+            code_obj = PasswordResetCode.objects.get(id=code_id, usado=False)
+            user = code_obj.usuario
             user.set_password(password)
             user.save()
             
-            messages.success(request, '¡Tu contraseña ha sido restablecida exitosamente! Ya puedes iniciar sesión.')
+            # Marcar código como usado
+            code_obj.usado = True
+            code_obj.save()
+            
+            # Limpiar sesión
+            del request.session['reset_email']
+            del request.session['reset_code_id']
+            
+            messages.success(request, '¡Contraseña actualizada! Ya puedes iniciar sesión.')
             return redirect('usuarios:login')
-        
-        return render(request, 'password_reset_confirm.html', {
-            'validlink': True,
-            'uidb64': uidb64,
-            'token': token
-        })
-    else:
-        messages.error(request, 'El enlace de restablecimiento es inválido o ha expirado.')
-        return redirect('usuarios:login')
+        except Exception:
+            messages.error(request, 'Error al actualizar la contraseña.')
+
+    return render(request, 'password_reset_complete.html')
+
+
+def password_reset_resend(request):
+    """Etapa D: Reenviar código vía AJAX"""
+    email = request.session.get('reset_email')
+    if not email:
+        return JsonResponse({'success': False, 'message': 'No hay email en sesión.'})
+
+    try:
+        user = Usuario.objects.get(email=email)
+        PasswordResetCode.objects.filter(usuario=user, usado=False).update(usado=True)
+        codigo = PasswordResetCode.generar_codigo()
+        PasswordResetCode.objects.create(usuario=user, codigo=codigo)
+        enviar_email_codigo_recuperacion(request, user, codigo)
+        return JsonResponse({'success': True, 'message': 'Nuevo código enviado.'})
+    except Exception:
+        return JsonResponse({'success': False, 'message': 'Error al reenviar.'})
+
 
 
 def api_ciudades_por_provincia(request, provincia_id):
@@ -1009,8 +988,17 @@ def reenviar_verificacion(request):
 
 @login_required(login_url='usuarios:login')
 def my_account_wishlist(request):
-    """Redirige al listado principal de favoritos."""
-    return redirect('core:wishlist')
+    """Muestra los productos favoritos del usuario actual."""
+    wishlist_items = Wishlist.objects.filter(
+        usuario=request.user
+    ).select_related('producto').prefetch_related('producto__imagenes')
+
+    productos_favoritos = [item.producto for item in wishlist_items]
+
+    return render(request, 'my-account-wishlist.html', {
+        'user': request.user,
+        'productos_favoritos': productos_favoritos,
+    })
 
 
 @login_required(login_url='usuarios:login')

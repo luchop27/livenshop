@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Beneficios para Novios — Liven{% endblock %}
+
+{% block content %}
+
+<style>
+.ben-page { background: #fff; padding-bottom: 80px; }
+.ben-hero {
+    padding: 60px 24px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 40px;
+}
+.ben-hero h1 {
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 400;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #000;
+    margin: 0;
+}
+
+/* Filter pills - Minimalist */
+.ben-filters {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    justify-content: center; padding: 0 24px 40px;
+}
+.ben-filter-link {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #999;
+    transition: all .2s;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 4px;
+}
+.ben-filter-link:hover, .ben-filter-link.active {
+    color: #000;
+    border-bottom-color: #000;
+}
+
+/* Cards grid - Diorvett Style */
+.ben-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+}
+.ben-card {
+    background: #fff;
+    border: 1px solid #000;
+    padding: 40px 30px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+.ben-card-logo {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+.ben-card-logo img {
+    max-height: 60px;
+    max-width: 200px;
+    object-fit: contain;
+}
+.ben-card-logo-fallback {
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: #000;
+}
+
+.ben-section-title {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    color: #000;
+}
+
+.ben-card-beneficio {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.8;
+    flex: 1;
+    margin-bottom: 30px;
+}
+.ben-card-beneficio p { margin-bottom: 10px; }
+
+.ben-card-divider {
+    border: none;
+    border-top: 1px solid #000;
+    width: 60%;
+    margin: 0 auto 30px;
+}
+
+.ben-contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.ben-contact-item {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+    display: block;
+    text-decoration: none;
+}
+.ben-contact-item:hover { color: #000; }
+
+.empty-state { text-align: center; padding: 100px 24px; color: #999; border: 1px dashed #ccc; margin: 40px 0; }
+</style>
+
+<div class="ben-page">
+
+    <!-- Hero -->
+    <section class="ben-hero">
+        <div class="container">
+            <h1>Today is the beginning of your next chapter. Here's to you!</h1>
+        </div>
+    </section>
+
+    <div class="container">
+
+        <!-- Filtros -->
+        <div class="ben-filters">
+            <a href="{% url 'planes:beneficios' %}"
+               class="ben-filter-link {% if not categoria_activa %}active{% endif %}">
+                Todos
+            </a>
+            {% for val, label in categorias %}
+            <a href="{% url 'planes:beneficios' %}?cat={{ val }}"
+               class="ben-filter-link {% if categoria_activa == val %}active{% endif %}">
+                {{ label }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Grid -->
+        {% if aliados %}
+        <div class="ben-grid">
+            {% for aliado in aliados %}
+            <div class="ben-card">
+                <!-- Logo -->
+                <div class="ben-card-logo">
+                    {% if aliado.logo %}
+                    <img src="{{ aliado.logo.url }}" alt="{{ aliado.nombre }}">
+                    {% else %}
+                    <div class="ben-card-logo-fallback">{{ aliado.nombre }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="ben-section-title">BENEFICIOS</div>
+
+                <!-- Lista de Beneficios -->
+                <div class="ben-card-beneficio">
+                    {{ aliado.descripcion_beneficio|linebreaks }}
+                </div>
+
+                <hr class="ben-card-divider">
+
+                <div class="ben-section-title">CONTACTO</div>
+
+                <!-- Contacto -->
+                <div class="ben-contact-list">
+                    {% if aliado.email %}
+                    <a href="mailto:{{ aliado.email }}" class="ben-contact-item">{{ aliado.email }}</a>
+                    {% endif %}
+
+                    {% if aliado.telefono %}
+                    <a href="tel:{{ aliado.telefono }}" class="ben-contact-item">{{ aliado.telefono }}</a>
+                    {% endif %}
+
+                    {% if aliado.sitio_web %}
+                    <a href="{{ aliado.sitio_web }}" target="_blank" class="ben-contact-item">{{ aliado.sitio_web|cut:"https://"|cut:"http://"|truncatechars:30 }}</a>
+                    {% endif %}
+
+                    {% if aliado.instagram %}
+                    <a href="https://instagram.com/{{ aliado.instagram }}" target="_blank" class="ben-contact-item">@{{ aliado.instagram }}</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>Próximamente estaremos agregando nuevos aliados y beneficios exclusivos para ti.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

@@ -267,8 +267,15 @@
                             <div class="sub-menu submenu-default">
                                 <ul class="menu-list">
                                     <li class="menu-item-2">
-                                        <a href="{% url 'planes:detalle' 'novios' %}" class="menu-link-text link text_black-2">Plan Novios</a>
+                                        <a href="{% url 'planes:plan_novios' %}" class="menu-link-text link text_black-2">Plan de Novios</a>
                                     </li>
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:beneficios' %}" class="menu-link-text link text_black-2">Beneficios para Novios</a>
+                                    </li>
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:portal_novios' %}" class="menu-link-text link text_black-2">Portal Novios</a>
+                                    </li>
+                                    <li style="border-top:1px solid #f0ece6;margin:8px 0 4px;"></li>
                                     <li class="menu-item-2">
                                         <a href="{% url 'planes:detalle' 'eventos' %}" class="menu-link-text link text_black-2">Plan Eventos</a>
                                     </li>
@@ -550,7 +557,13 @@
                     <div id="mb-dropdown-planes" class="collapse">
                         <ul class="sub-nav-menu">
                             <li>
-                                <a href="{% url 'planes:detalle' 'novios' %}" class="sub-nav-link force-menu-liven">Plan Novios</a>
+                                <a href="{% url 'planes:plan_novios' %}" class="sub-nav-link force-menu-liven">Plan de Novios</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'planes:beneficios' %}" class="sub-nav-link force-menu-liven">Beneficios para Novios</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'planes:portal_novios' %}" class="sub-nav-link force-menu-liven">Portal Novios</a>
                             </li>
                             <li>
                                 <a href="{% url 'planes:detalle' 'eventos' %}" class="sub-nav-link force-menu-liven">Plan Eventos</a>

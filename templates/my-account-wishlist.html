@@ -1,22 +1,27 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+
         <!-- page-title -->
         <div class="tf-page-title">
             <div class="container-full">
-                <div class="heading text-center">Favoritos</div>
+                <div class="heading text-center">Mis Favoritos</div>
             </div>
         </div>
         <!-- /page-title -->
 
-        <!-- page-cart -->
-        <section class="flat-spacing-11">
+        <section class="flat-spacing-11 page-my-account">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-12">
+                    <div class="col-lg-3">
+                        <div class="wrap-sidebar-account">
+                            {% include "includes/my-account-sidebar.html" with active_tab='favoritos' %}
+                        </div>
+                    </div>
+                    <div class="col-lg-9">
                         <div class="my-account-content account-wishlist">
                             {% if productos_favoritos %}
-                            <div class="grid-layout wrapper-shop" data-grid="grid-4">
+                            <div class="grid-layout wrapper-shop" data-grid="grid-3">
                                 {% for producto in productos_favoritos %}
                                 <div class="card-product">
                                     <div class="card-product-wrapper">
@@ -61,10 +66,13 @@
                                 {% endfor %}
                             </div>
                             {% else %}
-                            <div class="text-center mt_100 mb_100">
-                                <i class="icon icon-heart" style="font-size: 5rem; color: #ddd;"></i>
-                                <h4 class="mt_20 mb_20">Tu lista de favoritos está vacía</h4>
-                                <a href="{% url 'productos:lista_productos' %}" class="tf-btn btn-fill animate-hover-btn radius-3">Continuar Comprando</a>
+                            <div class="text-center mt_60 mb_60">
+                                <i class="icon icon-heart" style="font-size:4rem;opacity:.2;display:block;margin-bottom:16px;"></i>
+                                <h5 class="mb_20">Tu lista de favoritos está vacía</h5>
+                                <p class="text-secondary mb_30">Agrega productos que te gusten y encuéntralos aquí fácilmente.</p>
+                                <a href="{% url 'productos:lista_productos' %}" class="tf-btn btn-fill animate-hover-btn radius-3">
+                                    Explorar productos
+                                </a>
                             </div>
                             {% endif %}
                         </div>
@@ -74,7 +82,9 @@
         </section>
 
         <div class="btn-sidebar-account">
-            <button data-bs-toggle="offcanvas" data-bs-target="#mbAccount" aria-controls="offcanvas"><i
-                    class="icon icon-sidebar-2"></i></button>
+            <button data-bs-toggle="offcanvas" data-bs-target="#mbAccount" aria-controls="offcanvas">
+                <i class="icon icon-sidebar-2"></i>
+            </button>
         </div>
+
 {% endblock %}

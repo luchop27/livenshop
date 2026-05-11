@@ -85,6 +85,17 @@
                                         </ul>
                                     </li>
 
+                                    <li class="menu-item has-children {% block menu_collection %}{% endblock %}">
+                                        <a href="#" class="menu-item-button">
+                                            <div class="icon"><i class="icon-bookmark"></i></div>
+                                            <div class="text">Colecciones</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item"><a href="{% url 'productos:panel_admin_collections' %}"><div class="text">Lista de colecciones</div></a></li>
+                                            <li class="sub-menu-item"><a href="{% url 'productos:panel_admin_collection_add' %}"><div class="text">Nueva colección</div></a></li>
+                                        </ul>
+                                    </li>
+
                                     <li class="menu-item has-children {% block menu_category %}{% endblock %}">
                                         <a href="#" class="menu-item-button">
                                             <div class="icon"><i class="icon-layers"></i></div>
@@ -127,6 +138,16 @@
                                             <li class="sub-menu-item">
                                                 <a href="{% url 'planes:panel_admin_plan_add' %}">
                                                     <div class="text">Nuevo plan</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item" style="border-top:1px solid #eee; margin-top:5px; padding-top:5px;">
+                                                <a href="{% url 'planes:panel_admin_aliados' %}">
+                                                    <div class="text">Lista de aliados</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'planes:panel_admin_aliado_add' %}">
+                                                    <div class="text">Nuevo aliado</div>
                                                 </a>
                                             </li>
                                         </ul>

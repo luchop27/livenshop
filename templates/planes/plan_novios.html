@@ -1,85 +1,321 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ plan.nombre }}{% endblock %}
+{% block title %}Plan de Novios — Liven{% endblock %}
 
 {% block content %}
 
-<!-- Page Title -->
-<div class="tf-page-title">
-    <div class="container-full">
-        <div class="row">
-            <div class="col-12">
-                <div class="heading text-center">{{ plan.nombre }}</div>
-                <p class="text-center mt-2" style="color: var(--color-text-secondary);">
-                    A continuación encontrarás la información sobre el plan de novios que ofrecemos
+<style>
+/* ── PLAN NOVIOS — LANDING PREMIUM ── */
+.pn-hero {
+    position: relative;
+    min-height: 560px;
+    background: linear-gradient(135deg, #0d1b2a 0%, #1a2a3a 50%, #0d2233 100%);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    text-align: center;
+    padding: 100px 24px;
+}
+.pn-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("{% static 'images/logo/logolivenwhiteor.png' %}") center/240px no-repeat;
+    opacity: .04;
+}
+.pn-hero-tag {
+    display: inline-block;
+    font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    color: #c9a96e; border: 1px solid rgba(201,169,110,.4);
+    padding: 5px 18px; border-radius: 20px; margin-bottom: 24px;
+}
+.pn-hero h1 {
+    font-size: clamp(2rem, 5vw, 4rem);
+    color: #fff;
+    font-weight: 300;
+    letter-spacing: .04em;
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+.pn-hero h1 strong { font-weight: 700; color: #c9a96e; }
+.pn-hero p {
+    color: rgba(255,255,255,.72);
+    max-width: 560px; margin: 0 auto 36px;
+    font-size: 16px; line-height: 1.7;
+}
+.pn-btn-group { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.pn-btn-gold {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 32px; background: #c9a96e; color: #0d1b2a !important;
+    border-radius: 50px; font-weight: 700; font-size: 13px;
+    letter-spacing: .06em; text-transform: uppercase; text-decoration: none;
+    transition: all .25s; box-shadow: 0 4px 20px rgba(201,169,110,.35);
+}
+.pn-btn-gold:hover {
+    background: #b8925a; transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(201,169,110,.45);
+}
+.pn-btn-outline {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 30px; border: 1.5px solid rgba(255,255,255,.4); color: #fff !important;
+    border-radius: 50px; font-weight: 600; font-size: 13px;
+    letter-spacing: .06em; text-transform: uppercase; text-decoration: none;
+    transition: all .25s;
+}
+.pn-btn-outline:hover { border-color: #c9a96e; color: #c9a96e !important; }
+
+/* ── BENEFICIOS CARDS ── */
+.pn-benefits { padding: 80px 0; background: #fff; }
+.pn-benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 28px; margin-top: 48px;
+}
+.pn-benefit-card {
+    background: #fafaf9;
+    border: 1px solid #ede9e2;
+    border-radius: 16px;
+    padding: 36px 28px;
+    text-align: center;
+    transition: all .3s;
+}
+.pn-benefit-card:hover {
+    border-color: #c9a96e;
+    box-shadow: 0 8px 32px rgba(201,169,110,.15);
+    transform: translateY(-4px);
+}
+.pn-benefit-icon {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, #c9a96e, #b8925a);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    font-size: 26px;
+}
+.pn-benefit-card h4 {
+    font-size: 14px; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; margin-bottom: 10px; color: #1a1a1a;
+}
+.pn-benefit-card p { font-size: 14px; color: #666; line-height: 1.6; margin: 0; }
+
+/* ── TÉRMINOS ── */
+.pn-terminos { padding: 80px 0; background: #f8f6f2; }
+.pn-terminos-inner {
+    max-width: 780px; margin: 0 auto;
+}
+.pn-term-item {
+    display: flex; gap: 18px; margin-bottom: 28px;
+    padding: 24px; background: #fff; border-radius: 12px;
+    border-left: 4px solid #c9a96e;
+}
+.pn-term-num {
+    flex-shrink: 0;
+    width: 36px; height: 36px;
+    background: #c9a96e; color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; margin-top: 2px;
+}
+.pn-term-item h5 { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #1a1a1a; }
+.pn-term-item p  { font-size: 13px; color: #555; margin: 0; line-height: 1.65; }
+
+/* ── PORTAL CTA ── */
+.pn-portal-cta {
+    background: linear-gradient(135deg, #0d1b2a, #1a2a3a);
+    padding: 80px 24px;
+    text-align: center;
+    color: #fff;
+}
+.pn-portal-cta h2 { font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 300; margin-bottom: 12px; }
+.pn-portal-cta h2 strong { color: #c9a96e; font-weight: 700; }
+.pn-portal-cta p { color: rgba(255,255,255,.7); margin-bottom: 36px; }
+</style>
+
+<!-- ── HERO ─────────────────────────────────────────────── -->
+<section class="pn-hero">
+    <div style="position:relative;z-index:2;">
+        <div class="pn-hero-tag">✦ Liven Home Decor</div>
+        <h1>Hoy es el comienzo de<br><strong>tu próximo capítulo.</strong></h1>
+        <p>Diseña el hogar de tus sueños con nuestro exclusivo Plan de Novios. Selecciona lo mejor de nuestra colección, recibe aportes de tus invitados y estrena tu espacio.</p>
+        <div class="pn-btn-group">
+            <a href="{% url 'planes:registro_novios' %}" class="pn-btn-gold">
+                Registra tu Plan
+            </a>
+            <a href="{% url 'planes:beneficios' %}" class="pn-btn-outline">
+                Ver nuestros beneficios
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ── 4 BENEFICIOS EXCLUSIVOS ────────────────────────── -->
+<section class="pn-benefits">
+    <div class="container">
+        <div class="text-center">
+            <div class="pn-hero-tag" style="color:#c9a96e;border-color:rgba(201,169,110,.4);">Beneficios Exclusivos</div>
+            <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:300;margin-top:12px;">
+                Ventajas diseñadas para <strong>ti</strong>
+            </h2>
+        </div>
+        <div class="pn-benefits-grid">
+            <div class="pn-benefit-card">
+                <div class="pn-benefit-icon" style="background:#000;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 16 16"><path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9A1.5 1.5 0 0 1 1.5 3H2V1.78a1.5 1.5 0 0 1 1.864-1.454L8 1.545 12.136.326zM11 3V1.545L8 2.435l-3-.89V3h6zM2.5 13h11V4h-11v9z"/></svg>
+                </div>
+                <h4>Fondo de Bienvenida</h4>
+                <p>Comenzamos con una base de <strong>$800</strong>. Cualquier excedente acumulado te será devuelto íntegramente.</p>
+            </div>
+            <div class="pn-benefit-card">
+                <div class="pn-benefit-icon" style="background:#000;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 16 16"><path d="M11 2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM4 7a3 3 0 0 0-3 3v2.146c0 .1.016.199.048.293l.54 1.591A.5.5 0 0 0 2.054 14h11.892a.5.5 0 0 0 .466-.61l-.54-1.591a.958.958 0 0 0-.048-.293V10a3 3 0 0 0-3-3H4z"/></svg>
+                </div>
+                <h4>Membresía Liven</h4>
+                <p>Reciben la <strong>Tarjeta Novios Liven</strong> con un 10% de descuento en todas sus compras durante el primer año.</p>
+            </div>
+            <div class="pn-benefit-card">
+                <div class="pn-benefit-icon" style="background:#000;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 16 16"><path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h6zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H5z"/><path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+                </div>
+                <h4>Control Total 24/7</h4>
+                <p>Consulten su saldo acumulado y movimientos en cualquier momento desde nuestro <strong>portal exclusivo</strong>.</p>
+            </div>
+            <div class="pn-benefit-card">
+                <div class="pn-benefit-icon" style="background:#000;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 16 16"><path d="M11.5 15a.5.5 0 0 1-.5-.5V2.707l-3.146 3.147a.5.5 0 1 1-.708-.708l4-4a.5.5 0 0 1 .708 0l4 4a.5.5 0 1 1-.708.708L12 2.707V14.5a.5.5 0 0 1-.5.5zM4.5 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 1 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/></svg>
+                </div>
+                <h4>Intercambio Flexible</h4>
+                <p>Si algún detalle de Liven no encaja con su visión, lo convertimos en <strong>crédito</strong> para las piezas que sí necesitan.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── TÉRMINOS ────────────────────────────────────────── -->
+<section class="pn-terminos">
+    <div class="container">
+        <div class="pn-terminos-inner">
+            <div class="text-center mb-5">
+                <div class="pn-hero-tag" style="color:#c9a96e;border-color:rgba(201,169,110,.4);">Términos del Plan</div>
+                <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:300;margin-top:12px;">¿Cómo funciona?</h2>
+            </div>
+
+            <div class="pn-term-item">
+                <div class="pn-term-num">1</div>
+                <div>
+                    <h5>Fondo de Bienvenida — $800</h5>
+                    <p>Establecemos un valor base de $800 como punto de partida para equipar tu hogar. Cualquier excedente acumulado te será devuelto íntegramente.</p>
+                </div>
+            </div>
+            <div class="pn-term-item">
+                <div class="pn-term-num">2</div>
+                <div>
+                    <h5>Comunicación Personalizada</h5>
+                    <p>Liven se encarga de todo. Enviamos mensajes de WhatsApp personalizados a tu lista de invitados compartiendo los detalles de tu Plan. Recibirás un informe detallado de cada notificación.</p>
+                </div>
+            </div>
+            <div class="pn-term-item">
+                <div class="pn-term-num">3</div>
+                <div>
+                    <h5>Recordatorios Especiales</h5>
+                    <p>Tus invitados recibirán un recordatorio especial de parte de Liven previo a la boda para que nadie olvide su aporte.</p>
+                </div>
+            </div>
+            <div class="pn-term-item">
+                <div class="pn-term-num">4</div>
+                <div>
+                    <h5>Flexibilidad en los Aportes</h5>
+                    <p>Aceptamos contribuciones en: tarjeta de crédito, transferencia bancaria, efectivo, cheques o pagos directos por nuestra plataforma web. Puntos físicos en <strong>Machala — Av. 25 de Junio (Supermercados Del Portal)</strong>.</p>
+                </div>
+            </div>
+            <div class="pn-term-item">
+                <div class="pn-term-num">5</div>
+                <div>
+                    <h5>Anticipos Disponibles — hasta el 50%</h5>
+                    <p>Pueden solicitar un adelanto de hasta el 50% de los fondos acumulados antes de finalizar su Plan de Novios.</p>
+                </div>
+            </div>
+            <div class="pn-term-item">
+                <div class="pn-term-num">6</div>
+                <div>
+                    <h5>Comisión Bancaria — 5%</h5>
+                    <p>Para pagos con tarjeta de crédito, Liven retiene el 5% del valor, que corresponde a lo que las tarjetas cobran aproximadamente.</p>
+                </div>
+            </div>
+
+            <!-- Nota de regalos -->
+            <div style="background:#fff7ed;border:1px solid #f4d39a;border-radius:10px;padding:18px 22px;margin-top:12px;font-size:13px;color:#7a5c28;">
+                <strong>* Intercambio de Regalos:</strong> Las devoluciones de regalos se gestionan mediante crédito interno para consumo en nuestras tiendas y no son canjeables por dinero en efectivo.
+            </div>
+
+<!-- ── REGISTRO CTA ────────────────────────── -->
+<section style="padding:100px 0;background:#fff;border-top:1px solid #eee;">
+    <div class="container text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <h2 style="font-size:2.2rem;font-weight:300;letter-spacing:.05em;text-transform:uppercase;color:#000;margin-bottom:20px;">
+                    ¿Listos para <strong>empezar?</strong>
+                </h2>
+                <p style="color:#666;font-size:16px;line-height:1.8;margin-bottom:40px;">
+                    Únete a las cientos de parejas que han confiado en Liven para equipar su hogar con lo mejor en diseño y calidad.
                 </p>
+                <a href="{% url 'planes:registro_novios' %}" class="pn-btn-gold" style="padding:18px 50px;">
+                    Registra tu Plan Ahora
+                </a>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="container my-60">
-
-    <!-- TÉRMINOS -->
-    <div class="row justify-content-center mb-60">
-        <div class="col-lg-8">
-            <h2 class="mb-24">{{ plan.titulo_terminos }}</h2>
-            <p>Te brindamos el servicio de separación de regalos para tu matrimonio</p>
-            <div class="mb-32">
-                {{ plan.contenido_terminos|linebreaks }}
-            </div>
-            <div class="d-flex gap-12 flex-wrap">
-                {% if plan.url_boton_secundario %}
-                <a href="{{ plan.url_boton_secundario }}" class="tf-btn btn-outline">
-                    {{ plan.texto_boton_secundario }}
-                </a>
-                {% endif %}
-                {% if plan.url_boton_principal %}
-                <a href="{{ plan.url_boton_principal }}" class="tf-btn btn-fill">
-                    {{ plan.texto_boton_principal }}
-                </a>
-                {% endif %}
-            </div>
+<!-- ── ALIADOS (preview 6) ─────────────────────────────── -->
+{% if aliados %}
+<section style="padding:80px 0;background:#fafaf9;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="pn-hero-tag" style="color:#c9a96e;border-color:rgba(201,169,110,.4);">Alianzas Exclusivas</div>
+            <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:300;margin-top:12px;">
+                Nuestros <strong>Aliados</strong>
+            </h2>
+            <p class="text-secondary">Proveedores seleccionados que ofrecen beneficios especiales a nuestros novios</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;">
+            {% for aliado in aliados|slice:":9" %}
+            <a href="{% url 'planes:beneficios' %}" style="display:block;text-decoration:none;">
+                <div style="background:#fff;border:1px solid #ede9e2;border-radius:14px;padding:28px 20px;text-align:center;transition:all .3s;" onmouseover="this.style.borderColor='#000';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='#ede9e2';this.style.transform='translateY(0)'">
+                    {% if aliado.logo %}
+                    <img src="{{ aliado.logo.url }}" alt="{{ aliado.nombre }}" style="max-height:70px;max-width:140px;object-fit:contain;margin-bottom:12px;">
+                    {% else %}
+                    <div style="width:70px;height:70px;background:#000;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:22px;color:#fff;">
+                        {{ aliado.nombre|first }}
+                    </div>
+                    {% endif %}
+                    <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#1a1a1a;">{{ aliado.nombre }}</div>
+                    <div style="font-size:11px;color:#c9a96e;margin-top:4px;">{{ aliado.get_categoria_display }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{% url 'planes:beneficios' %}" class="pn-btn-outline" style="color:#000 !important; border-color:#000;">
+                Ver todos los beneficios →
+            </a>
         </div>
     </div>
+</section>
+{% endif %}
 
-    <hr class="my-60">
-
-    <!-- BENEFICIOS -->
-    <div class="row justify-content-center mb-60">
-        <div class="col-lg-8">
-            <h2 class="mb-24">{{ plan.titulo_beneficios }}</h2>
-            <p>Nuestros beneficios:</p>
-            <div class="mb-32">
-                {{ plan.contenido_beneficios|linebreaks }}
-            </div>
-            <div class="d-flex gap-12 flex-wrap">
-                {% if plan.url_boton_secundario %}
-                <a href="{{ plan.url_boton_secundario }}" class="tf-btn btn-outline">
-                    {{ plan.texto_boton_secundario }}
-                </a>
-                {% endif %}
-                {% if plan.url_boton_principal %}
-                <a href="{{ plan.url_boton_principal }}" class="tf-btn btn-fill">
-                    {{ plan.texto_boton_principal }}
-                </a>
-                {% endif %}
-            </div>
+<!-- ── PORTAL CTA ──────────────────────────────────────── -->
+<section class="pn-portal-cta">
+    <div class="container">
+        <h2>Control Total <strong>24/7</strong></h2>
+        <p>Consulta el saldo de tu plan en cualquier momento con tu clave personal exclusiva</p>
+        <div class="pn-btn-group">
+            <a href="{% url 'planes:portal_novios' %}" class="pn-btn-gold">
+                Ingresar al Portal
+            </a>
+            <a href="{% url 'planes:registro_novios' %}" class="pn-btn-outline">
+                Registrar Plan
+            </a>
         </div>
     </div>
+</section>
 
-    <!-- SECCIONES ADICIONALES -->
-    {% for seccion in plan.secciones.all %}
-    <hr class="my-60">
-    <div class="row justify-content-center mb-60">
-        <div class="col-lg-8">
-            <h2 class="mb-24">{{ seccion.titulo }}</h2>
-            <div>{{ seccion.contenido|linebreaks }}</div>
-        </div>
-    </div>
-    {% endfor %}
-
-</div>
 
 {% endblock %}

@@ -90,8 +90,8 @@ class ProductoAdmin(admin.ModelAdmin):
 # =====================
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'padre', 'coleccion', 'posicion', 'activo']
-    list_filter = ['activo', 'coleccion', 'padre']
+    list_display = ['nombre', 'padre', 'posicion', 'activo']
+    list_filter = ['activo', 'padre']
     search_fields = ['nombre', 'descripcion']
     prepopulated_fields = {'slug': ('nombre',)}
     fieldsets = (
@@ -99,7 +99,7 @@ class CategoriaAdmin(admin.ModelAdmin):
             'fields': ('nombre', 'slug', 'descripcion')
         }),
         ('Jerarquía', {
-            'fields': ('padre', 'coleccion')
+            'fields': ('padre',)
         }),
         ('Imagen y Orden', {
             'fields': ('imagen', 'posicion')

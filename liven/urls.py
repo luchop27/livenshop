@@ -30,12 +30,12 @@ urlpatterns = [
     path('cerrar-sesion/', usuarios_views.logout_usuario, name='logout'),
     path('registro/', usuarios_views.registrar_usuario, name='register'),
     path('my-account/', usuarios_views.my_account, name='my-account'),
-    path('wishlist/', TemplateView.as_view(template_name='my-account-wishlist.html'), name='wishlist'),
+    path('wishlist/', usuarios_views.my_account_wishlist, name='wishlist'),
     path('my-account/orders/', usuarios_views.my_account_orders, name='my-account-orders'),
-    path('my-account/orders/<int:order_id>/', TemplateView.as_view(template_name='my-account-orders-details.html'), name='my-account-orders-details'),
+    path('my-account/orders/<int:pedido_id>/', usuarios_views.my_account_orders_details, name='my-account-orders-details'),
     path('my-account/edit/', usuarios_views.my_account_edit, name='my-account-edit'),
     path('my-account/address/', usuarios_views.my_account_address, name='my-account-address'),
-    path('my-account/wishlist/', TemplateView.as_view(template_name='my-account-wishlist.html'), name='my-account-wishlist'),
+    path('my-account/wishlist/', usuarios_views.my_account_wishlist, name='my-account-wishlist'),
 ]
 
 if settings.DEBUG:

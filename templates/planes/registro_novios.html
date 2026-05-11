@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registro Plan de Novios — Liven{% endblock %}
+
+{% block content %}
+
+<style>
+.reg-page { background: #fafaf9; padding: 100px 24px; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.reg-container {
+    max-width: 800px;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #000;
+    padding: 60px 50px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.05);
+}
+.reg-header { text-align: center; margin-bottom: 40px; }
+.reg-header h1 {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 300;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #000;
+    margin-bottom: 15px;
+}
+.reg-header h1 strong { font-weight: 700; color: #c9a96e; }
+.reg-header p { color: #666; font-size: 15px; }
+
+.reg-form label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: #000;
+}
+.reg-form input, .reg-form textarea, .reg-form select {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 14px;
+    transition: border-color .3s;
+    background: #fcfcfc;
+}
+.reg-form input:focus, .reg-form textarea:focus { border-color: #000; background: #fff; }
+
+.reg-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 18px 50px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .3s;
+    width: 100%;
+    margin-top: 20px;
+}
+.reg-btn:hover { background: #c9a96e; transform: translateY(-2px); }
+
+.reg-back {
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    font-size: 12px;
+    color: #999;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+}
+.reg-back:hover { color: #000; }
+
+.alert {
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 0;
+    text-align: center;
+    font-size: 14px;
+}
+.alert-success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+</style>
+
+<div class="reg-page">
+    <div class="reg-container">
+        
+        <div class="reg-header">
+            <h1>Registro <strong>Plan de Novios</strong></h1>
+            <p>Comienza hoy a diseñar el hogar que siempre soñaron.</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% if 'success' in messages.0.tags %}
+                <div class="text-center">
+                    <a href="{% url 'planes:plan_novios' %}" class="reg-btn" style="text-decoration:none; display:inline-block; width:auto;">Volver al inicio</a>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if not messages or 'error' in messages.0.tags %}
+        <form method="post" class="reg-form">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <label>Nombres de los Novios *</label>
+                    <input type="text" name="nombres_novios" required placeholder="Ej: Maria y Juan">
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label>Email de contacto *</label>
+                    <input type="email" name="email" required placeholder="tu@email.com">
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label>Teléfono / WhatsApp *</label>
+                    <input type="text" name="telefono" required placeholder="0999999999">
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label>Fecha tentativa de boda *</label>
+                    <input type="date" name="fecha_boda" required>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label>Ciudad</label>
+                    <input type="text" name="ciudad" placeholder="Ej: Machala">
+                </div>
+                <div class="col-md-12 mb-4">
+                    <label>¿Cómo podemos ayudarles?</label>
+                    <textarea name="mensaje" rows="4" placeholder="Algún detalle adicional que debamos saber..."></textarea>
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="reg-btn">Enviar Solicitud</button>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+
+        <a href="{% url 'planes:plan_novios' %}" class="reg-back">← Volver al Plan de Novios</a>
+    </div>
+</div>
+
+{% endblock %}

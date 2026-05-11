@@ -34,6 +34,12 @@
                 </ul>
             </div>
 
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+
             {% if categoria_padre %}
             <div class="mb-20">
                 <a href="{% url 'productos:panel_admin_categories' %}" class="tf-button style-2">
@@ -65,12 +71,12 @@
                 <div class="wg-table table-all-category">
                     <ul class="table-title flex gap20 mb-14">
                         <li><div class="body-title">Categoria</div></li>
-                        <li><div class="body-title">Coleccion</div></li>
                         <li><div class="body-title">Slug</div></li>
                         <li><div class="body-title">Subcategorias</div></li>
                         <li><div class="body-title">Productos</div></li>
                         <li><div class="body-title">Posicion</div></li>
                         <li><div class="body-title">Estado</div></li>
+                        <li><div class="body-title">Acciones</div></li>
                     </ul>
 
                     {% if categorias %}
@@ -81,14 +87,6 @@
                                 <div class="title mb-0">
                                     <strong class="body-text">{{ categoria.nombre }}</strong>
                                 </div>
-                            </div>
-
-                            <div class="body-text text-main-dark mt-4">
-                                {% if categoria.coleccion %}
-                                    {{ categoria.coleccion.nombre }}
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
                             </div>
 
                             <div class="body-text text-main-dark mt-4">
@@ -115,6 +113,31 @@
                                     <span class="block-not-available bg-1 fw-7">Inactiva</span>
                                 {% endif %}
                             </div>
+
+                            <!-- Acciones: Editar y Eliminar -->
+                            <div class="body-text text-main-dark mt-4">
+                                <div class="flex items-center gap10">
+                                    <!-- Botón Editar -->
+                                    <a href="{% url 'productos:panel_admin_category_edit' categoria.pk %}"
+                                       title="Editar categoría"
+                                       class="cat-action-btn cat-action-edit">
+                                        <i class="icon-edit-3"></i>
+                                    </a>
+
+                                    <!-- Botón Eliminar (mini formulario POST) -->
+                                    <form method="post"
+                                          action="{% url 'productos:panel_admin_category_delete' categoria.pk %}"
+                                          onsubmit="return confirm('¿Eliminar la categoría «{{ categoria.nombre|escapejs }}»? Esta acción desvinculará sus productos y no puede deshacerse.');"
+                                          style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                title="Eliminar categoría"
+                                                class="cat-action-btn cat-action-delete">
+                                            <i class="icon-trash-2"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </li>
                         {% endfor %}
                     </ul>
@@ -136,4 +159,43 @@
         </div>
     </div>
 </div>
+
+<style>
+/* ── Botones de acción en filas de categoría ─────────── */
+.cat-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.18s ease, transform 0.15s ease;
+    text-decoration: none;
+    background: transparent;
+}
+
+.cat-action-edit {
+    color: #4f46e5;
+    background: rgba(79, 70, 229, 0.08);
+}
+.cat-action-edit:hover {
+    background: rgba(79, 70, 229, 0.18);
+    color: #4338ca;
+    transform: scale(1.1);
+}
+
+.cat-action-delete {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.08);
+    padding: 0;
+}
+.cat-action-delete:hover {
+    background: rgba(220, 38, 38, 0.18);
+    color: #b91c1c;
+    transform: scale(1.1);
+}
+</style>
 {% endblock %}

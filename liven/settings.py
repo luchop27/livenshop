@@ -140,5 +140,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'marcojaramillo0142@gmail.com')
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
+
 
 SITE_URL = os.environ.get('SITE_URL', 'http://localhost:8000')

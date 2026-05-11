@@ -119,14 +119,6 @@ class Categoria(models.Model):
         null=True,
         help_text="Imagen representativa de la categoría"
     )
-    coleccion = models.ForeignKey(
-        Coleccion,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='categorias',
-        help_text="Colección a la que pertenece esta categoría (opcional)"
-    )
     padre = models.ForeignKey(
         'self',
         on_delete=models.SET_NULL,

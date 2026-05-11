@@ -430,6 +430,139 @@ def panel_admin_brand_delete(request, brand_id):
     return redirect('productos:panel_admin_brands')
 
 
+# ══════════════════════════════════════════════════════
+# PANEL ADMIN — COLECCIONES
+# ══════════════════════════════════════════════════════
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_collections(request):
+    """
+    Listado de colecciones para el panel administrativo.
+    Incluye búsqueda y conteo de productos asociados.
+    """
+    search = request.GET.get('q', '').strip()
+    colecciones = Coleccion.objects.annotate(
+        num_productos=Count('productos', distinct=True)
+    )
+    if search:
+        colecciones = colecciones.filter(nombre__icontains=search)
+    colecciones = colecciones.order_by('nombre')
+
+    return render(request, 'panel_admin/collection_list.html', {
+        'colecciones': colecciones,
+        'search': search,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_collection_add(request):
+    """
+    Formulario para crear una nueva colección.
+    """
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        slug_manual = request.POST.get('slug', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        activo = request.POST.get('estado', 'True') == 'True'
+        destacada = request.POST.get('destacada') == 'on'
+        imagen = request.FILES.get('imagen') or None
+
+        if not nombre:
+            messages.error(request, 'El nombre de la colección es obligatorio.')
+        elif Coleccion.objects.filter(nombre__iexact=nombre).exists():
+            messages.error(request, f'Ya existe una colección con el nombre "{nombre}".')
+        else:
+            slug = slug_manual if slug_manual else slugify(nombre)
+            base_slug = slug
+            counter = 1
+            while Coleccion.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            Coleccion.objects.create(
+                nombre=nombre,
+                slug=slug,
+                descripcion=descripcion,
+                activo=activo,
+                destacada=destacada,
+                imagen=imagen,
+            )
+            messages.success(request, f'Colección "{nombre}" creada exitosamente.')
+            return redirect('productos:panel_admin_collections')
+
+    return render(request, 'panel_admin/collection_add.html')
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_collection_edit(request, coleccion_id):
+    """
+    Formulario para editar una colección existente.
+    """
+    coleccion = get_object_or_404(Coleccion, pk=coleccion_id)
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        slug_manual = request.POST.get('slug', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        activo = request.POST.get('estado', 'True') == 'True'
+        destacada = request.POST.get('destacada') == 'on'
+        remove_imagen = request.POST.get('remove_imagen')
+        nueva_imagen = request.FILES.get('imagen')
+
+        if not nombre:
+            messages.error(request, 'El nombre de la colección es obligatorio.')
+        elif Coleccion.objects.filter(nombre__iexact=nombre).exclude(pk=coleccion_id).exists():
+            messages.error(request, f'Ya existe otra colección con el nombre "{nombre}".')
+        else:
+            slug = slug_manual if slug_manual else coleccion.slug
+            if slug != coleccion.slug:
+                base_slug = slug
+                counter = 1
+                while Coleccion.objects.filter(slug=slug).exclude(pk=coleccion.pk).exists():
+                    slug = f"{base_slug}-{counter}"
+                    counter += 1
+
+            coleccion.nombre = nombre
+            coleccion.slug = slug
+            coleccion.descripcion = descripcion
+            coleccion.activo = activo
+            coleccion.destacada = destacada
+
+            if remove_imagen:
+                coleccion.imagen = None
+            if nueva_imagen:
+                coleccion.imagen = nueva_imagen
+
+            coleccion.save()
+            messages.success(request, f'Colección "{nombre}" actualizada exitosamente.')
+            return redirect('productos:panel_admin_collections')
+
+    return render(request, 'panel_admin/collection_edit.html', {
+        'coleccion': coleccion,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
+@require_POST
+def panel_admin_collection_delete(request, coleccion_id):
+    """
+    Elimina una colección. Solo acepta POST.
+    Avisa si tiene productos asociados (los desvincula, no los borra).
+    """
+    coleccion = get_object_or_404(Coleccion, pk=coleccion_id)
+    nombre = coleccion.nombre
+    num_productos = coleccion.productos.count()
+    coleccion.delete()
+    if num_productos:
+        messages.warning(
+            request,
+            f'Colección "{nombre}" eliminada. {num_productos} producto(s) quedaron sin colección asignada.'
+        )
+    else:
+        messages.success(request, f'Colección "{nombre}" eliminada correctamente.')
+    return redirect('productos:panel_admin_collections')
+
+
 @staff_member_required(login_url='usuarios:login')
 @require_POST
 def panel_admin_product_delete(request, producto_id):
@@ -457,7 +590,7 @@ def panel_admin_categories(request):
     padre_id = request.GET.get('padre')
     categoria_padre = None
 
-    categorias = Categoria.objects.select_related('coleccion', 'padre').annotate(
+    categorias = Categoria.objects.select_related('padre').annotate(
         num_subcategorias=Count('subcategorias', distinct=True),
         num_productos=Count('productos', distinct=True),
     )
@@ -490,7 +623,6 @@ def panel_admin_category_add(request):
         slug_manual = request.POST.get('slug', '').strip()
         descripcion = request.POST.get('descripcion', '').strip()
         padre_id = request.POST.get('padre') or None
-        coleccion_id = request.POST.get('coleccion') or None
         activo = request.POST.get('estado', 'True') == 'True'
         posicion = request.POST.get('posicion', 0)
 
@@ -511,7 +643,6 @@ def panel_admin_category_add(request):
                 slug=slug,
                 descripcion=descripcion,
                 padre_id=padre_id,
-                coleccion_id=coleccion_id,
                 activo=activo,
                 posicion=posicion,
                 imagen=imagen,
@@ -520,11 +651,9 @@ def panel_admin_category_add(request):
             return redirect('productos:panel_admin_categories')
 
     categorias = Categoria.objects.filter(activo=True, padre__isnull=True).order_by('nombre')
-    colecciones = Coleccion.objects.filter(activo=True).order_by('nombre')
 
     return render(request, 'panel_admin/category_add.html', {
         'categorias': categorias,
-        'colecciones': colecciones,
     })
 
 
@@ -540,7 +669,6 @@ def panel_admin_category_edit(request, categoria_id):
         slug_manual = request.POST.get('slug', '').strip()
         descripcion = request.POST.get('descripcion', '').strip()
         padre_id = request.POST.get('padre') or None
-        coleccion_id = request.POST.get('coleccion') or None
         activo = request.POST.get('estado', 'True') == 'True'
         posicion = request.POST.get('posicion', categoria.posicion)
         remove_imagen = request.POST.get('remove_imagen')
@@ -560,7 +688,6 @@ def panel_admin_category_edit(request, categoria_id):
             categoria.slug = slug
             categoria.descripcion = descripcion
             categoria.padre_id = padre_id
-            categoria.coleccion_id = coleccion_id
             categoria.activo = activo
             categoria.posicion = posicion
 
@@ -578,12 +705,11 @@ def panel_admin_category_edit(request, categoria_id):
     categorias = Categoria.objects.filter(
         activo=True, padre__isnull=True
     ).exclude(pk=categoria_id).order_by('nombre')
-    colecciones = Coleccion.objects.filter(activo=True).order_by('nombre')
 
     return render(request, 'panel_admin/category_edit.html', {
         'categoria': categoria,
         'categorias': categorias,
-        'colecciones': colecciones,
+        # colecciones ya no aplica a Categoria — se asigna en el Producto
     })
 
 

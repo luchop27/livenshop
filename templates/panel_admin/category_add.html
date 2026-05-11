@@ -57,18 +57,7 @@
 
                     <div class="cols-lg gap22 mb-20">
                         <fieldset class="category">
-                            <div class="body-title mb-10">Colección</div>
-                            <div class="select flex-grow">
-                                <select name="coleccion" class="tf-input">
-                                    <option value="">Sin colección</option>
-                                    {% for col in colecciones %}
-                                    <option value="{{ col.id }}">{{ col.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </fieldset>
 
-                        <fieldset class="category">
                             <div class="body-title mb-10">Categoría Padre</div>
                             <div class="select flex-grow">
                                 <select name="padre" class="tf-input">
