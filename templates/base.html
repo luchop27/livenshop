@@ -273,6 +273,9 @@
                                         <a href="{% url 'planes:beneficios' %}" class="menu-link-text link text_black-2">Beneficios para Novios</a>
                                     </li>
                                     <li class="menu-item-2">
+                                        <a href="{% url 'planes:registro_novios' %}" class="menu-link-text link text_black-2">Registrar mi Plan</a>
+                                    </li>
+                                    <li class="menu-item-2">
                                         <a href="{% url 'planes:portal_novios' %}" class="menu-link-text link text_black-2">Portal Novios</a>
                                     </li>
                                     <li style="border-top:1px solid #f0ece6;margin:8px 0 4px;"></li>
@@ -287,6 +290,30 @@
                                     </li>
                                     <li class="menu-item-2">
                                         <a href="{% url 'planes:detalle' 'casa_nueva' %}" class="menu-link-text link text_black-2">Casa Nueva</a>
+                                    </li>
+                                    {% if user.is_staff %}
+                                    <li style="border-top:1px solid #f0ece6;margin:8px 0 4px;"></li>
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:panel_admin_solicitudes' %}" class="menu-link-text link text_black-2" style="color:#c9a96e;">&#9998; Solicitudes Admin</a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </li>
+
+                        <!-- DEJAR REGALOS -->
+                        <li class="menu-item position-relative">
+                            <a href="{% url 'planes:dejar_regalos_matrimonios' %}" class="item-link">Dejar Regalo<i class="icon icon-arrow-down"></i></a>
+                            <div class="sub-menu submenu-default">
+                                <ul class="menu-list">
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:dejar_regalos_matrimonios' %}" class="menu-link-text link text_black-2">💍 Matrimonios</a>
+                                    </li>
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:dejar_regalos_cumpleanos' %}" class="menu-link-text link text_black-2">🎂 Cumpleaños</a>
+                                    </li>
+                                    <li class="menu-item-2">
+                                        <a href="{% url 'planes:dejar_regalos_otros' %}" class="menu-link-text link text_black-2">🎁 Otros Eventos</a>
                                     </li>
                                 </ul>
                             </div>
@@ -560,6 +587,9 @@
                                 <a href="{% url 'planes:plan_novios' %}" class="sub-nav-link force-menu-liven">Plan de Novios</a>
                             </li>
                             <li>
+                                <a href="{% url 'planes:registro_novios' %}" class="sub-nav-link force-menu-liven">Registrar mi Plan</a>
+                            </li>
+                            <li>
                                 <a href="{% url 'planes:beneficios' %}" class="sub-nav-link force-menu-liven">Beneficios para Novios</a>
                             </li>
                             <li>
@@ -577,6 +607,22 @@
                             <li>
                                 <a href="{% url 'planes:detalle' 'casa_nueva' %}" class="sub-nav-link force-menu-liven">Casa Nueva</a>
                             </li>
+                            {% if user.is_staff %}
+                            <li>
+                                <a href="{% url 'planes:panel_admin_solicitudes' %}" class="sub-nav-link force-menu-liven" style="color:#c9a96e;">&#9998; Solicitudes Admin</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </li>
+                <!-- DEJAR REGALOS mobile -->
+                <li class="nav-mb-item">
+                    <a href="{% url 'planes:dejar_regalos_matrimonios' %}" class="mb-menu-link">Dejar Regalos</a>
+                    <div class="sub-nav-mb">
+                        <ul class="sub-nav-list">
+                            <li><a href="{% url 'planes:dejar_regalos_matrimonios' %}" class="sub-nav-link force-menu-liven">💍 Matrimonios</a></li>
+                            <li><a href="{% url 'planes:dejar_regalos_cumpleanos' %}" class="sub-nav-link force-menu-liven">🎂 Cumpleaños</a></li>
+                            <li><a href="{% url 'planes:dejar_regalos_otros' %}" class="sub-nav-link force-menu-liven">🎁 Otros Eventos</a></li>
                         </ul>
                     </div>
                 </li>

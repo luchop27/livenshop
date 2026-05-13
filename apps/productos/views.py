@@ -14,6 +14,7 @@ from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 
 from .models import Marca, Producto, Categoria, Coleccion, CarritoItem, Imagen, AtributoProducto, ShopGramPost, Pedido, PedidoItem
+from decimal import Decimal
 
 
 def _active_marcas():
@@ -41,15 +42,19 @@ def home(request):
     
     # Colecciones destacadas para el slider
     colecciones = Coleccion.objects.filter(activo=True, destacada=True)
+    marcas_slider = Marca.objects.filter(activo=True, mostrar_en_slider=True)
     shop_gram_posts = ShopGramPost.objects.filter(activo=True)[:10]
     marcas = Marca.objects.filter(activo=True).order_by('nombre')
+    
     return render(request, 'home.html', {
         'productos': productos,
         'categorias': categorias,
         'colecciones': colecciones,
-        'shop_gram_posts': shop_gram_posts,\
+        'marcas_slider': marcas_slider,
+        'shop_gram_posts': shop_gram_posts,
         'marcas': marcas,
     })
+
 def productos_por_marca(request, slug):
     if slug == 'todos':
         productos = Producto.objects.filter(activo=True).prefetch_related('imagenes').select_related('marca')
@@ -354,6 +359,9 @@ def panel_admin_brand_add(request):
         descripcion = request.POST.get('descripcion', '').strip()
         activo = request.POST.get('estado', 'True') == 'True'
         imagen = request.FILES.get('imagen') or None
+        mostrar_en_slider = request.POST.get('mostrar_en_slider') == 'on'
+        imagen_slider = request.FILES.get('imagen_slider') or None
+
 
         if not nombre:
             messages.error(request, 'El nombre de la marca es obligatorio.')
@@ -371,7 +379,10 @@ def panel_admin_brand_add(request):
                 descripcion=descripcion,
                 activo=activo,
                 imagen=imagen,
+                mostrar_en_slider=mostrar_en_slider,
+                imagen_slider=imagen_slider,
             )
+
             messages.success(request, f'Marca "{nombre}" creada exitosamente.')
             return redirect('productos:panel_admin_brands')
 
@@ -389,6 +400,10 @@ def panel_admin_brand_edit(request, brand_id):
         activo = request.POST.get('estado', 'True') == 'True'
         remove_imagen = request.POST.get('remove_imagen')
         nueva_imagen = request.FILES.get('imagen')
+        mostrar_en_slider = request.POST.get('mostrar_en_slider') == 'on'
+        remove_imagen_slider = request.POST.get('remove_imagen_slider')
+        nueva_imagen_slider = request.FILES.get('imagen_slider')
+
 
         if not nombre:
             messages.error(request, 'El nombre de la marca es obligatorio.')
@@ -405,13 +420,20 @@ def panel_admin_brand_edit(request, brand_id):
             marca.slug = slug
             marca.descripcion = descripcion
             marca.activo = activo
+            marca.mostrar_en_slider = mostrar_en_slider
 
             if remove_imagen:
                 marca.imagen = None
             if nueva_imagen:
                 marca.imagen = nueva_imagen
+            
+            if remove_imagen_slider:
+                marca.imagen_slider = None
+            if nueva_imagen_slider:
+                marca.imagen_slider = nueva_imagen_slider
 
             marca.save()
+
             messages.success(request, f'Marca "{nombre}" actualizada exitosamente.')
             return redirect('productos:panel_admin_brands')
 
@@ -968,6 +990,49 @@ def cart_add(request):
         return JsonResponse({'success': False, 'message': str(e)})
 
 @require_POST
+def cart_add_gift(request):
+    """
+    Añade un aporte (regalo) de Plan de Novios al carrito (AJAX).
+    """
+    cart = Cart(request)
+    plan_id = request.POST.get('plan_id')
+    nombres_novios = request.POST.get('nombres_novios')
+    nombre_invitado = request.POST.get('nombre_invitado')
+    mensaje = request.POST.get('mensaje', '')
+    monto = request.POST.get('monto')
+    quantity = int(request.POST.get('quantity', 1))
+    
+    # Parámetros opcionales si es un producto físico
+    producto_id = request.POST.get('producto_id')
+    nombre_producto = request.POST.get('nombre_producto')
+    imagen_url = request.POST.get('imagen_url')
+    
+    if not all([plan_id, nombres_novios, nombre_invitado, monto]):
+        return JsonResponse({'success': False, 'message': 'Faltan datos obligatorios para el regalo.'})
+        
+    try:
+        cart.add_gift(
+            plan_id=plan_id,
+            nombres_novios=nombres_novios,
+            nombre_invitado=nombre_invitado,
+            mensaje=mensaje,
+            monto=monto,
+            quantity=quantity,
+            producto_id=producto_id,
+            nombre_producto=nombre_producto,
+            imagen_url=imagen_url
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Regalo añadido al carrito correctamente.',
+            'cart_count': len(cart),
+            'cart_total': str(cart.get_total_price())
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+@require_POST
 def cart_update(request):
     """
     Actualiza la cantidad de un producto (AJAX).
@@ -1116,6 +1181,15 @@ def checkout_process(request):
     notas = request.POST.get('order_note', '')
     metodo_pago = request.POST.get('payment_method', 'bank_transfer')
 
+    # Recopilar notas de regalos
+    notas_regalos = ""
+    for item in cart:
+        if item.get('is_gift'):
+            notas_regalos += f"Regalo: {item['nombre']} | De: {item.get('nombre_invitado', '')} | Mensaje: {item.get('mensaje', '')}\n"
+            
+    if notas_regalos:
+        notas = notas_regalos + ("\nNotas adicionales: " + notas if notas else "")
+
     # Crear el Pedido
     pedido = Pedido.objects.create(
         usuario=request.user if request.user.is_authenticated else None,
@@ -1134,20 +1208,64 @@ def checkout_process(request):
         metodo_pago=metodo_pago
     )
 
-    # Crear los PedidoItem
+    # Crear los PedidoItem y registrar Movimientos
+    has_gifts = False
+    from apps.planes.models import SolicitudPlanNovios, MovimientoPlan
+    
     for item in cart:
-        producto_obj = item['producto']
-        PedidoItem.objects.create(
-            pedido=pedido,
-            producto=producto_obj,
-            nombre_producto=producto_obj.nombre,
-            precio=item['precio'],
-            cantidad=item['quantity']
-        )
-        # Opcional: reducir stock aquí o cuando el pedido sea pagado
-        if producto_obj.stock >= item['quantity']:
-            producto_obj.stock -= item['quantity']
-            producto_obj.save()
+        if item.get('is_gift'):
+            has_gifts = True
+            PedidoItem.objects.create(
+                pedido=pedido,
+                producto=None,
+                nombre_producto=item['nombre'],
+                precio=item['precio'],
+                cantidad=item['quantity']
+            )
+            
+            # Sumar al plan de novios y crear movimiento
+            plan_id = item.get('plan_id')
+            monto_total_regalo = Decimal(item['precio']) * int(item['quantity'])
+            
+            try:
+                if plan_id:
+                    plan = SolicitudPlanNovios.objects.get(id=plan_id)
+                    
+                    # 1. Crear el registro en el historial de movimientos
+                    MovimientoPlan.objects.create(
+                        plan=plan,
+                        tipo='aporte',
+                        monto=monto_total_regalo,
+                        descripcion=f"Aporte de Invitado: {item.get('nombre_invitado', 'Anónimo')} | Pedido #{pedido.id}"
+                    )
+                    
+                    # 2. Actualizar el saldo acumulado general del plan
+                    plan.saldo_acumulado += monto_total_regalo
+                    plan.save(update_fields=['saldo_acumulado'])
+            except Exception as e:
+                print(f"Error actualizando plan de novios: {e}")
+                
+        else:
+            producto_obj = item['producto']
+            PedidoItem.objects.create(
+                pedido=pedido,
+                producto=producto_obj,
+                nombre_producto=producto_obj.nombre if producto_obj else item.get('nombre', 'Producto'),
+                precio=item['precio'],
+                cantidad=item['quantity']
+            )
+            # Opcional: reducir stock aquí o cuando el pedido sea pagado
+            if producto_obj and hasattr(producto_obj, 'stock') and producto_obj.stock and producto_obj.stock >= item['quantity']:
+                producto_obj.stock -= item['quantity']
+                producto_obj.save()
+    
+    # ── Enviar Notificación WhatsApp al Administrador si hay regalos ──
+    if has_gifts:
+        try:
+            from .whatsapp_utils import enviar_mensaje_admin_nuevo_regalo
+            enviar_mensaje_admin_nuevo_regalo(pedido)
+        except Exception as e:
+            print(f"Error enviando WhatsApp al admin: {e}")
     
     # Limpiar el carrito después de la compra
     cart.clear()

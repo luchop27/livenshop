@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Dejar Regalos · Cumpleaños — Liven{% endblock %}
+{% block content %}
+<style>
+    .dr-tabs { display:flex;gap:0;border-bottom:2px solid #ede9e2;background:#fff;padding:0 24px;justify-content:center; }
+    .dr-tab { padding:16px 28px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#888;text-decoration:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s; }
+    .dr-tab:hover { color:#1a1a1a; }
+    .dr-tab.active { color:#c9a96e;border-bottom-color:#c9a96e; }
+</style>
+<div class="dr-tabs" style="padding-top:60px;">
+    <a href="{% url 'planes:dejar_regalos_matrimonios' %}" class="dr-tab">💍 Matrimonios</a>
+    <a href="{% url 'planes:dejar_regalos_cumpleanos' %}" class="dr-tab active">🎂 Cumpleaños</a>
+    <a href="{% url 'planes:dejar_regalos_otros' %}" class="dr-tab">🎁 Otros Eventos</a>
+</div>
+<div style="text-align:center;padding:100px 24px;">
+    <div style="font-size:56px;margin-bottom:20px;">🎂</div>
+    <h2 style="font-size:2rem;font-weight:300;color:#1a1a1a;margin-bottom:12px;">Cumpleaños <strong>próximamente</strong></h2>
+    <p style="color:#888;max-width:480px;margin:0 auto 32px;">Estamos trabajando en esta sección. Muy pronto podrás registrar y celebrar cumpleaños especiales.</p>
+    <a href="{% url 'planes:plan_novios' %}" style="display:inline-block;padding:14px 36px;background:#c9a96e;color:#fff;border-radius:50px;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;">Ver Plan de Novios</a>
+</div>
+{% endblock %}

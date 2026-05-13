@@ -26,16 +26,20 @@ class AtributoProductoInline(admin.TabularInline):
 # =====================
 @admin.register(Marca)
 class MarcaAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'activo', 'created_at']
-    list_filter = ['activo', 'created_at']
+    list_display = ['nombre', 'mostrar_en_slider', 'activo', 'created_at']
+    list_filter = ['activo', 'mostrar_en_slider', 'created_at']
     search_fields = ['nombre', 'descripcion']
     prepopulated_fields = {'slug': ('nombre',)}
     fieldsets = (
         ('Información Básica', {
             'fields': ('nombre', 'slug', 'descripcion')
         }),
-        ('Imagen', {
+        ('Imagen Principal', {
             'fields': ('imagen',)
+        }),
+        ('Configuración Home Slider', {
+            'fields': ('mostrar_en_slider', 'imagen_slider'),
+            'description': 'Si marcas esta opción, la marca aparecerá en el slider principal de la página de inicio.'
         }),
         ('Estado', {
             'fields': ('activo',)
@@ -46,6 +50,9 @@ class MarcaAdmin(admin.ModelAdmin):
         }),
     )
     readonly_fields = ['created_at', 'updated_at']
+
+    class Media:
+        js = ('admin/js/brand_slider_toggle.js',)
 
 
 # =====================

@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    body { background-color: #fafaf9; }
+    
+    .gift-page-wrapper {
+        max-width: 1200px; margin: 60px auto;
+        display: grid; grid-template-columns: 1fr 1fr;
+        background: #fff; border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    /* Izquierda: Tarjeta Fija */
+    .gift-card-col {
+        background: #1a2744; /* Azul Liven */
+        display: flex; align-items: center; justify-content: center;
+        padding: 40px; position: relative;
+    }
+    
+    .card-container {
+        position: relative;
+        width: 100%; max-width: 450px;
+        aspect-ratio: 4 / 5; /* Asegura proporción de la tarjeta aprox, ajustable por la img */
+        display: flex; align-items: center; justify-content: center;
+    }
+    
+    .card-image {
+        width: 100%; height: auto;
+        object-fit: contain;
+        display: block;
+    }
+    
+    .card-names-overlay {
+        position: absolute;
+        top: 55%; left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: 'Great Vibes', cursive;
+        font-size: clamp(36px, 5vw, 55px);
+        color: #ffffff; /* Letras blancas para contrastar con el fondo azul */
+        text-align: center; line-height: 1.1;
+        width: 80%;
+    }
+
+    /* Derecha: Formulario */
+    .gift-form-col {
+        padding: 60px 40px;
+        display: flex; flex-direction: column;
+    }
+    
+    .gift-form-title {
+        font-size: 28px; color: #1a2744; margin-bottom: 8px; font-weight: 300;
+    }
+    .gift-form-desc {
+        color: #666; font-size: 15px; margin-bottom: 40px;
+    }
+    
+    /* Productos */
+    .gift-products-wrapper { margin-bottom: 40px; }
+    .gift-products-title {
+        font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;
+        color: #888; margin-bottom: 15px;
+    }
+    .gift-product-list {
+        display: flex; flex-direction: column; gap: 12px;
+    }
+    .gift-product-item {
+        display: flex; align-items: center; gap: 12px;
+        background: #fff; border: 1px solid #eee; padding: 12px;
+        border-radius: 12px; text-align: left; text-decoration: none;
+        transition: all 0.2s; color: inherit; cursor: pointer;
+    }
+    .gift-product-item:hover {
+        border-color: #c9a96e; box-shadow: 0 4px 15px rgba(201,169,110,0.1);
+    }
+    .gift-product-img {
+        width: 60px; height: 60px; object-fit: cover; border-radius: 8px;
+    }
+    .gift-product-info { flex: 1; }
+    .gift-product-name { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+    .gift-product-price { font-size: 14px; color: #c9a96e; font-weight: 700; }
+    
+    /* Aporte Efectivo */
+    .g-form-group { margin-bottom: 24px; }
+    .g-form-label {
+        display: block; font-size: 12px; font-weight: 700; color: #1a2744;
+        text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+    }
+    .g-form-input {
+        width: 100%; border: 1px solid #ddd; padding: 14px 16px;
+        border-radius: 8px; font-size: 15px; background: #fafaf9;
+        transition: all 0.2s;
+    }
+    .g-form-input:focus { border-color: #1a2744; outline: none; background: #fff; }
+    
+    .g-monto-wrap { position: relative; }
+    .g-monto-wrap::before {
+        content: '$'; position: absolute; left: 16px; top: 50%;
+        transform: translateY(-50%); color: #666; font-weight: 600; font-size: 16px;
+    }
+    .g-monto-wrap .g-form-input { padding-left: 32px; font-weight: 600; font-size: 18px; }
+
+    .g-qty-wrap {
+        display: inline-flex; border: 1px solid #ddd;
+        border-radius: 8px; overflow: hidden; height: 50px;
+    }
+    .g-qty-btn {
+        width: 50px; background: #f5f5f5; border: none; font-size: 18px;
+        cursor: pointer; transition: background 0.2s; color: #666;
+    }
+    .g-qty-btn:hover { background: #e5e5e5; }
+    .g-qty-input {
+        width: 60px; text-align: center; border: none; font-weight: 600;
+        font-size: 16px; -moz-appearance: textfield;
+    }
+    
+    .g-total-row {
+        margin-top: 20px; padding-top: 30px; border-top: 1px solid #eee;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .g-total-label { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 0.05em; }
+    .g-total-val { font-size: 32px; font-weight: 300; color: #1a2744; }
+    
+    .g-submit-btn {
+        width: 100%; background: #1a2744; color: #fff; border: none;
+        padding: 18px; border-radius: 8px; font-size: 15px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer;
+        transition: all 0.3s; margin-top: 24px;
+    }
+    .g-submit-btn:hover { background: #c9a96e; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(201,169,110,0.3); }
+
+    .back-link {
+        display: inline-block; margin-bottom: 20px;
+        color: #888; font-size: 14px; text-decoration: none;
+    }
+    .back-link:hover { color: #1a2744; }
+
+    @media (max-width: 768px) {
+        .gift-page-wrapper { grid-template-columns: 1fr; margin: 20px; }
+        .gift-form-col { padding: 30px 20px; }
+        .gift-card-col { padding: 20px; }
+    }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+<div class="container">
+    <div class="gift-page-wrapper">
+        <!-- Columna Izquierda: Tarjeta -->
+        <div class="gift-card-col">
+            <div class="card-container">
+                <img src="/media/tarjeta/tarjetaplannovios.png" alt="Tarjeta Plan Novios" class="card-image">
+                <div class="card-names-overlay" id="cardNamesOverlay">
+                    <!-- Nombres generados por JS -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Columna Derecha: Formulario y Productos -->
+        <div class="gift-form-col">
+            <a href="{% url 'planes:dejar_regalos_matrimonios' %}" class="back-link">← Volver a matrimonios</a>
+            
+            <h1 class="gift-form-title" style="font-family: 'Jost', sans-serif;">Matrimonio {{ s.nombres_novios }}</h1>
+            <p class="gift-form-desc" style="font-size: 16px;">
+                Acompaña a la pareja en este momento tan especial. Puedes elegir uno de los productos de su lista o realizar un aporte económico directo para ayudarles a construir su nuevo hogar.
+            </p>
+            
+            {% if s.productos_regalo.exists %}
+            <div class="gift-products-wrapper">
+                <div class="gift-products-title">Su Lista de Productos Físicos</div>
+                <div class="gift-product-list">
+                    {% for prod in s.productos_regalo.all %}
+                        <div class="gift-product-item" style="cursor:pointer;" onclick="selectPhysicalGift('{{ prod.id }}', '{{ prod.nombre|escapejs }}', '{{ prod.precio_final }}', '{% if prod.imagenes.first %}{{ prod.imagenes.first.src }}{% endif %}')">
+                            {% if prod.imagenes.first %}
+                                <img src="{{ prod.imagenes.first.src }}" class="gift-product-img" alt="{{ prod.nombre }}">
+                            {% else %}
+                                <img src="{% static 'images/products/placeholder.jpg' %}" class="gift-product-img" alt="{{ prod.nombre }}">
+                            {% endif %}
+                            <div class="gift-product-info">
+                                <div class="gift-product-name">{{ prod.nombre|truncatechars:40 }}</div>
+                                <div class="gift-product-price">${{ prod.precio_final }}</div>
+                            </div>
+                            <div class="gift-product-add" style="width:32px;height:32px;background:#f5f5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;">
+                                +
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <form id="giftFormDetail">
+                {% csrf_token %}
+                <input type="hidden" name="plan_id" value="{{ s.id }}">
+                <input type="hidden" name="nombres_novios" value="{{ s.nombres_novios|escape }}">
+                
+                <input type="hidden" name="producto_id" id="hiddenProductId" value="">
+                <input type="hidden" name="nombre_producto" id="hiddenProductName" value="">
+                <input type="hidden" name="imagen_url" id="hiddenProductImage" value="">
+                
+                <div class="gift-products-title" style="margin-top:20px;" id="giftSectionTitle">
+                    Aporte en Efectivo 
+                    <a href="javascript:void(0)" id="resetPhysicalGift" style="display:none; font-size:12px; color:#c9a96e; text-transform:none; margin-left:10px;">(Volver a Aporte Libre)</a>
+                </div>
+                
+                <div class="g-form-group">
+                    <label class="g-form-label">Tu Nombre (Invitado) *</label>
+                    <input type="text" class="g-form-input" name="nombre_invitado" required placeholder="Ej: Familia Pérez">
+                </div>
+                
+                <div class="g-form-group">
+                    <label class="g-form-label">Mensaje para los novios</label>
+                    <textarea class="g-form-input" name="mensaje" rows="3" placeholder="Escribe tus mejores deseos..."></textarea>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr auto; gap: 20px;">
+                    <div class="g-form-group">
+                        <label class="g-form-label">Monto del Regalo *</label>
+                        <div class="g-monto-wrap">
+                            <input type="number" class="g-form-input" id="detailGiftAmount" name="monto" min="1" step="1" value="50" required>
+                        </div>
+                    </div>
+                    
+                    <div class="g-form-group">
+                        <label class="g-form-label">Cant.</label>
+                        <div class="g-qty-wrap">
+                            <button type="button" class="g-qty-btn" id="detailGiftMinus">-</button>
+                            <input type="number" class="g-qty-input" id="detailGiftQty" name="quantity" value="1" min="1" readonly>
+                            <button type="button" class="g-qty-btn" id="detailGiftPlus">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="g-total-row">
+                    <div class="g-total-label">Subtotal:</div>
+                    <div class="g-total-val" id="detailGiftTotalVal">$50.00</div>
+                </div>
+                
+                <button type="submit" class="g-submit-btn" id="detailGiftSubmit">
+                    Añadir al Carrito
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Generar nombres centrados
+    const rawNames = "{{ s.nombres_novios|escapejs }}";
+    const formattedNames = rawNames.replace(/ y /gi, '<br><span style="font-size:0.6em;color:#c9a96e;">&</span><br>');
+    document.getElementById('cardNamesOverlay').innerHTML = formattedNames;
+    
+    // Funciones para seleccionar producto físico
+    window.selectPhysicalGift = function(id, name, price, imageUrl) {
+        document.getElementById('hiddenProductId').value = id;
+        document.getElementById('hiddenProductName').value = name;
+        document.getElementById('hiddenProductImage').value = imageUrl;
+        
+        // Cambiar títulos y habilitar reseteo
+        document.getElementById('giftSectionTitle').innerHTML = 'Regalar: ' + name + ' <a href="javascript:void(0)" id="resetPhysicalGift" style="font-size:12px; color:#c9a96e; text-transform:none; margin-left:10px;">(Volver a Aporte Libre)</a>';
+        
+        // Asignar eventos de nuevo al enlace de reseteo
+        document.getElementById('resetPhysicalGift').addEventListener('click', resetPhysicalGift);
+        
+        // Cambiar precio e inhabilitarlo
+        const amtInput = document.getElementById('detailGiftAmount');
+        amtInput.value = parseFloat(price.replace(',', '.')).toFixed(2);
+        amtInput.setAttribute('readonly', 'true');
+        amtInput.style.backgroundColor = '#f9f9f9';
+        amtInput.style.color = '#333';
+        
+        // Actualizar subtotal
+        document.getElementById('detailGiftQty').value = 1;
+        updateTotal();
+        
+        // Bajar al formulario
+        document.getElementById('giftFormDetail').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    function resetPhysicalGift() {
+        document.getElementById('hiddenProductId').value = '';
+        document.getElementById('hiddenProductName').value = '';
+        document.getElementById('hiddenProductImage').value = '';
+        
+        document.getElementById('giftSectionTitle').innerHTML = 'Aporte en Efectivo';
+        
+        const amtInput = document.getElementById('detailGiftAmount');
+        amtInput.value = '50';
+        amtInput.removeAttribute('readonly');
+        amtInput.style.backgroundColor = '';
+        amtInput.style.color = '';
+        
+        updateTotal();
+    }
+    
+    // Cálculos
+    const amtInput = document.getElementById('detailGiftAmount');
+    const qtyInput = document.getElementById('detailGiftQty');
+    const totalVal = document.getElementById('detailGiftTotalVal');
+    const btnMinus = document.getElementById('detailGiftMinus');
+    const btnPlus = document.getElementById('detailGiftPlus');
+    const form = document.getElementById('giftFormDetail');
+    const submitBtn = document.getElementById('detailGiftSubmit');
+    
+    function updateTotal() {
+        const amt = parseFloat(amtInput.value) || 0;
+        const qty = parseInt(qtyInput.value) || 1;
+        totalVal.textContent = '$' + (amt * qty).toFixed(2);
+    }
+    
+    amtInput.addEventListener('input', updateTotal);
+    
+    btnMinus.addEventListener('click', () => {
+        let val = parseInt(qtyInput.value);
+        if (val > 1) { qtyInput.value = val - 1; updateTotal(); }
+    });
+    btnPlus.addEventListener('click', () => {
+        let val = parseInt(qtyInput.value);
+        qtyInput.value = val + 1; updateTotal();
+    });
+    
+    // AJAX
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = 'Añadiendo...';
+        submitBtn.disabled = true;
+        
+        const formData = new FormData(form);
+        
+        fetch("{% url 'productos:cart_add_gift' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                const cartCounts = document.querySelectorAll('.count-box');
+                cartCounts.forEach(el => el.textContent = data.cart_count);
+                
+                alert("¡Regalo añadido al carrito!");
+                window.location.href = "{% url 'productos:view_cart' %}";
+            } else {
+                alert("Error: " + data.message);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error de conexión");
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+});
+</script>
+
+{% endblock %}

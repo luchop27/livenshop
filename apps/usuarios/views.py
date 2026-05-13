@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
 from django.http import JsonResponse
-from .models import Usuario, EmailVerificationToken, Provincia, Ciudad, Wishlist, PasswordResetCode
+from .models import Usuario, EmailVerificationToken, Provincia, Ciudad, Wishlist, PasswordResetCode, NotificacionAdmin
 from apps.productos.models import Producto
 import base64
 import os
@@ -1153,3 +1153,63 @@ def panel_admin_user_toggle_status(request, usuario_id):
     accion = 'activado' if usuario.is_active else 'desactivado'
     return JsonResponse({'success': True, 'message': f'Usuario {accion} correctamente.', 'is_active': usuario.is_active})
 
+# ==============================================================================
+# NOTIFICACIONES ADMIN (CAMPANITA)
+# ==============================================================================
+@login_required
+def api_notificaciones_admin(request):
+    """Devuelve las últimas notificaciones no leídas para la campanita del admin"""
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+        
+    notificaciones = NotificacionAdmin.objects.filter(leido=False).order_by('-fecha_creacion')[:10]
+    total_no_leidas = NotificacionAdmin.objects.filter(leido=False).count()
+    
+    html = ""
+    if not notificaciones:
+        html = '<div style="padding: 20px; text-align: center; color: #888; font-size: 13px;">No hay notificaciones nuevas.</div>'
+    else:
+        for notif in notificaciones:
+            from django.urls import reverse
+            url_ir = reverse('usuarios:ir_notificacion_admin', args=[notif.id])
+            
+            # Seleccionar icono según tipo
+            if notif.tipo == 'pedido':
+                icono = '<i class="icon-shopping-cart" style="font-size: 16px;"></i>'
+                icono_bg = '#fef3c7'
+                icono_color = '#d97706'
+            else:
+                icono = '<i class="icon-heart" style="font-size: 16px;"></i>'
+                icono_bg = '#fce7f3'
+                icono_color = '#db2777'
+                
+            fecha_str = notif.fecha_creacion.strftime("%d %b %H:%M")
+            
+            html += f'''
+            <a href="{url_ir}" style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #f0ece6; text-decoration: none; transition: background 0.2s; background: #fff;" onmouseover="this.style.background='#fafaf9'" onmouseout="this.style.background='#fff'">
+                <div style="background: {icono_bg}; color: {icono_color}; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    {icono}
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-size: 13px; color: #1a1a1a; font-weight: 600; line-height: 1.3; margin-bottom: 4px;">{notif.mensaje}</div>
+                    <div style="font-size: 11px; color: #888;">{fecha_str}</div>
+                </div>
+            </a>
+            '''
+            
+    return JsonResponse({
+        'count': total_no_leidas,
+        'html': html
+    })
+
+@login_required
+def ir_notificacion_admin(request, notificacion_id):
+    """Marca la notificación como leída y redirige al destino"""
+    if not request.user.is_staff:
+        return redirect('home')
+        
+    notif = get_object_or_404(NotificacionAdmin, id=notificacion_id)
+    notif.leido = True
+    notif.save()
+    
+    return redirect(notif.url)

@@ -61,6 +61,43 @@ def generar_mensaje_factura_cliente(pedido, request=None):
 
     return mensaje
 
+def enviar_mensaje_admin_nuevo_regalo(pedido):
+    """
+    Simula el envío o la preparación de la notificación al administrador (0989387657) 
+    sobre un nuevo aporte para el Plan de Novios.
+    Dado que el envío automático requiere una API externa (Twilio, Cloud API),
+    aquí registramos el mensaje y lo guardamos en los logs como constancia.
+    """
+    mensaje = (
+        f"🎉 *NUEVO APORTE DE PLAN DE NOVIOS*\n"
+        f"------------------------------------\n\n"
+        f"*Pedido:* #{pedido.id}\n"
+        f"*Comprador:* {pedido.nombres} {pedido.apellidos}\n"
+        f"*Teléfono:* {pedido.telefono}\n\n"
+        f"*Detalles del Aporte:*\n"
+    )
+    
+    total_aporte = 0
+    for item in pedido.items.all():
+        if "Regalo" in item.nombre_producto or not item.producto:
+            mensaje += f"  - {item.cantidad}x {item.nombre_producto} : ${item.precio:.2f}\n"
+            total_aporte += (item.precio * item.cantidad)
+            
+    mensaje += f"\n*TOTAL APORTADO:* ${total_aporte:.2f}\n"
+    
+    if pedido.notas:
+        mensaje += f"\n*Mensajes / Notas del Invitado:*\n{pedido.notas}\n"
+        
+    # Log para el backend
+    logger.info(f"\n======================================\n"
+                f"WHATSAPP AUTOMÁTICO A ADMIN (0989387657):\n"
+                f"{mensaje}"
+                f"\n======================================")
+    
+    # Aquí iría la integración con la API de WhatsApp, por ejemplo:
+    # twilio_client.messages.create(body=mensaje, from_='whatsapp:+... ', to='whatsapp:+593989387657')
+    return True
+
 def generar_link_whatsapp_web(numero_destino, mensaje_preview=''):
     """
     Genera un enlace para abrir WhatsApp Web o App con un mensaje predeterminado.

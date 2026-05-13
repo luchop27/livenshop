@@ -313,8 +313,10 @@
                                         {% for item in cart %}
                                         <div class="tf-mini-cart-item tf-cart-item" data-product-id="{{ item.producto_id }}" data-stock="{{ item.producto.stock|default:0 }}">
                                             <div class="tf-mini-cart-image">
-                                                <a href="{{ item.producto.get_absolute_url }}">
-                                                    {% if item.imagen %}
+                                                <a href="{% if item.producto %}{{ item.producto.get_absolute_url }}{% else %}javascript:void(0){% endif %}">
+                                                    {% if item.is_gift %}
+                                                        <img src="/media/tarjeta/tarjetaplannovios.png" alt="Tarjeta Plan Novios">
+                                                    {% elif item.imagen %}
                                                         <img src="{{ item.imagen }}" alt="{{ item.nombre }}">
                                                     {% else %}
                                                         <img src="{% static 'images/products/placeholder.jpg' %}" alt="{{ item.nombre }}">
@@ -322,7 +324,7 @@
                                                 </a>
                                             </div>
                                             <div class="tf-mini-cart-info">
-                                                <a class="title link" href="{{ item.producto.get_absolute_url }}">{{ item.nombre }}</a>
+                                                <a class="title link" href="{% if item.producto %}{{ item.producto.get_absolute_url }}{% else %}javascript:void(0){% endif %}">{{ item.nombre }}</a>
                                                 <div class="price fw-6">${{ item.precio }}</div>
                                                 <div class="tf-mini-cart-btns">
                                                     <div class="wg-quantity small">

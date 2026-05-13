@@ -56,6 +56,27 @@
                     </fieldset>
 
                     <fieldset class="mb-20">
+                        <div class="body-title mb-10">Configuración Home Slider</div>
+                        <div class="flex items-center gap10">
+                            <input type="checkbox" name="mostrar_en_slider" id="id_mostrar_en_slider" style="width: 20px; height: 20px;">
+                            <label for="id_mostrar_en_slider" class="body-title-2">¿Mostrar esta marca en el slider principal?</label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="name mb-20" id="fieldset_imagen_slider" style="display: none;">
+                        <div class="body-title mb-10">Imagen para el Slider</div>
+                        <div class="up-load" id="upload-area-slider" style="min-height:140px;border:2px dashed #ddd;border-radius:8px;padding:16px;text-align:center;">
+                            <label for="sliderImagen" style="cursor:pointer;display:block;">
+                                <i class="icon-upload-cloud" style="font-size:1.8rem;"></i>
+                                <div class="text-tiny mt-6">Haz clic o arrastra la imagen del slider aquí</div>
+                                <input type="file" id="sliderImagen" name="imagen_slider" accept="image/*" style="display:none;">
+                            </label>
+                        </div>
+                        <div id="imagen-preview-slider" style="display:none;margin-top:12px;"></div>
+                        <small class="text-muted">Imagen horizontal optimizada para el banner de inicio.</small>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
                         <div class="body-title mb-10">Estado</div>
                         <div class="radio-buttons">
                             <div class="item">
@@ -92,33 +113,54 @@ nombreInput.addEventListener('input', function() {
 });
 slugInput.addEventListener('input', function() { this.dataset.manuallyEdited = 'true'; });
 
+// Toggle Slider Image Field
+const mostrarEnSlider = document.getElementById('id_mostrar_en_slider');
+const fieldsetSlider = document.getElementById('fieldset_imagen_slider');
+mostrarEnSlider.addEventListener('change', function() {
+    fieldsetSlider.style.display = this.checked ? 'block' : 'none';
+});
+
 const marcaImageInput = document.getElementById('marcaImagen');
 const marcaImagePreview = document.getElementById('imagen-preview-marca');
 const uploadAreaMarca = document.getElementById('upload-area-marca');
 
+const sliderImageInput = document.getElementById('sliderImagen');
+const sliderImagePreview = document.getElementById('imagen-preview-slider');
+const uploadAreaSlider = document.getElementById('upload-area-slider');
+
 marcaImageInput.addEventListener('change', function(e) {
-    if (e.target.files && e.target.files[0]) handleMarcaImage(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) handlePreview(e.target.files[0], uploadAreaMarca, marcaImagePreview, 'removeMarcaImage');
 });
 
-function handleMarcaImage(file) {
+sliderImageInput.addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) handlePreview(e.target.files[0], uploadAreaSlider, sliderImagePreview, 'removeSliderImage');
+});
+
+function handlePreview(file, area, preview, removeFnName) {
     const reader = new FileReader();
     reader.onload = function(e) {
-        uploadAreaMarca.style.display = 'none';
-        marcaImagePreview.style.display = 'block';
-        marcaImagePreview.innerHTML = `
-            <div style="position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;max-width:250px;">
+        area.style.display = 'none';
+        preview.style.display = 'block';
+        preview.innerHTML = `
+            <div style="position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;max-width:350px;">
                 <img src="${e.target.result}" style="width:100%;height:auto;display:block;">
-                <button type="button" onclick="removeMarcaImage()"
+                <button type="button" onclick="${removeFnName}()"
                     style="position:absolute;top:8px;right:8px;background:rgba(220,53,69,.9);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
             </div>`;
     };
     reader.readAsDataURL(file);
 }
+
 function removeMarcaImage() {
     marcaImageInput.value = '';
     marcaImagePreview.style.display = 'none';
-    marcaImagePreview.innerHTML = '';
     uploadAreaMarca.style.display = 'block';
+}
+
+function removeSliderImage() {
+    sliderImageInput.value = '';
+    sliderImagePreview.style.display = 'none';
+    uploadAreaSlider.style.display = 'block';
 }
 </script>
 {% endblock %}

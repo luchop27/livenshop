@@ -1,4 +1,5 @@
 from django.db import models
+from apps.productos.utils import compress_image_to_webp
 
 
 class Plan(models.Model):
@@ -105,6 +106,11 @@ class AliadoBeneficio(models.Model):
         verbose_name = 'Aliado / Beneficio'
         verbose_name_plural = 'Aliados / Beneficios'
 
+    def save(self, *args, **kwargs):
+        if self.logo and not self.logo.name.lower().endswith('.webp'):
+            self.logo = compress_image_to_webp(self.logo)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.nombre
 
@@ -142,7 +148,7 @@ class MovimientoPlan(models.Model):
         ('devolucion', 'Devolución'),
         ('ajuste', 'Ajuste'),
     ]
-    plan = models.ForeignKey(PlanNovios, related_name='movimientos', on_delete=models.CASCADE)
+    plan = models.ForeignKey('SolicitudPlanNovios', related_name='movimientos', on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='aporte')
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.CharField(max_length=250, blank=True)
@@ -154,17 +160,38 @@ class MovimientoPlan(models.Model):
         verbose_name_plural = 'Movimientos'
 
     def __str__(self):
-        return f"{self.plan.nombres} — {self.tipo} ${self.monto}"
+        return f"{self.plan.nombres_novios} — {self.tipo} ${self.monto}"
 
 
 class SolicitudPlanNovios(models.Model):
     """Solicitudes enviadas desde el formulario de la landing page."""
+
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('aprobado', 'Aprobado'),
+        ('finalizado', 'Finalizado'),
+    ]
+
     nombres_novios = models.CharField(max_length=255, verbose_name='Nombres de los Novios')
     email = models.EmailField(verbose_name='Email de contacto')
     telefono = models.CharField(max_length=20, verbose_name='Teléfono / WhatsApp')
     fecha_boda = models.DateField(verbose_name='Fecha tentativa de boda')
     ciudad = models.CharField(max_length=100, blank=True, verbose_name='Ciudad')
     mensaje = models.TextField(blank=True, verbose_name='Comentario adicional')
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADO_CHOICES,
+        default='pendiente',
+        verbose_name='Estado',
+        help_text='Solo los planes "Aprobados" aparecen en la lista pública.'
+    )
+    productos_regalo = models.ManyToManyField(
+        'productos.Producto', 
+        blank=True, 
+        verbose_name='Productos elegidos como regalo'
+    )
+    clave = models.CharField(max_length=128, blank=True, verbose_name='Clave Portal (Hash)')
+    saldo_acumulado = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Saldo Acumulado ($)')
     procesado = models.BooleanField(default=False, verbose_name='¿Ya se contactó?')
     fecha_solicitud = models.DateTimeField(auto_now_add=True)
 
@@ -174,5 +201,5 @@ class SolicitudPlanNovios(models.Model):
         ordering = ['-fecha_solicitud']
 
     def __str__(self):
-        return f"{self.nombres_novios} — {self.fecha_solicitud.strftime('%d/%m/%Y')}"
+        return f"{self.nombres_novios} — {self.get_estado_display()} — {self.fecha_solicitud.strftime('%d/%m/%Y')}"
 

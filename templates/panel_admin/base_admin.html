@@ -19,6 +19,105 @@
     <link rel="shortcut icon" href="{% static 'images/logo/iconlogolivenwhite.png' %}">
     <link rel="apple-touch-icon-precomposed" href="{% static 'images/logo/iconlogolivenwhite.png' %}">
 
+    <style>
+        /* TEMA AZUL PARA EL ADMIN (Acento) */
+        :root {
+            --primary-color: #0d1b2a; /* Azul oscuro Liven */
+            --hover-color: #1a2a3a;
+        }
+        
+        /* Ajustar color naranja a azul para los items activos */
+        .section-menu-left .menu-item.active > a .text,
+        .section-menu-left .menu-item.active > a .icon {
+            color: var(--primary-color) !important;
+        }
+        
+        /* Hover con azul oscuro */
+        .section-menu-left .menu-item:hover > a .text, 
+        .section-menu-left .menu-item:hover > a .icon {
+            color: var(--hover-color) !important;
+        }
+        
+        /* Submenú items activos/hover a azul oscuro */
+        .section-menu-left .sub-menu-item:hover .text {
+            color: var(--primary-color) !important;
+        }
+        
+        /* Notificaciones Campanita */
+        .notif-bell-wrapper {
+            position: relative;
+            margin-right: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .notif-bell-icon {
+            font-size: 20px;
+            color: #444;
+            transition: color 0.2s;
+        }
+        .notif-bell-wrapper:hover .notif-bell-icon {
+            color: #000;
+        }
+        .notif-badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 20px;
+            display: none;
+            box-shadow: 0 0 0 2px #fff;
+        }
+        .notif-dropdown {
+            position: absolute;
+            top: 100%;
+            right: -10px;
+            width: 320px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-top: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            border: 1px solid #f0ece6;
+        }
+        .notif-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .notif-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0ece6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafaf9;
+            border-radius: 12px 12px 0 0;
+        }
+        .notif-header h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .notif-list {
+            max-height: 380px;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .notif-list::-webkit-scrollbar { width: 4px; }
+        .notif-list::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+    </style>
+
     {% block extra_css %}{% endblock %}
 </head>
 <body class="body">
@@ -34,10 +133,10 @@
                 <div class="section-menu-left">
                     <div class="box-logo">
                         <a href="{% url 'panel_admin_demo' %}" id="site-logo-inner" style="display:flex;align-items:center;justify-content:center;width:100%;">
-                            <img id="logo_header" alt="LivenShop" src="{% static 'images/logo/logo.svg' %}"
-                                data-light="{% static 'images/logo/logo.svg' %}"
-                                data-dark="{% static 'images/logo/logo-white.svg' %}"
-                                style="max-height:70px;width:auto;object-fit:contain;padding:0;margin:0;">
+                            <img id="logo_header" alt="LivenShop" src="{% static 'images/logo/logoliven.png' %}"
+                                data-light="{% static 'images/logo/logoliven.png' %}"
+                                data-dark="{% static 'images/logo/logolivenwhite.png' %}"
+                                style="max-height:60px;width:auto;object-fit:contain;padding:0;margin:0;">
                         </a>
                         <div class="button-show-hide">
                             <i class="icon-chevron-left"></i>
@@ -140,7 +239,7 @@
                                                     <div class="text">Nuevo plan</div>
                                                 </a>
                                             </li>
-                                            <li class="sub-menu-item" style="border-top:1px solid #eee; margin-top:5px; padding-top:5px;">
+                                            <li class="sub-menu-item" style="border-top:1px solid rgba(255,255,255,0.1); margin-top:5px; padding-top:5px;">
                                                 <a href="{% url 'planes:panel_admin_aliados' %}">
                                                     <div class="text">Lista de aliados</div>
                                                 </a>
@@ -148,6 +247,11 @@
                                             <li class="sub-menu-item">
                                                 <a href="{% url 'planes:panel_admin_aliado_add' %}">
                                                     <div class="text">Nuevo aliado</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item" style="border-top:1px solid rgba(255,255,255,0.1); margin-top:5px; padding-top:5px;">
+                                                <a href="{% url 'planes:panel_admin_solicitudes' %}">
+                                                    <div class="text" style="color:#c9a96e !important;">Solicitudes Plan Novios</div>
                                                 </a>
                                             </li>
                                         </ul>
@@ -207,9 +311,26 @@
                                 </div>
                             </div>
                             <div class="header-grid">
+                                
+                                <!-- Campanita -->
+                                <div class="notif-bell-wrapper" id="adminNotifBell">
+                                    <i class="icon-bell notif-bell-icon"></i>
+                                    <span class="notif-badge" id="adminNotifBadge">0</span>
+                                    
+                                    <div class="notif-dropdown" id="adminNotifDropdown">
+                                        <div class="notif-header">
+                                            <h4>Notificaciones</h4>
+                                            <a href="#" id="adminNotifRefresh" style="color:#c9a96e; font-size:12px; text-decoration:none;"><i class="icon-refresh-cw"></i></a>
+                                        </div>
+                                        <div class="notif-list" id="adminNotifList">
+                                            <div style="padding: 20px; text-align: center; color: #888; font-size: 13px;">Cargando...</div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="popup-wrap user type-header">
                                     <div class="dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background:transparent; border:none;">
                                             <span class="header-user wg-user">
                                                 <span class="image">
                                                     <img src="{% static 'panel_admin/images/avatar/useradmin.png' %}" alt="Usuario">
@@ -251,6 +372,80 @@
     <script src="{% static 'panel_admin/js/switcher.js' %}"></script>
     <script defer src="{% static 'panel_admin/js/theme-settings.js' %}"></script>
     <script src="{% static 'panel_admin/js/main.js' %}"></script>
+
+    <script>
+        // Lógica de Notificaciones (Campanita)
+        document.addEventListener('DOMContentLoaded', function() {
+            const bellWrapper = document.getElementById('adminNotifBell');
+            const dropdown = document.getElementById('adminNotifDropdown');
+            const badge = document.getElementById('adminNotifBadge');
+            const list = document.getElementById('adminNotifList');
+            const refreshBtn = document.getElementById('adminNotifRefresh');
+            
+            let isDropdownOpen = false;
+
+            // Toggle dropdown
+            bellWrapper.addEventListener('click', function(e) {
+                // Prevenir que si se hace click dentro de la lista (en un link) se cierre antes de navegar
+                if (e.target.closest('.notif-dropdown') && !e.target.closest('.notif-header')) return;
+                
+                e.preventDefault();
+                isDropdownOpen = !isDropdownOpen;
+                if (isDropdownOpen) {
+                    dropdown.classList.add('show');
+                    fetchNotificaciones(); // Refrescar al abrir
+                } else {
+                    dropdown.classList.remove('show');
+                }
+            });
+
+            // Cerrar al clickear afuera
+            document.addEventListener('click', function(e) {
+                if (isDropdownOpen && !bellWrapper.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                    isDropdownOpen = false;
+                }
+            });
+
+            // Refrescar manual
+            refreshBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                fetchNotificaciones();
+            });
+
+            function fetchNotificaciones() {
+                fetch('{% url "usuarios:api_notificaciones_admin" %}', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) return;
+                    
+                    // Actualizar badge
+                    if (data.count > 0) {
+                        badge.style.display = 'block';
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                    
+                    // Actualizar lista html
+                    list.innerHTML = data.html;
+                })
+                .catch(err => {
+                    console.error('Error fetching notifications:', err);
+                    list.innerHTML = '<div style="padding: 20px; text-align: center; color: #ef4444; font-size: 12px;">Error al cargar notificaciones.<br><br><b>⚠️ Recuerda ejecutar:</b><br>python manage.py makemigrations<br>python manage.py migrate</div>';
+                });
+            }
+
+            // Primer fetch
+            fetchNotificaciones();
+            
+            // Polling cada 60 segundos
+            setInterval(fetchNotificaciones, 60000);
+        });
+    </script>
 
     {% block extra_js %}{% endblock %}
 </body>
