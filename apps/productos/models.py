@@ -38,6 +38,8 @@ def generate_unique_slug(model_class, value, instance_pk=None):
         counter += 1
 
 
+from .utils import compress_image_to_webp
+
 # -----------------------------
 # MARCA
 # -----------------------------
@@ -47,6 +49,13 @@ class Marca(models.Model):
     imagen = models.ImageField(upload_to='marcas/', blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
     activo = models.BooleanField(default=True)
+    mostrar_en_slider = models.BooleanField(default=False, help_text="¿Mostrar esta marca en el slider del home?")
+    imagen_slider = models.ImageField(
+        upload_to='marcas/slider/',
+        blank=True,
+        null=True,
+        help_text="Imagen especial para el slider del home (solo se usa si 'mostrar en slider' está marcado)"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -64,7 +73,17 @@ class Marca(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_unique_slug(Marca, self.nombre, self.pk)
+        
+        # Procesar imagen principal
+        if self.imagen and not self.imagen.name.lower().endswith('.webp'):
+            self.imagen = compress_image_to_webp(self.imagen)
+        
+        # Procesar imagen del slider
+        if self.imagen_slider and not self.imagen_slider.name.lower().endswith('.webp'):
+            self.imagen_slider = compress_image_to_webp(self.imagen_slider)
+
         super().save(*args, **kwargs)
+
 
 # -----------------------------
 # COLECCIÓN
@@ -96,8 +115,14 @@ class Coleccion(models.Model):
     def __str__(self):
         return self.nombre
 
-    def get_absolute_url(self):
-        return reverse('productos:lista_por_coleccion', args=[self.slug])
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(Coleccion, self.nombre, self.pk)
+        
+        if self.imagen and not self.imagen.name.lower().endswith('.webp'):
+            self.imagen = compress_image_to_webp(self.imagen)
+            
+        super().save(*args, **kwargs)
 
 
 # -----------------------------
@@ -148,8 +173,14 @@ class Categoria(models.Model):
     def get_absolute_url(self):
         return reverse('productos:lista_por_categoria', args=[self.slug])
 
-    def es_principal(self):
-        return self.padre is None
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(Categoria, self.nombre, self.pk)
+            
+        if self.imagen and not self.imagen.name.lower().endswith('.webp'):
+            self.imagen = compress_image_to_webp(self.imagen)
+            
+        super().save(*args, **kwargs)
 
 
 # -----------------------------
@@ -317,22 +348,10 @@ class Imagen(models.Model):
         tipo = "Video" if self.tipo_medio == 'video' else "Imagen"
         return f"{tipo} de {self.producto.nombre}"
 
-    def clean(self):
-        super().clean()
-        if self.tipo_medio == 'video':
-            if self.imagen and not self.video:
-                raise ValidationError({
-                    'tipo_medio': 'Seleccionaste "Video" pero subiste una imagen.'
-                })
-            if not self.video and not self.url:
-                raise ValidationError({'video': 'Sube un archivo de video o proporciona una URL.'})
-        elif self.tipo_medio == 'imagen':
-            if self.video and not self.imagen:
-                raise ValidationError({
-                    'tipo_medio': 'Seleccionaste "Imagen" pero subiste un video.'
-                })
-            if not self.imagen and not self.url:
-                raise ValidationError({'imagen': 'Sube una imagen o proporciona una URL.'})
+    def save(self, *args, **kwargs):
+        if self.imagen and not self.imagen.name.lower().endswith('.webp'):
+            self.imagen = compress_image_to_webp(self.imagen)
+        super().save(*args, **kwargs)
 
     @property
     def src(self):
@@ -488,6 +507,11 @@ class ShopGramPost(models.Model):
         ordering = ['-created_at']
         verbose_name = "Shop Gram Post"
         verbose_name_plural = "Shop Gram Posts"
+
+    def save(self, *args, **kwargs):
+        if self.imagen and not self.imagen.name.lower().endswith('.webp'):
+            self.imagen = compress_image_to_webp(self.imagen)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.instagram_url

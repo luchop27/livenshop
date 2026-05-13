@@ -1,434 +1,449 @@
-
 {% extends "base.html" %}
 {% load static %}
 
 {% block content %}
 
-        <!-- Slider -->
-        <section class="tf-slideshow slider-effect-fade slider-home-5 position-relative">
-            <div dir="ltr" class="swiper tf-sw-slideshow" data-preview="1" data-tablet="1" data-mobile="1"
-                data-centered="false" data-space="0" data-loop="true" data-auto-play="true" data-delay="2000"
-                data-speed="1000">
-                <div class="swiper-wrapper">
+<!-- Slider -->
+<section class="tf-slideshow slider-effect-fade slider-home-5 position-relative">
+    <div dir="ltr" class="swiper tf-sw-slideshow" data-preview="1" data-tablet="1" data-mobile="1" data-centered="false"
+        data-space="0" data-loop="true" data-auto-play="true" data-delay="2000" data-speed="1000">
+        <div class="swiper-wrapper">
 
-                    {% if colecciones %}
-                        {% for coleccion in colecciones %}
-                            <div class="swiper-slide" lazy="true">
-                                <div class="wrap-slider">
-                                    {% if coleccion.imagen %}
-                                        <img class="lazyload"
-                                            data-src="{{ coleccion.imagen.url }}"
-                                            src="{{ coleccion.imagen.url }}"
-                                            alt="{{ coleccion.nombre }}">
-                                    {% else %}
-                                        <img class="lazyload"
-                                            data-src="{% static 'images/slider/plant_slide_1.jpg' %}"
-                                            src="{% static 'images/slider/plant_slide_1.jpg' %}"
-                                            alt="{{ coleccion.nombre }}">
-                                    {% endif %}
-                                    <div class="box-content text-center">
-                                        <div class="container">
-                                            <h1 class="fade-item fade-item-1 text-white">{{ coleccion.nombre }}</h1>
-                                            {% if coleccion.descripcion %}
-                                                <p class="fade-item fade-item-2 text-white">
-                                                    {{ coleccion.descripcion|truncatewords:15 }}
-                                                </p>
-                                            {% else %}
-                                                <p class="fade-item fade-item-2 text-white">
-                                                    Descubre nuestra colección exclusiva
-                                                </p>
-                                            {% endif %}
-                                            <a href="{{ coleccion.get_absolute_url }}"
-                                                class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
-                                                <span>Ver colección</span>
-                                                <i class="icon icon-arrow-right"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
+            {% if marcas_slider %}
 
-                    {% else %}
-                        <div class="swiper-slide" lazy="true">
-                            <div class="wrap-slider">
-                                <img class="lazyload"
-                                    data-src="{% static 'images/slider/plant_slide_1.jpg' %}"
-                                    src="{% static 'images/slider/plant_slide_1.jpg' %}"
-                                    alt="slide-01">
-                                <div class="box-content text-center">
-                                    <div class="container">
-                                        <h1 class="fade-item fade-item-1 text-white">Quality<br>Craftsmanship</h1>
-                                        <p class="fade-item fade-item-2 text-white">
-                                            Descubre muebles elaborados con atención meticulosa al detalle
-                                        </p>
-                                        <a href="{% url 'productos:lista_productos' %}"
-                                            class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
-                                            <span>Ver colección</span>
-                                            <i class="icon icon-arrow-right"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="swiper-slide" lazy="true">
-                            <div class="wrap-slider">
-                                <img class="lazyload"
-                                    data-src="{% static 'images/slider/plant_slide_2.jpg' %}"
-                                    src="{% static 'images/slider/plant_slide_2.jpg' %}"
-                                    alt="slide-02">
-                                <div class="box-content text-center">
-                                    <div class="container">
-                                        <h1 class="fade-item fade-item-1 text-white">Diseño<br>Atemporal</h1>
-                                        <p class="fade-item fade-item-2 text-white">
-                                            Piezas que transforman cada espacio en un hogar
-                                        </p>
-                                        <a href="{% url 'productos:lista_productos' %}"
-                                            class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
-                                            <span>Explorar</span>
-                                            <i class="icon icon-arrow-right"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="swiper-slide" lazy="true">
-                            <div class="wrap-slider">
-                                <img class="lazyload"
-                                    data-src="{% static 'images/slider/plant_slide_3.jpg' %}"
-                                    src="{% static 'images/slider/plant_slide_3.jpg' %}"
-                                    alt="slide-03">
-                                <div class="box-content text-center">
-                                    <div class="container">
-                                        <h1 class="fade-item fade-item-1 text-white">Materiales<br>Nobles</h1>
-                                        <p class="fade-item fade-item-2 text-white">
-                                            Calidad que se siente, elegancia que se ve
-                                        </p>
-                                        <a href="{% url 'productos:lista_productos' %}"
-                                            class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
-                                            <span>Ver todo</span>
-                                            <i class="icon icon-arrow-right"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
+            {% for marca in marcas_slider %}
+            <div class="swiper-slide" lazy="true">
+                <div class="wrap-slider">
+                    <a href="{{ marca.get_absolute_url }}" style="display: block; width: 100%; height: 100%;">
+                        {% if marca.imagen_slider %}
+                        <img class="lazyload" data-src="{{ marca.imagen_slider.url }}"
+                            src="{{ marca.imagen_slider.url }}" alt="{{ marca.nombre }}">
+                        {% else %}
+                        <img class="lazyload" data-src="{% static 'images/slider/plant_slide_1.jpg' %}"
+                            src="{% static 'images/slider/plant_slide_1.jpg' %}" alt="{{ marca.nombre }}">
+                        {% endif %}
+                    </a>
                 </div>
             </div>
-            <div class="wrap-pagination">
-                <div class="container">
-                    <div class="sw-dots style-2 dots-white sw-pagination-slider justify-content-center"></div>
-                </div>
-            </div>
-        </section>
-        <!-- /Slider -->
-
-        <!-- brand -->
-        <section class="flat-spacing-2 pb_0">
-            <div class="container">
-                <div class="mb_30 fw-7 text-center">MARCAS</div>
-                <div dir="ltr" class="swiper tf-sw-brand border-0" data-loop="false" data-play="false" data-preview="4"
-                    data-tablet="2" data-mobile="1" data-space-lg="0" data-space-md="0">
-                    <div class="swiper-wrapper">
-                        {% for marca in marcas %}
-                        <div class="swiper-slide">
-                            <div class="brand-item border-0">
-                                <img class="lazyload" data-src="{{ marca.imagen.url }}" src="{{ marca.imagen.url }}" alt="{{ marca.nombre }}">
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="sw-dots style-2 sw-pagination-brand justify-content-center"></div>
-            </div>
-        </section>
-        <!-- /brand -->
+            {% endfor %}
 
 
-        
 
-        <!-- Product -->
-        <section class="flat-spacing-12 has-line-bottom">
-            <div class="container">
-                    <!-- Sección de selección de marca -->
-                    <div class="brand-filter mb-3 d-flex justify-content-center">
-                <div class="nav-brand-filter d-flex gap-2">
-                    <div class="nav-brand-list d-flex gap-2">
-                        <!-- Botón "Todos" -->
-                        {% for marca in marcas %}
-                            <a href="#" class="brand-item mb_30 fw-7 text-center" data-slug="{{ marca.slug }}">
-                                {{ marca.nombre }}
+            {% else %}
+
+            <div class="swiper-slide" lazy="true">
+                <div class="wrap-slider">
+                    <img class="lazyload" data-src="{% static 'images/slider/plant_slide_1.jpg' %}"
+                        src="{% static 'images/slider/plant_slide_1.jpg' %}" alt="slide-01">
+                    <div class="box-content text-center">
+                        <div class="container">
+                            <h1 class="fade-item fade-item-1 text-white">Quality<br>Craftsmanship</h1>
+                            <p class="fade-item fade-item-2 text-white">
+                                Descubre muebles elaborados con atención meticulosa al detalle
+                            </p>
+                            <a href="{% url 'productos:lista_productos' %}"
+                                class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
+                                <span>Ver colección</span>
+                                <i class="icon icon-arrow-right"></i>
                             </a>
-                        {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div class="swiper-slide" lazy="true">
+                <div class="wrap-slider">
+                    <img class="lazyload" data-src="{% static 'images/slider/plant_slide_2.jpg' %}"
+                        src="{% static 'images/slider/plant_slide_2.jpg' %}" alt="slide-02">
+                    <div class="box-content text-center">
+                        <div class="container">
+                            <h1 class="fade-item fade-item-1 text-white">Diseño<br>Atemporal</h1>
+                            <p class="fade-item fade-item-2 text-white">
+                                Piezas que transforman cada espacio en un hogar
+                            </p>
+                            <a href="{% url 'productos:lista_productos' %}"
+                                class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
+                                <span>Explorar</span>
+                                <i class="icon icon-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swiper-slide" lazy="true">
+                <div class="wrap-slider">
+                    <img class="lazyload" data-src="{% static 'images/slider/plant_slide_3.jpg' %}"
+                        src="{% static 'images/slider/plant_slide_3.jpg' %}" alt="slide-03">
+                    <div class="box-content text-center">
+                        <div class="container">
+                            <h1 class="fade-item fade-item-1 text-white">Materiales<br>Nobles</h1>
+                            <p class="fade-item fade-item-2 text-white">
+                                Calidad que se siente, elegancia que se ve
+                            </p>
+                            <a href="{% url 'productos:lista_productos' %}"
+                                class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
+                                <span>Ver todo</span>
+                                <i class="icon icon-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+    <div class="wrap-pagination">
+        <div class="container">
+            <div class="sw-dots style-2 dots-white sw-pagination-slider justify-content-center"></div>
+        </div>
+    </div>
+</section>
+<!-- /Slider -->
+
+<!-- brand -->
+<section class="flat-spacing-2 pb_0">
+    <div class="container">
+        <div class="mb_30 fw-7 text-center">MARCAS</div>
+        <div dir="ltr" class="swiper tf-sw-brand border-0" data-loop="false" data-play="false" data-preview="4"
+            data-tablet="2" data-mobile="1" data-space-lg="0" data-space-md="0">
+            <div class="swiper-wrapper">
+                {% for marca in marcas %}
+                <div class="swiper-slide">
+                    <div class="brand-item border-0">
+                        <img class="lazyload" data-src="{{ marca.imagen.url }}" src="{{ marca.imagen.url }}"
+                            alt="{{ marca.nombre }}">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="sw-dots style-2 sw-pagination-brand justify-content-center"></div>
+    </div>
+</section>
+<!-- /brand -->
+
+
+
+
+<!-- Product -->
+<section class="flat-spacing-12 has-line-bottom">
+    <div class="container">
+        <!-- Sección de selección de marca -->
+        <div class="brand-filter mb-3 d-flex justify-content-center">
+            <div class="nav-brand-filter d-flex gap-2">
+                <div class="nav-brand-list d-flex gap-2">
+                    <!-- Botón "Todos" -->
+                    {% for marca in marcas %}
+                    <a href="#" class="brand-item mb_30 fw-7 text-center" data-slug="{{ marca.slug }}">
+                        {{ marca.nombre }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
 
         <!-- Título -->
 
-                <!-- Slider de productos -->
-                <div class="hover-sw-nav hover-sw-2">
-                    <div dir="ltr" class="swiper tf-sw-product-sell wrap-sw-over" data-preview="4" data-tabley="3" data-mobile="2" data-space-lg="30" data-space-md="15" data-pagination="2" data-pagination-md="3" data-pagination-lg="3">
-                        <div class="swiper-wrapper">
-                            {% for producto in productos %}
-                            <div class="swiper-slide" lazy="true">
-                                <div class="card-product">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ producto.get_absolute_url }}" class="product-img">
-                                            {% with producto.imagenes.all as imgs %}
-                                                {% if imgs.0 %}
-                                                    <img class="lazyload img-product" data-src="{{ imgs.0.src }}" src="{{ imgs.0.src }}" alt="{{ producto.nombre }}">
-                                                {% endif %}
-                                                {% if imgs.1 %}
-                                                    <img class="lazyload img-hover" data-src="{{ imgs.1.src }}" src="{{ imgs.1.src }}" alt="{{ producto.nombre }}">
-                                                {% endif %}
-                                            {% endwith %}
-                                        </a>
-                                        <div class="list-product-btn absolute-2">
-                                            <a href="#" class="box-icon bg_white wishlist btn-icon-action {% if producto.id in request.session.wishlist %}active{% endif %}" data-product-id="{{ producto.id }}">
-                                                <span class="icon icon-heart"></span>
-                                                <span class="tooltip">Añadir a Favoritos</span>
-                                                <span class="icon icon-delete"></span>
-                                            </a>
-                                            <a href="#quick_view" data-bs-toggle="modal" data-product-id="{{ producto.id }}" class="box-icon bg_white quickview tf-btn-loading">
-                                                <span class="icon icon-view"></span>
-                                                <span class="tooltip">Quick View</span>
-                                            </a>
-                                        </div>
-                                        {% if producto.tiene_oferta %}
-                                            <div class="on-sale-wrap text-end">
-                                                <div class="on-sale-item">-{{ producto.porcentaje_descuento }}%</div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="card-product-info">
-                                        <a href="{{ producto.get_absolute_url }}" class="title link">{{ producto.nombre }}</a>
-                                        <span class="price">
-                                            {% if producto.tiene_oferta %}
-                                                <span class="old-price">${{ producto.precio }}</span>
-                                                <span class="new-price">${{ producto.precio_oferta }}</span>
-                                            {% else %}
-                                                <span class="new-price">${{ producto.precio }}</span>
-                                            {% endif %}
-                                        </span>
-                                    </div>
+        <!-- Slider de productos -->
+        <div class="hover-sw-nav hover-sw-2">
+            <div dir="ltr" class="swiper tf-sw-product-sell wrap-sw-over" data-preview="4" data-tabley="3"
+                data-mobile="2" data-space-lg="30" data-space-md="15" data-pagination="2" data-pagination-md="3"
+                data-pagination-lg="3">
+                <div class="swiper-wrapper">
+                    {% for producto in productos %}
+                    <div class="swiper-slide" lazy="true">
+                        <div class="card-product">
+                            <div class="card-product-wrapper">
+                                <a href="{{ producto.get_absolute_url }}" class="product-img">
+                                    {% with producto.imagenes.all as imgs %}
+                                    {% if imgs.0 %}
+                                    <img class="lazyload img-product" data-src="{{ imgs.0.src }}" src="{{ imgs.0.src }}"
+                                        alt="{{ producto.nombre }}">
+                                    {% endif %}
+                                    {% if imgs.1 %}
+                                    <img class="lazyload img-hover" data-src="{{ imgs.1.src }}" src="{{ imgs.1.src }}"
+                                        alt="{{ producto.nombre }}">
+                                    {% endif %}
+                                    {% endwith %}
+                                </a>
+                                <div class="list-product-btn absolute-2">
+                                    <a href="#"
+                                        class="box-icon bg_white wishlist btn-icon-action {% if producto.id in request.session.wishlist %}active{% endif %}"
+                                        data-product-id="{{ producto.id }}">
+                                        <span class="icon icon-heart"></span>
+                                        <span class="tooltip">Añadir a Favoritos</span>
+                                        <span class="icon icon-delete"></span>
+                                    </a>
+                                    <a href="#quick_view" data-bs-toggle="modal" data-product-id="{{ producto.id }}"
+                                        class="box-icon bg_white quickview tf-btn-loading">
+                                        <span class="icon icon-view"></span>
+                                        <span class="tooltip">Quick View</span>
+                                    </a>
                                 </div>
+                                {% if producto.tiene_oferta %}
+                                <div class="on-sale-wrap text-end">
+                                    <div class="on-sale-item">-{{ producto.porcentaje_descuento }}%</div>
+                                </div>
+                                {% endif %}
                             </div>
-                            {% endfor %}
+                            <div class="card-product-info">
+                                <a href="{{ producto.get_absolute_url }}" class="title link">{{ producto.nombre }}</a>
+                                <span class="price">
+                                    {% if producto.tiene_oferta %}
+                                    <span class="old-price">${{ producto.precio }}</span>
+                                    <span class="new-price">${{ producto.precio_oferta }}</span>
+                                    {% else %}
+                                    <span class="new-price">${{ producto.precio }}</span>
+                                    {% endif %}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="nav-sw nav-next-slider nav-next-product box-icon w_46 round"><span class="icon icon-arrow-left"></span></div>
-                    <div class="nav-sw nav-prev-slider nav-prev-product box-icon w_46 round"><span class="icon icon-arrow-right"></span></div>
+                    {% endfor %}
                 </div>
             </div>
-        </section>
+            <div class="nav-sw nav-next-slider nav-next-product box-icon w_46 round"><span
+                    class="icon icon-arrow-left"></span></div>
+            <div class="nav-sw nav-prev-slider nav-prev-product box-icon w_46 round"><span
+                    class="icon icon-arrow-right"></span></div>
+        </div>
+    </div>
+</section>
 <!-- /Product -->
 
 
-        <!-- Product -->
-        <section class="flat-spacing-12 has-line-bottom">
-            <div class="container">
-                <div class="flat-title wow fadeInUp" data-wow-delay="0s">
-                    <span class="title">NUEVOS PRODUCTOS</span>
-                    <!-- <div class="d-flex gap-16 align-items-center">
+<!-- Product -->
+<section class="flat-spacing-12 has-line-bottom">
+    <div class="container">
+        <div class="flat-title wow fadeInUp" data-wow-delay="0s">
+            <span class="title">NUEVOS PRODUCTOS</span>
+            <!-- <div class="d-flex gap-16 align-items-center">
                         <div class="nav-sw-arrow nav-next-slider nav-next-product"><span
                                 class="icon icon-arrow1-left"></span></div>
                         <a href="product-style-05.html" class="tf-btn btn-line fs-12 fw-6">VER TODOS</a>
                         <div class="nav-sw-arrow nav-prev-slider nav-prev-product"><span
                                 class="icon icon-arrow1-right"></span></div>
                     </div> -->
-                </div>
-                <div class="hover-sw-nav hover-sw-2">
-                    <div dir="ltr" class="swiper tf-sw-product-sell wrap-sw-over" data-preview="4" data-tablet="3"
-                        data-mobile="2" data-space-lg="30" data-space-md="15" data-pagination="2" data-pagination-md="3"
-                        data-pagination-lg="3">
-                        <div class="swiper-wrapper">
-                            {% for producto in productos %}
-                            <div class="swiper-slide" lazy="true">
-                                <div class="card-product">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ producto.get_absolute_url }}" class="product-img">
-                                            {% with producto.imagenes.all as imgs %}
-                                                {% if imgs.0 %}
-                                                    <img class="lazyload img-product" 
-                                                        data-src="{{ imgs.0.src }}" 
-                                                        src="{{ imgs.0.src }}" 
-                                                        alt="{{ producto.nombre }}">
-                                                {% endif %}
-                                                {% if imgs.1 %}
-                                                    <img class="lazyload img-hover" 
-                                                        data-src="{{ imgs.1.src }}" 
-                                                        src="{{ imgs.1.src }}" 
-                                                        alt="{{ producto.nombre }}">
-                                                {% endif %}
-                                            {% endwith %}
-                                        </a>
-                                        <div class="list-product-btn absolute-2">
-                                            <a href="#" class="box-icon bg_white wishlist btn-icon-action {% if producto.id in request.session.wishlist %}active{% endif %}" data-product-id="{{ producto.id }}">
-                                                <span class="icon icon-heart"></span>
-                                                <span class="tooltip">Añadir a Favoritos</span>
-                                                <span class="icon icon-delete"></span>
-                                            </a>
-                                            <a href="#quick_view" data-bs-toggle="modal"
-                                             data-product-id="{{ producto.id }}"
-                                                class="box-icon bg_white quickview tf-btn-loading">
-                                                <span class="icon icon-view"></span>
-                                                <span class="tooltip">Quick View</span>
-                                            </a>
-                                        </div>
-                                        {% if producto.tiene_oferta %}
-                                            <div class="on-sale-wrap text-end">
-                                                <div class="on-sale-item">-{{ producto.porcentaje_descuento }}%</div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="card-product-info">
-                                        <a href="{{ producto.get_absolute_url }}" class="title link">{{ producto.nombre }}</a>
-                                        <span class="price">
-                                            {% if producto.tiene_oferta %}
-                                                <span class="old-price">${{ producto.precio }}</span>
-                                                <span class="new-price">${{ producto.precio_oferta }}</span>
-                                            {% else %}
-                                                <span class="new-price">${{ producto.precio }}</span>
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                            
-                        </div>
-                    </div>
-                    <div class="nav-sw nav-next-slider nav-next-product box-icon w_46 round"><span
-                            class="icon icon-arrow-left"></span></div>
-                    <div class="nav-sw nav-prev-slider nav-prev-product box-icon w_46 round"><span
-                            class="icon icon-arrow-right"></span></div>
-                </div>
-            </div>
-        </section>
-        <!-- /Product -->
-
-        <!-- Categories -->
-        <section class="flat-spacing-18">
-            <div class="container">
-                <!-- <div class="flat-title">
-                    <span class="title wow fadeInUp" data-wow-delay="0s">CATEGORIAS</span>
-                </div> -->
-                <div class="wrap-carousel wrap-mobile">
-                    <div dir="ltr" class="swiper tf-sw-mobile" data-preview="1.3" data-space="15">
-                        <div class="swiper-wrapper grid-mobile-1">
-                            {% for categoria in categorias %}
-                            <div class="swiper-slide">
-                                <div class="collection-item-v2 hover-img">
-                                    <a href="{{ categoria.get_absolute_url }}" class="collection-inner">
-                                        <div class="collection-image img-style">
-                                            {% if categoria.imagen %}
-                                                <img class="lazyload" data-src="{{ categoria.imagen.url }}"
-                                                    src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}">
-                                            {% else %}
-                                                <img class="lazyload" data-src="{% static 'images/placeholder.jpg' %}"
-                                                    src="{% static 'images/placeholder.jpg' %}" alt="{{ categoria.nombre }}">
-                                            {% endif %}
-                                        </div>
-                                        <div class="collection-content">
-                                            <div class="top wow fadeInUp" data-wow-delay="0s">
-                                                <h5 class="heading">{{ categoria.nombre }}</h5>
-                                                <p class="subheading">{{ categoria.descripcion|truncatewords:5 }}</p>
-                                            </div>
-                                            <div class="bottom wow fadeInUp" data-wow-delay="0s">
-                                                <button class="tf-btn btn-line collection-other-link fw-6"><span>Comprar ahora</span><i class="icon icon-arrow1-top-left"></i></button>
-                                            </div>
-                                        </div>
+        </div>
+        <div class="hover-sw-nav hover-sw-2">
+            <div dir="ltr" class="swiper tf-sw-product-sell wrap-sw-over" data-preview="4" data-tablet="3"
+                data-mobile="2" data-space-lg="30" data-space-md="15" data-pagination="2" data-pagination-md="3"
+                data-pagination-lg="3">
+                <div class="swiper-wrapper">
+                    {% for producto in productos %}
+                    <div class="swiper-slide" lazy="true">
+                        <div class="card-product">
+                            <div class="card-product-wrapper">
+                                <a href="{{ producto.get_absolute_url }}" class="product-img">
+                                    {% with producto.imagenes.all as imgs %}
+                                    {% if imgs.0 %}
+                                    <img class="lazyload img-product" data-src="{{ imgs.0.src }}" src="{{ imgs.0.src }}"
+                                        alt="{{ producto.nombre }}">
+                                    {% endif %}
+                                    {% if imgs.1 %}
+                                    <img class="lazyload img-hover" data-src="{{ imgs.1.src }}" src="{{ imgs.1.src }}"
+                                        alt="{{ producto.nombre }}">
+                                    {% endif %}
+                                    {% endwith %}
+                                </a>
+                                <div class="list-product-btn absolute-2">
+                                    <a href="#"
+                                        class="box-icon bg_white wishlist btn-icon-action {% if producto.id in request.session.wishlist %}active{% endif %}"
+                                        data-product-id="{{ producto.id }}">
+                                        <span class="icon icon-heart"></span>
+                                        <span class="tooltip">Añadir a Favoritos</span>
+                                        <span class="icon icon-delete"></span>
+                                    </a>
+                                    <a href="#quick_view" data-bs-toggle="modal" data-product-id="{{ producto.id }}"
+                                        class="box-icon bg_white quickview tf-btn-loading">
+                                        <span class="icon icon-view"></span>
+                                        <span class="tooltip">Quick View</span>
                                     </a>
                                 </div>
+                                {% if producto.tiene_oferta %}
+                                <div class="on-sale-wrap text-end">
+                                    <div class="on-sale-item">-{{ producto.porcentaje_descuento }}%</div>
+                                </div>
+                                {% endif %}
                             </div>
-                            {% endfor %}
+                            <div class="card-product-info">
+                                <a href="{{ producto.get_absolute_url }}" class="title link">{{ producto.nombre }}</a>
+                                <span class="price">
+                                    {% if producto.tiene_oferta %}
+                                    <span class="old-price">${{ producto.precio }}</span>
+                                    <span class="new-price">${{ producto.precio_oferta }}</span>
+                                    {% else %}
+                                    <span class="new-price">${{ producto.precio }}</span>
+                                    {% endif %}
+                                </span>
+                            </div>
                         </div>
-
                     </div>
+                    {% endfor %}
+
                 </div>
             </div>
-        </section>
-        <!-- /Categories -->
-
-        <section class="banner-hero-collection-wrap banner-parallax"
-        style="background-image: url('{% static "images/slider/banner.png" %}');">
-        <div class="box-content">
-            <div class="container">
-                <a href="shop-collection-sub.html" class="card-box text-md-start text-center rounded-0">
-                    <h5>Our foundation is set on tried and true processes and open lines of communication.</h5>
-                    <p class="text">We understand that, redesigning your home is a huge undertaking that requires courage and trust. Our experience allows us to guide you every step of the way, keep you informed, and deliver a finished product that is undeniably unique to you.</p>
-                    <div class="wow fadeInUp" data-wow-delay="0s">
-                        <button class="tf-btn style-2 fw-7 text-2 btn-fill animate-hover-btn">
-                            <span>Start today</span>
-                        </button>
-                    </div>
-                </a>
-            </div>
+            <div class="nav-sw nav-next-slider nav-next-product box-icon w_46 round"><span
+                    class="icon icon-arrow-left"></span></div>
+            <div class="nav-sw nav-prev-slider nav-prev-product box-icon w_46 round"><span
+                    class="icon icon-arrow-right"></span></div>
         </div>
-        </section>
-         
-       <!-- Shop Gram -->
-        <section class="pb-0 flat-spacing-18">
-            <div class="container-full px-0">
-                <div dir="ltr" class="swiper tf-sw-shop-gallery" data-preview="5" data-tablet="3" data-mobile="2"
-                    data-space-lg="0" data-space-md="0">
-                    <div class="swiper-wrapper">
-                        {% for post in shop_gram_posts %}
-                        <div class="swiper-slide">
-                            <a href="{{ post.instagram_url }}" target="_blank" rel="noopener noreferrer">
-                                <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
-                                    <div class="img-style">
-                                        <img class="lazyload img-hover shopgram-img"
-                                            data-src="{{ post.imagen.url }}"
-                                            src="{{ post.imagen.url }}"
-                                            alt="Instagram post">
+    </div>
+</section>
+<!-- /Product -->
+
+<!-- Categories -->
+<section class="flat-spacing-18">
+    <div class="container">
+        <!-- <div class="flat-title">
+                    <span class="title wow fadeInUp" data-wow-delay="0s">CATEGORIAS</span>
+                </div> -->
+        <div class="wrap-carousel wrap-mobile">
+            <div dir="ltr" class="swiper tf-sw-mobile" data-preview="1.3" data-space="15">
+                <div class="swiper-wrapper grid-mobile-1">
+                    {% for categoria in categorias %}
+                    <div class="swiper-slide">
+                        <div class="collection-item-v2 hover-img">
+                            <a href="{{ categoria.get_absolute_url }}" class="collection-inner">
+                                <div class="collection-image img-style">
+                                    {% if categoria.imagen %}
+                                    <img class="lazyload" data-src="{{ categoria.imagen.url }}"
+                                        src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}">
+                                    {% else %}
+                                    <img class="lazyload" data-src="{% static 'images/placeholder.jpg' %}"
+                                        src="{% static 'images/placeholder.jpg' %}" alt="{{ categoria.nombre }}">
+                                    {% endif %}
+                                </div>
+                                <div class="collection-content">
+                                    <div class="top wow fadeInUp" data-wow-delay="0s">
+                                        <h5 class="heading">{{ categoria.nombre }}</h5>
+                                        <p class="subheading">{{ categoria.descripcion|truncatewords:5 }}</p>
+                                    </div>
+                                    <div class="bottom wow fadeInUp" data-wow-delay="0s">
+                                        <button class="tf-btn btn-line collection-other-link fw-6"><span>Comprar
+                                                ahora</span><i class="icon icon-arrow1-top-left"></i></button>
                                     </div>
                                 </div>
                             </a>
                         </div>
-                        {% empty %}
-                        <p class="text-center w-100 py-4">No hay publicaciones aún.</p>
-                        {% endfor %}
                     </div>
-                    <div class="absolute-dots sw-dots sw-pagination-gallery justify-content-center"></div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /Categories -->
+
+<style>
+    .card-design-michelle {
+        background-color: rgba(255, 255, 255, 0.75) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    }
+    .card-design-michelle h3 {
+        font-size: 28px;
+        font-weight: 700;
+        font-style: italic;
+        margin-bottom: 20px;
+        color: #001d3d;
+    }
+    @media (max-width: 767px) {
+        .card-design-michelle {
+            padding: 25px 15px !important;
+        }
+        .card-design-michelle h3 {
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            font-style: italic !important;
+            margin-bottom: 12px !important;
+        }
+        .card-design-michelle p {
+            font-size: 12px !important;
+            line-height: 1.4 !important;
+            margin-bottom: 8px !important;
+        }
+    }
+</style>
+
+<section class="banner-hero-collection-wrap banner-parallax" style="background-image: url('/media/portafolio/bannerproyecto.png');">
+    <div class="box-content">
+        <div class="container">
+            <div class="card-box card-design-michelle text-md-start text-center rounded-0">
+                <h3 class="fw-7">Diseño Interior by Michelle Salazar</h3>
+                <p class="text">En <b>Liven Concept Store</b> ofrecemos el servicio de diseño interior personalizado de la mano de Michelle Salazar, diseñadora y directora creativa.</p>
+                <p class="text">Creamos espacios residenciales y comerciales con identidad, funcionalidad y una estética cuidadosamente curada, adaptándonos al estilo y esencia de cada cliente.</p>
+                <p class="text">Diseño, decoración y selección de piezas exclusivas para transformar tus espacios.</p>
+                <div class="wow fadeInUp" data-wow-delay="0s">
+                    <a href="{% url 'productos:lista_productos' %}" class="tf-btn style-2 fw-7 text-2 btn-fill animate-hover-btn">
+                        <span>Comienza hoy</span>
+                    </a>
                 </div>
             </div>
-        </section>
-        <!-- /Shop Gram -->
+        </div>
+    </div>
+</section>
+
+<!-- Shop Gram -->
+<section class="pb-0 flat-spacing-18">
+    <div class="container-full px-0">
+        <div dir="ltr" class="swiper tf-sw-shop-gallery" data-preview="5" data-tablet="3" data-mobile="2"
+            data-space-lg="0" data-space-md="0">
+            <div class="swiper-wrapper">
+                {% for post in shop_gram_posts %}
+                <div class="swiper-slide">
+                    <a href="{{ post.instagram_url }}" target="_blank" rel="noopener noreferrer">
+                        <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
+                            <div class="img-style">
+                                <img class="lazyload img-hover shopgram-img" data-src="{{ post.imagen.url }}"
+                                    src="{{ post.imagen.url }}" alt="Instagram post">
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-center w-100 py-4">No hay publicaciones aún.</p>
+                {% endfor %}
+            </div>
+            <div class="absolute-dots sw-dots sw-pagination-gallery justify-content-center"></div>
+        </div>
+    </div>
+</section>
+<!-- /Shop Gram -->
 <script>
-(function () {
-    // Guarda referencia al swiper del slider de productos
-    let productoSwiper = null;
+    (function () {
+        // Guarda referencia al swiper del slider de productos
+        let productoSwiper = null;
 
-    function getSwiperInstance() {
-        // Busca la instancia Swiper inicializada en el elemento
-        const el = document.querySelector('.tf-sw-product-sell');
-        if (el && el.swiper) return el.swiper;
-        return null;
-    }
+        function getSwiperInstance() {
+            // Busca la instancia Swiper inicializada en el elemento
+            const el = document.querySelector('.tf-sw-product-sell');
+            if (el && el.swiper) return el.swiper;
+            return null;
+        }
 
-    function buildSlide(p) {
-        const ofertaBadge = p.tiene_oferta
-            ? `<div class="on-sale-wrap text-end">
+        function buildSlide(p) {
+            const ofertaBadge = p.tiene_oferta
+                ? `<div class="on-sale-wrap text-end">
                  <div class="on-sale-item">-${p.porcentaje_descuento}%</div>
                </div>`
-            : '';
+                : '';
 
-        const imgHover = p.imagen_2
-            ? `<img class="lazyload img-hover" data-src="${p.imagen_2}" src="${p.imagen_2}" alt="${p.nombre}">`
-            : '';
+            const imgHover = p.imagen_2
+                ? `<img class="lazyload img-hover" data-src="${p.imagen_2}" src="${p.imagen_2}" alt="${p.nombre}">`
+                : '';
 
-        const precioHTML = p.tiene_oferta
-            ? `<span class="old-price">$${p.precio}</span>
+            const precioHTML = p.tiene_oferta
+                ? `<span class="old-price">$${p.precio}</span>
                <span class="new-price">$${p.precio_oferta}</span>`
-            : `<span class="new-price">$${p.precio}</span>`;
+                : `<span class="new-price">$${p.precio}</span>`;
 
-        return `
+            return `
         <div class="swiper-slide">
             <div class="card-product">
                 <div class="card-product-wrapper">
@@ -455,41 +470,42 @@
                 </div>
             </div>
         </div>`;
-    }
+        }
 
-    function cargarProductos(slug) {
-        fetch(`/marca/${slug}/`)
-            .then(r => r.json())
-            .then(data => {
-                const swiper = getSwiperInstance();
-                const wrapper = document.querySelector('.tf-sw-product-sell .swiper-wrapper');
+        function cargarProductos(slug) {
+            fetch(`/marca/${slug}/`)
+                .then(r => r.json())
+                .then(data => {
+                    const swiper = getSwiperInstance();
+                    const wrapper = document.querySelector('.tf-sw-product-sell .swiper-wrapper');
 
-                if (!wrapper) return;
+                    if (!wrapper) return;
 
-                // Reemplaza slides
-                wrapper.innerHTML = data.productos.map(buildSlide).join('');
+                    // Reemplaza slides
+                    wrapper.innerHTML = data.productos.map(buildSlide).join('');
 
-                // Reinicia el swiper
-                if (swiper) {
-                    swiper.update();
-                    swiper.slideTo(0, 0);
-                }
-            })
-            .catch(err => console.error('Error cargando productos:', err));
-    }
+                    // Reinicia el swiper
+                    if (swiper) {
+                        swiper.update();
+                        swiper.slideTo(0, 0);
+                    }
+                })
+                .catch(err => console.error('Error cargando productos:', err));
+        }
 
-    // Event listeners en los botones de marca
-    document.querySelectorAll('.brand-item').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
+        // Event listeners en los botones de marca
+        document.querySelectorAll('.brand-item').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
 
-            // Actualiza clase activa
-            document.querySelectorAll('.brand-item').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
+                // Actualiza clase activa
+                document.querySelectorAll('.brand-item').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
 
-            cargarProductos(this.dataset.slug);
+                cargarProductos(this.dataset.slug);
+            });
         });
-    });
-})();
+    })();
 </script>
-{% endblock %}
+
+    {% endblock %}

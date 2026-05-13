@@ -69,6 +69,40 @@
                     </fieldset>
 
                     <fieldset class="mb-20">
+                        <div class="body-title mb-10">Configuración Home Slider</div>
+                        <div class="flex items-center gap10">
+                            <input type="checkbox" name="mostrar_en_slider" id="id_mostrar_en_slider" style="width: 20px; height: 20px;" {% if marca.mostrar_en_slider %}checked{% endif %}>
+                            <label for="id_mostrar_en_slider" class="body-title-2">¿Mostrar esta marca en el slider principal?</label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="name mb-20" id="fieldset_imagen_slider" {% if not marca.mostrar_en_slider %}style="display: none;"{% endif %}>
+                        <div class="body-title mb-10">Imagen para el Slider</div>
+                        {% if marca.imagen_slider %}
+                        <div id="imagen-actual-slider" style="margin-bottom:12px;">
+                            <div style="position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;max-width:350px;">
+                                <img src="{{ marca.imagen_slider.url }}" style="width:100%;height:auto;display:block;">
+                                <button type="button" onclick="removeCurrentSliderImage()"
+                                    style="position:absolute;top:8px;right:8px;background:rgba(220,53,69,.9);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+                                <div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.7);color:white;padding:3px 8px;border-radius:4px;font-size:11px;">Imagen actual del slider</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <input type="hidden" id="remove-current-slider-image" name="remove_imagen_slider" value="">
+                        <div id="upload-container-slider" {% if marca.imagen_slider %}style="display:none;"{% endif %}>
+                            <div class="up-load" id="upload-area-slider" style="min-height:120px;border:2px dashed #ddd;border-radius:8px;padding:16px;text-align:center;">
+                                <label for="sliderImagen" style="cursor:pointer;display:block;">
+                                    <i class="icon-upload-cloud" style="font-size:1.8rem;"></i>
+                                    <div class="text-tiny mt-6">Haz clic o arrastra para cambiar imagen del slider</div>
+                                    <input type="file" id="sliderImagen" name="imagen_slider" accept="image/*" style="display:none;">
+                                </label>
+                            </div>
+                            <div id="imagen-preview-slider-nueva" style="display:none;margin-top:10px;"></div>
+                        </div>
+                        <small class="text-muted">Imagen horizontal optimizada para el banner de inicio.</small>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
                         <div class="body-title mb-10">Estado</div>
                         <div class="radio-buttons">
                             <div class="item">
@@ -81,6 +115,7 @@
                             </div>
                         </div>
                     </fieldset>
+
 
                     <div class="bot">
                         <a href="{% url 'productos:panel_admin_brands' %}" class="tf-button style-1 w208">Cancelar</a>
@@ -116,6 +151,15 @@ nombreInput.addEventListener('input', function() {
 });
 slugInput.addEventListener('input', function() { this.dataset.manuallyEdited = 'true'; });
 
+// Toggle Slider Image Field
+const mostrarEnSlider = document.getElementById('id_mostrar_en_slider');
+const fieldsetSlider = document.getElementById('fieldset_imagen_slider');
+if (mostrarEnSlider) {
+    mostrarEnSlider.addEventListener('change', function() {
+        fieldsetSlider.style.display = this.checked ? 'block' : 'none';
+    });
+}
+
 function removeCurrentImage() {
     if (!confirm('¿Eliminar la imagen actual?')) return;
     document.getElementById('remove-current-image').value = '1';
@@ -124,34 +168,60 @@ function removeCurrentImage() {
     document.getElementById('upload-container-marca').style.display = 'block';
 }
 
+function removeCurrentSliderImage() {
+    if (!confirm('¿Eliminar la imagen del slider actual?')) return;
+    document.getElementById('remove-current-slider-image').value = '1';
+    const actual = document.getElementById('imagen-actual-slider');
+    if (actual) actual.style.display = 'none';
+    document.getElementById('upload-container-slider').style.display = 'block';
+}
+
 const marcaImageInput = document.getElementById('marcaImagen');
 const uploadAreaMarca = document.getElementById('upload-area-marca');
 const imagenPreviewNueva = document.getElementById('imagen-preview-nueva');
 
+const sliderImageInput = document.getElementById('sliderImagen');
+const uploadAreaSlider = document.getElementById('upload-area-slider');
+const sliderPreviewNueva = document.getElementById('imagen-preview-slider-nueva');
+
 if (marcaImageInput) {
     marcaImageInput.addEventListener('change', function(e) {
-        if (e.target.files && e.target.files[0]) handleMarcaImage(e.target.files[0]);
+        if (e.target.files && e.target.files[0]) handlePreview(e.target.files[0], uploadAreaMarca, imagenPreviewNueva, 'removeNewImage');
     });
 }
-function handleMarcaImage(file) {
+
+if (sliderImageInput) {
+    sliderImageInput.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) handlePreview(e.target.files[0], uploadAreaSlider, sliderPreviewNueva, 'removeNewSliderImage');
+    });
+}
+
+function handlePreview(file, area, preview, removeFnName) {
     const reader = new FileReader();
     reader.onload = function(e) {
-        uploadAreaMarca.style.display = 'none';
-        imagenPreviewNueva.style.display = 'block';
-        imagenPreviewNueva.innerHTML = `
-            <div style="position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;max-width:250px;">
+        area.style.display = 'none';
+        preview.style.display = 'block';
+        preview.innerHTML = `
+            <div style="position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;max-width:350px;">
                 <img src="${e.target.result}" style="width:100%;height:auto;display:block;">
-                <button type="button" onclick="removeNewImage()"
+                <button type="button" onclick="${removeFnName}()"
                     style="position:absolute;top:8px;right:8px;background:rgba(220,53,69,.9);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
             </div>`;
     };
     reader.readAsDataURL(file);
 }
+
 function removeNewImage() {
     marcaImageInput.value = '';
     imagenPreviewNueva.style.display = 'none';
-    imagenPreviewNueva.innerHTML = '';
     uploadAreaMarca.style.display = 'block';
 }
+
+function removeNewSliderImage() {
+    sliderImageInput.value = '';
+    sliderPreviewNueva.style.display = 'none';
+    uploadAreaSlider.style.display = 'block';
+}
 </script>
+
 {% endblock %}

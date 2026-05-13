@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from apps.productos.utils import compress_image_to_webp
 from apps.productos.models import Producto
 
 
@@ -32,6 +33,11 @@ class Proyecto(models.Model):
         ordering = ['posicion', 'created_at']
         verbose_name = "Proyecto"
         verbose_name_plural = "Proyectos"
+
+    def save(self, *args, **kwargs):
+        if self.imagen and not self.imagen.name.lower().endswith('.webp'):
+            self.imagen = compress_image_to_webp(self.imagen)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.titulo

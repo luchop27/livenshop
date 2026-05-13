@@ -1,0 +1,149 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Editar Solicitud - {{ solicitud.nombres_novios }}{% endblock %}
+
+{% block extra_css %}
+<!-- Incluir Select2 para búsqueda fácil de productos -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        min-height: 45px;
+        padding: 5px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #1a2744;
+        border: none;
+        color: white;
+        border-radius: 4px;
+        padding: 4px 8px;
+        margin-top: 4px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: white;
+        margin-right: 6px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        color: #ff6b6b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 style="font-size:1.5rem;font-weight:700;margin:0;">Editar Solicitud</h2>
+                    <p style="color:#888;font-size:13px;margin:4px 0 0;">{{ solicitud.nombres_novios }}</p>
+                </div>
+                <a href="{% url 'planes:panel_admin_solicitudes' %}" class="btn btn-outline-secondary" style="border-radius:20px; font-weight:600; font-size:13px;">← Volver</a>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card" style="border-radius:16px; border:none; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+                        <div class="card-body p-4 p-lg-5">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <h5 class="mb-4" style="color:#1a2744; font-weight:700; border-bottom:1px solid #eee; padding-bottom:10px;">Datos de los Novios</h5>
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Nombres de los Novios</label>
+                                        {{ form.nombres_novios }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Email</label>
+                                        {{ form.email }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Teléfono (WhatsApp)</label>
+                                        {{ form.telefono }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Fecha Tentativa de Boda</label>
+                                        {{ form.fecha_boda }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Ciudad</label>
+                                        {{ form.ciudad }}
+                                    </div>
+                                </div>
+
+                                <h5 class="mb-4 mt-4" style="color:#1a2744; font-weight:700; border-bottom:1px solid #eee; padding-bottom:10px;">Asignar Productos (Lista de Bodas)</h5>
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Buscar y Añadir Productos</label>
+                                    <p style="font-size:12px; color:#666; margin-bottom:8px;">Escribe el nombre del producto para buscarlo. Puedes seleccionar varios.</p>
+                                    {{ form.productos_regalo }}
+                                </div>
+
+                                <h5 class="mb-4 mt-4" style="color:#1a2744; font-weight:700; border-bottom:1px solid #eee; padding-bottom:10px;">Acceso al Portal 24/7</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Clave para el Portal</label>
+                                        {{ form.clave }}
+                                        <div class="form-text" style="font-size:11px;">Escribe una clave (ej: BodaLiven123) y envíasela por WhatsApp a los novios para que puedan ver su saldo.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Saldo Acumulado ($)</label>
+                                        {{ form.saldo_acumulado }}
+                                        <div class="form-text" style="font-size:11px;">Monto actual acumulado en regalos de efectivo.</div>
+                                    </div>
+                                </div>
+
+                                <h5 class="mb-4 mt-4" style="color:#1a2744; font-weight:700; border-bottom:1px solid #eee; padding-bottom:10px;">Gestión de la Solicitud</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Estado</label>
+                                        {{ form.estado }}
+                                        <div class="form-text" style="font-size:11px;">Recuerda ponerlo en "Aprobado" para que sea visible en la web.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check mt-4 pt-2">
+                                            {{ form.procesado }}
+                                            <label class="form-check-label fw-bold" for="{{ form.procesado.id_for_label }}">
+                                                ¿Ya me contacté con ellos?
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Comentario (Interno)</label>
+                                    {{ form.mensaje }}
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn" style="background:#1a2744; color:white; border-radius:50px; padding:12px 30px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; font-size:13px; border:none; box-shadow:0 4px 15px rgba(26,39,68,0.2);">Guardar Cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#id_productos_regalo').select2({
+            placeholder: "Buscar productos...",
+            allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return "No se encontraron productos";
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

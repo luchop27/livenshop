@@ -38,6 +38,7 @@ urlpatterns = [
     # ── CARRITO & CHECKOUT ───────────────────────────────────────
     path('cart/', views.view_cart, name='view_cart'),
     path('cart/add/', views.cart_add, name='cart_add'),
+    path('cart/add-gift/', views.cart_add_gift, name='cart_add_gift'),
     path('cart/remove/', views.cart_remove, name='cart_remove'),
     path('cart/update/', views.cart_update, name='cart_update'),
     path('checkout/', views.checkout, name='checkout'),

@@ -1,0 +1,160 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Solicitudes Plan de Novios | Panel Admin{% endblock %}
+{% block menu_planes %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <div class="main-content-inner">
+    <div class="main-content-wrap">
+
+<style>
+.sol-filters { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+.sol-filter-btn {
+    padding:8px 18px; border-radius:50px; font-size:12px; font-weight:600;
+    letter-spacing:.05em; text-transform:uppercase; text-decoration:none;
+    border:1.5px solid #e5e0d8; color:#666; transition:all .2s;
+}
+.sol-filter-btn:hover, .sol-filter-btn.active { background:#c9a96e; border-color:#c9a96e; color:#fff; }
+.sol-filter-btn.f-pending.active { background:#f59e0b; border-color:#f59e0b; color:#fff; }
+.sol-filter-btn.f-aprobado.active { background:#22c55e; border-color:#22c55e; color:#fff; }
+.sol-filter-btn.f-finalizado.active { background:#6b7280; border-color:#6b7280; color:#fff; }
+
+.sol-table th { font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:#888; font-weight:600; }
+.sol-table td { vertical-align:middle; font-size:14px; }
+
+.badge-estado {
+    display:inline-block; padding:4px 12px; border-radius:20px;
+    font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+}
+.badge-pendiente { background:#fef3c7; color:#92400e; }
+.badge-aprobado  { background:#dcfce7; color:#166534; }
+.badge-finalizado { background:#f3f4f6; color:#374151; }
+
+.sol-actions { display:flex; gap:6px; }
+.sol-action {
+    padding:5px 12px; border-radius:20px; font-size:11px; font-weight:700;
+    text-decoration:none; border:none; cursor:pointer; transition:all .2s; text-transform:uppercase; letter-spacing:.04em;
+}
+.sol-action.aprobar { background:#dcfce7; color:#166534; }
+.sol-action.aprobar:hover { background:#22c55e; color:#fff; }
+.sol-action.pendiente { background:#fef3c7; color:#92400e; }
+.sol-action.pendiente:hover { background:#f59e0b; color:#fff; }
+.sol-action.finalizar { background:#f3f4f6; color:#374151; }
+.sol-action.finalizar:hover { background:#6b7280; color:#fff; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 style="font-size:1.5rem;font-weight:700;margin:0;">Solicitudes Plan de Novios</h2>
+        <p style="color:#888;font-size:13px;margin:4px 0 0;">Gestiona y aprueba las solicitudes recibidas</p>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="sol-filters">
+    <a href="?estado=" class="sol-filter-btn {% if not estado_activo %}active{% endif %}">
+        Todos ({{ solicitudes|length }})
+    </a>
+    <a href="?estado=pendiente" class="sol-filter-btn f-pending {% if estado_activo == 'pendiente' %}active{% endif %}">
+        ⏳ Pendientes
+    </a>
+    <a href="?estado=aprobado" class="sol-filter-btn f-aprobado {% if estado_activo == 'aprobado' %}active{% endif %}">
+        ✅ Aprobados
+    </a>
+    <a href="?estado=finalizado" class="sol-filter-btn f-finalizado {% if estado_activo == 'finalizado' %}active{% endif %}">
+        🏁 Finalizados
+    </a>
+</div>
+
+{% if messages %}
+{% for msg in messages %}
+<div class="alert alert-{% if msg.tags == 'success' %}success{% else %}danger{% endif %} mb-3" style="border-radius:10px;">
+    {{ msg }}
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- Tabla -->
+<div class="table-responsive" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);overflow:hidden;">
+    <table class="table sol-table mb-0">
+        <thead style="background:#fafaf9;border-bottom:1px solid #f0ece6;">
+            <tr>
+                <th class="py-3 px-4">Novios</th>
+                <th class="py-3 px-4">Email</th>
+                <th class="py-3 px-4">WhatsApp</th>
+                <th class="py-3 px-4">Fecha Boda</th>
+                <th class="py-3 px-4">Ciudad</th>
+                <th class="py-3 px-4">Estado</th>
+                <th class="py-3 px-4">Recibido</th>
+                <th class="py-3 px-4">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sol in solicitudes %}
+            <tr style="border-bottom:1px solid #f5f5f5;">
+                <td class="px-4 py-3">
+                    <strong>{{ sol.nombres_novios }}</strong>
+                    {% if sol.mensaje %}
+                    <div style="font-size:12px;color:#999;margin-top:3px;">{{ sol.mensaje|truncatechars:50 }}</div>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3">
+                    <div style="max-width: 160px; word-break: break-all;">
+                        <a href="mailto:{{ sol.email }}" style="color:#c9a96e;font-size:13px;">{{ sol.email }}</a>
+                    </div>
+                </td>
+                <td class="px-4 py-3">
+                    <a href="https://wa.me/593{{ sol.telefono|slice:'1:' }}" target="_blank"
+                       style="color:#25d366;font-weight:600;white-space:nowrap;">{{ sol.telefono }}</a>
+                </td>
+                <td class="px-4 py-3">{{ sol.fecha_boda|date:"d M Y" }}</td>
+                <td class="px-4 py-3">{{ sol.ciudad|default:"—" }}</td>
+                <td class="px-4 py-3">
+                    <span class="badge-estado badge-{{ sol.estado }}">
+                        {{ sol.get_estado_display }}
+                    </span>
+                </td>
+                <td class="px-4 py-3" style="font-size:12px;color:#999;white-space:nowrap;">
+                    {{ sol.fecha_solicitud|date:"d/m/Y" }}
+                </td>
+                <td class="px-4 py-3">
+                    <div class="sol-actions">
+                        <a href="{% url 'planes:panel_admin_solicitud_editar' sol.pk %}"
+                           class="sol-action" style="background:#e0f2fe; color:#0369a1;" title="Editar (Admin)">✏️</a>
+                        
+                        {% if sol.estado != 'aprobado' %}
+                        <a href="{% url 'planes:panel_admin_solicitud_estado' sol.pk %}?estado=aprobado"
+                           class="sol-action aprobar" title="Aprobar">✅</a>
+                        {% endif %}
+                        {% if sol.estado != 'pendiente' %}
+                        <a href="{% url 'planes:panel_admin_solicitud_estado' sol.pk %}?estado=pendiente"
+                           class="sol-action pendiente" title="Pendiente">⏳</a>
+                        {% endif %}
+                        {% if sol.estado != 'finalizado' %}
+                        <a href="{% url 'planes:panel_admin_solicitud_estado' sol.pk %}?estado=finalizado"
+                           class="sol-action finalizar" title="Finalizar">🏁</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center py-5" style="color:#aaa;">
+                    No hay solicitudes {% if estado_activo %}con estado "{{ estado_activo }}"{% endif %}.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="margin-top:12px;font-size:12px;color:#aaa;">
+    💡 Solo los planes <strong>Aprobados</strong> aparecen en la sección pública "Dejar Regalos".
+</div>
+
+    </div><!-- /main-content-wrap -->
+  </div><!-- /main-content-inner -->
+</div><!-- /main-content -->
+{% endblock %}

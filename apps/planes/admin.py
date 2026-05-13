@@ -40,12 +40,13 @@ class PlanNoviosAdmin(admin.ModelAdmin):
     list_display = ['nombres', 'email', 'saldo_acumulado', 'fecha_boda', 'activo']
     list_editable = ['activo']
     search_fields = ['nombres', 'email']
-    inlines = [MovimientoPlanInline]
 
 
 @admin.register(SolicitudPlanNovios)
 class SolicitudPlanNoviosAdmin(admin.ModelAdmin):
-    list_display = ['nombres_novios', 'email', 'telefono', 'fecha_boda', 'procesado', 'fecha_solicitud']
-    list_filter = ['procesado', 'fecha_solicitud']
-    list_editable = ['procesado']
+    list_display = ['nombres_novios', 'email', 'telefono', 'fecha_boda', 'estado', 'procesado', 'fecha_solicitud']
+    list_filter = ['estado', 'procesado', 'fecha_solicitud']
+    list_editable = ['estado', 'procesado']
     search_fields = ['nombres_novios', 'email', 'telefono']
+    filter_horizontal = ['productos_regalo']
+    inlines = [MovimientoPlanInline]

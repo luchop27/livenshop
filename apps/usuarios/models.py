@@ -241,3 +241,25 @@ class Wishlist(models.Model):
     
     def __str__(self):
         return f"{self.usuario.email} - {self.producto.nombre}"
+
+
+# ==================== NOTIFICACION ADMIN ====================
+class NotificacionAdmin(models.Model):
+    """Modelo para notificaciones en el panel administrativo (Campanita)"""
+    TIPO_CHOICES = (
+        ('pedido', 'Pedido'),
+        ('plan_novios', 'Plan de Novios'),
+    )
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    mensaje = models.CharField(max_length=255)
+    url = models.CharField(max_length=255)
+    leido = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Notificación Admin'
+        verbose_name_plural = 'Notificaciones Admin'
+        ordering = ['-fecha_creacion']
+        
+    def __str__(self):
+        return f"{self.get_tipo_display()} - {self.mensaje}"

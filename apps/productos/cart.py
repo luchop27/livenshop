@@ -42,7 +42,8 @@ class Cart:
         if not self.user.is_authenticated:
             return
             
-        valid_items = {k: v for k, v in self.cart.items() if not k.startswith('_') and isinstance(v, dict)}
+        # Solo sincronizar items que NO sean regalos (ya que regalos no tienen producto_id real)
+        valid_items = {k: v for k, v in self.cart.items() if not k.startswith('_') and isinstance(v, dict) and not v.get('is_gift')}
         existing_db_ids = {item['_db_id'] for item in valid_items.values() if '_db_id' in item}
         
         CarritoItem.objects.filter(usuario=self.user).exclude(id__in=existing_db_ids).delete()
@@ -95,6 +96,27 @@ class Cart:
         
         self.save()
 
+    def add_gift(self, plan_id, nombres_novios, nombre_invitado, mensaje, monto, quantity=1, producto_id=None, nombre_producto=None, imagen_url=None):
+        """Agrega un aporte de regalo al carrito. Puede ser efectivo (sin producto) o un producto físico específico."""
+        import time
+        gift_key = f"gift_{plan_id}_{int(time.time())}"
+        
+        self.cart[gift_key] = {
+            'is_gift': True,
+            'plan_id': plan_id,
+            'nombres_novios': nombres_novios,
+            'nombre_invitado': nombre_invitado,
+            'mensaje': mensaje,
+            'precio': str(monto),
+            'quantity': quantity,
+            'nombre': nombre_producto if nombre_producto else f"Aporte en Efectivo: Matrimonio de {nombres_novios}",
+            'imagen': imagen_url,
+            'producto_slug': '#',
+            'producto_id': producto_id,
+            'is_physical_gift': bool(producto_id),
+        }
+        self.save()
+
     def save(self):
         self.session.modified = True
         if self.user.is_authenticated:
@@ -113,23 +135,30 @@ class Cart:
 
     def __iter__(self):
         valid_items = {k: v for k, v in self.cart.items() if not k.startswith('_') and isinstance(v, dict)}
-        product_ids = [int(item['producto_id']) for item in valid_items.values()]
+        product_ids = [int(item['producto_id']) for item in valid_items.values() if not item.get('is_gift') and item.get('producto_id')]
         productos = Producto.objects.filter(id__in=product_ids).prefetch_related('imagenes')
         
         for key, item_data in valid_items.items():
             item = item_data.copy()
             item['cart_key'] = key
-            producto = next((p for p in productos if p.id == item['producto_id']), None)
-            item['producto'] = producto
             
-            if 'producto_slug' not in item and producto:
-                item['producto_slug'] = producto.slug
-            
-            item['precio_decimal'] = Decimal(item['precio'])
-            item['total_precio'] = item['precio_decimal'] * item['quantity']
-            # Agregar 'total' que es lo que espera el template
-            item['total'] = item['total_precio']
-            yield item
+            if item.get('is_gift'):
+                item['producto'] = None
+                item['precio_decimal'] = Decimal(item['precio'])
+                item['total_precio'] = item['precio_decimal'] * item['quantity']
+                item['total'] = item['total_precio']
+                yield item
+            else:
+                producto = next((p for p in productos if p.id == item['producto_id']), None)
+                item['producto'] = producto
+                
+                if 'producto_slug' not in item and producto:
+                    item['producto_slug'] = producto.slug
+                
+                item['precio_decimal'] = Decimal(item['precio'])
+                item['total_precio'] = item['precio_decimal'] * item['quantity']
+                item['total'] = item['total_precio']
+                yield item
 
     def __len__(self):
         return sum(item['quantity'] for key, item in self.cart.items() if not key.startswith('_') and isinstance(item, dict))
@@ -159,7 +188,8 @@ class Cart:
             self.save()
 
     def sync_with_stock(self, adjust_to_stock=True):
-        valid_items = {key: item for key, item in self.cart.items() if not key.startswith('_') and isinstance(item, dict)}
+        # Ignoramos los items de regalo porque no tienen stock real
+        valid_items = {key: item for key, item in self.cart.items() if not key.startswith('_') and isinstance(item, dict) and not item.get('is_gift')}
         has_changes = False
 
         for product_key, item_data in list(valid_items.items()):

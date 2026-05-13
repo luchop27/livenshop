@@ -51,4 +51,8 @@ urlpatterns = [
     # Panel Admin — Usuarios
     path('panel-admin/usuarios/', views.panel_admin_users, name='panel_admin_users'),
     path('panel-admin/usuarios/<int:usuario_id>/toggle-status/', views.panel_admin_user_toggle_status, name='panel_admin_user_toggle_status'),
+
+    # Panel Admin — Notificaciones
+    path('panel-admin/api/notificaciones/', views.api_notificaciones_admin, name='api_notificaciones_admin'),
+    path('panel-admin/notificaciones/<int:notificacion_id>/ir/', views.ir_notificacion_admin, name='ir_notificacion_admin'),
 ]
