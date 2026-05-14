@@ -146,15 +146,18 @@ def portal_novios(request):
         clave_hash = hashlib.sha256(clave.encode()).hexdigest()
 
         try:
-            registro = SolicitudPlanNovios.objects.get(email=email, estado='aprobado')
-            if registro.clave and (registro.clave == clave_hash or registro.clave == clave):
-                plan_data = registro
-            elif not registro.clave:
-                error = 'Tu plan está aprobado pero aún no se te ha asignado una clave. Contacta a Liven.'
+            registro = SolicitudPlanNovios.objects.filter(email=email, estado='aprobado').first()
+            if registro:
+                if registro.clave and (registro.clave == clave_hash or registro.clave == clave):
+                    plan_data = registro
+                elif not registro.clave:
+                    error = 'Tu plan está aprobado pero aún no se te ha asignado una clave. Contacta a Liven.'
+                else:
+                    error = 'Clave incorrecta. Por favor verifica tus datos.'
             else:
-                error = 'Clave incorrecta. Por favor verifica tus datos.'
-        except SolicitudPlanNovios.DoesNotExist:
-            error = 'No encontramos un plan aprobado con ese email.'
+                error = 'No encontramos un plan aprobado con ese email.'
+        except Exception as e:
+            error = f'Ocurrió un error al verificar los datos: {e}'
 
     return render(request, 'planes/portal_novios.html', {
         'plan_data': plan_data,

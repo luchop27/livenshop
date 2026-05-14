@@ -78,9 +78,7 @@ class Marca(models.Model):
         if self.imagen and not self.imagen.name.lower().endswith('.webp'):
             self.imagen = compress_image_to_webp(self.imagen)
         
-        # Procesar imagen del slider
-        if self.imagen_slider and not self.imagen_slider.name.lower().endswith('.webp'):
-            self.imagen_slider = compress_image_to_webp(self.imagen_slider)
+        # Nota: Ya no comprimimos a WebP la imagen_slider porque el cliente pidió mantener la máxima calidad original.
 
         super().save(*args, **kwargs)
 
