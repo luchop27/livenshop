@@ -43,6 +43,23 @@
 .sol-action.pendiente:hover { background:#f59e0b; color:#fff; }
 .sol-action.finalizar { background:#f3f4f6; color:#374151; }
 .sol-action.finalizar:hover { background:#6b7280; color:#fff; }
+
+.table-solicitudes-list .table-title,
+.table-solicitudes-list .item-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    align-items: center;
+    gap: 20px;
+}
+@media (max-width: 768px) {
+    .table-solicitudes-list .table-title { display: none; }
+    .table-solicitudes-list .item-row {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -76,78 +93,76 @@
 {% endfor %}
 {% endif %}
 
-<!-- Tabla -->
-<div class="table-responsive" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);overflow:hidden;">
-    <table class="table sol-table mb-0">
-        <thead style="background:#fafaf9;border-bottom:1px solid #f0ece6;">
-            <tr>
-                <th class="py-3 px-4">Novios</th>
-                <th class="py-3 px-4">Email</th>
-                <th class="py-3 px-4">WhatsApp</th>
-                <th class="py-3 px-4">Fecha Boda</th>
-                <th class="py-3 px-4">Ciudad</th>
-                <th class="py-3 px-4">Estado</th>
-                <th class="py-3 px-4">Recibido</th>
-                <th class="py-3 px-4">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
+<div class="wg-box">
+    <div class="wg-table table-solicitudes-list">
+        <ul class="table-title mb-14" style="padding-bottom:10px;border-bottom:1px solid #eee; list-style:none; padding-left:0;">
+            <li><div class="body-title">Novios y Acciones</div></li>
+            <li><div class="body-title">Contacto</div></li>
+            <li><div class="body-title">Fecha Boda</div></li>
+            <li><div class="body-title">Estado</div></li>
+        </ul>
+
+        <ul class="flex flex-column" style="list-style:none; padding-left:0;">
             {% for sol in solicitudes %}
-            <tr style="border-bottom:1px solid #f5f5f5;">
-                <td class="px-4 py-3">
-                    <strong>{{ sol.nombres_novios }}</strong>
-                    {% if sol.mensaje %}
-                    <div style="font-size:12px;color:#999;margin-top:3px;">{{ sol.mensaje|truncatechars:50 }}</div>
-                    {% endif %}
-                </td>
-                <td class="px-4 py-3">
-                    <div style="max-width: 160px; word-break: break-all;">
-                        <a href="mailto:{{ sol.email }}" style="color:#c9a96e;font-size:13px;">{{ sol.email }}</a>
+            <li class="wg-product item-row" style="padding:15px 0; border-bottom:1px solid #f9f9f9;">
+                <div class="name" style="display:flex; flex-direction:column; justify-content:center;">
+                    <div class="title mb-0">
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <a href="{% url 'planes:panel_admin_solicitud_editar' sol.pk %}" class="body-text" style="font-size:15px; font-weight:700; color:#1a2744;" title="Clic para editar">
+                                {{ sol.nombres_novios }}
+                            </a>
+                            
+                            <div class="sol-actions" style="margin-top:2px;">
+                                <a href="{% url 'planes:panel_admin_solicitud_editar' sol.pk %}"
+                                   class="sol-action" style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:20px; font-size:10px;" title="Editar (Admin)">Editar</a>
+                                
+                                {% if sol.estado != 'aprobado' %}
+                                <a href="{% url 'planes:panel_admin_solicitud_estado' sol.pk %}?estado=aprobado"
+                                   class="sol-action aprobar" style="padding:4px 8px; border-radius:50%; display:flex; align-items:center; justify-content:center; width:24px; height:24px; font-size:10px;" title="Aprobar">✅</a>
+                                {% endif %}
+                                {% if sol.estado != 'pendiente' %}
+                                <a href="{% url 'planes:panel_admin_solicitud_estado' sol.pk %}?estado=pendiente"
+                                   class="sol-action pendiente" style="padding:4px 8px; border-radius:50%; display:flex; align-items:center; justify-content:center; width:24px; height:24px; font-size:10px;" title="Pendiente">⏳</a>
+                                {% endif %}
+                                {% if sol.estado != 'finalizado' %}
+                                <a href="{% url 'planes:panel_admin_solicitud_estado' sol.pk %}?estado=finalizado"
+                                   class="sol-action finalizar" style="padding:4px 8px; border-radius:50%; display:flex; align-items:center; justify-content:center; width:24px; height:24px; font-size:10px;" title="Finalizar">🏁</a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if sol.mensaje %}
+                        <div class="text-tiny text-muted mt-4" style="font-size:12px; line-height:1.4;">{{ sol.mensaje|truncatechars:60 }}</div>
+                        {% endif %}
+                        <div class="text-tiny text-muted mt-4">Recibido: {{ sol.fecha_solicitud|date:"d/m/Y" }}</div>
                     </div>
-                </td>
-                <td class="px-4 py-3">
-                    <a href="https://wa.me/593{{ sol.telefono|slice:'1:' }}" target="_blank"
-                       style="color:#25d366;font-weight:600;white-space:nowrap;">{{ sol.telefono }}</a>
-                </td>
-                <td class="px-4 py-3">{{ sol.fecha_boda|date:"d M Y" }}</td>
-                <td class="px-4 py-3">{{ sol.ciudad|default:"—" }}</td>
-                <td class="px-4 py-3">
+                </div>
+
+                <div class="body-text text-main-dark" style="display:flex; flex-direction:column; gap:4px; justify-content:center;">
+                    <div style="font-size:13px;word-break:break-all;"><i class="icon-mail" style="color:#888;"></i> {{ sol.email }}</div>
+                    <div><a href="https://wa.me/593{{ sol.telefono|slice:'1:' }}" target="_blank" style="color:#25d366;font-weight:600;font-size:13px;"><i class="icon-phone" style="color:#25d366;"></i> {{ sol.telefono }}</a></div>
+                </div>
+
+                <div class="body-text text-main-dark" style="display:flex; flex-direction:column; justify-content:center;">
+                    <div style="font-weight:600; font-size:13px;">{{ sol.fecha_boda|date:"d M Y" }}</div>
+                    <div class="text-tiny text-muted mt-4">{{ sol.ciudad|default:"—" }}</div>
+                </div>
+
+                <div class="body-text text-main-dark" style="display:flex; align-items:center;">
                     <span class="badge-estado badge-{{ sol.estado }}">
                         {{ sol.get_estado_display }}
                     </span>
-                </td>
-                <td class="px-4 py-3" style="font-size:12px;color:#999;white-space:nowrap;">
-                    {{ sol.fecha_solicitud|date:"d/m/Y" }}
-                </td>
-                <td class="px-4 py-3">
-                    <div class="sol-actions">
-                        <a href="{% url 'planes:panel_admin_solicitud_editar' sol.pk %}"
-                           class="sol-action" style="background:#e0f2fe; color:#0369a1;" title="Editar (Admin)">✏️</a>
-                        
-                        {% if sol.estado != 'aprobado' %}
-                        <a href="{% url 'planes:panel_admin_solicitud_estado' sol.pk %}?estado=aprobado"
-                           class="sol-action aprobar" title="Aprobar">✅</a>
-                        {% endif %}
-                        {% if sol.estado != 'pendiente' %}
-                        <a href="{% url 'planes:panel_admin_solicitud_estado' sol.pk %}?estado=pendiente"
-                           class="sol-action pendiente" title="Pendiente">⏳</a>
-                        {% endif %}
-                        {% if sol.estado != 'finalizado' %}
-                        <a href="{% url 'planes:panel_admin_solicitud_estado' sol.pk %}?estado=finalizado"
-                           class="sol-action finalizar" title="Finalizar">🏁</a>
-                        {% endif %}
-                    </div>
-                </td>
-            </tr>
+                </div>
+            </li>
             {% empty %}
-            <tr>
-                <td colspan="8" class="text-center py-5" style="color:#aaa;">
+            <li class="item-row gap20" style="padding:30px 0; justify-content:center;">
+                <div class="body-text" style="color:#aaa;">
                     No hay solicitudes {% if estado_activo %}con estado "{{ estado_activo }}"{% endif %}.
-                </td>
-            </tr>
+                </div>
+            </li>
             {% endfor %}
-        </tbody>
-    </table>
+        </ul>
+    </div>
 </div>
 
 <div style="margin-top:12px;font-size:12px;color:#aaa;">

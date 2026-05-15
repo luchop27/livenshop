@@ -59,14 +59,14 @@ def registro_novios(request):
                 )
                 # Notificación WhatsApp al administrador
                 wa_msg = (
-                    f"💍 *Nueva Solicitud Plan de Novios*%0a%0a"
+                    f"💍 *Hola Liven, nos acabamos de registrar en el Plan de Novios!*%0a%0a"
+                    f"Queremos agendar una cita presencial para elegir los productos de nuestra lista y recibir recomendaciones.%0a%0a"
+                    f"*Nuestros datos:*%0a"
                     f"*Novios:* {urllib.parse.quote(nombres)}%0a"
                     f"*Email:* {urllib.parse.quote(email)}%0a"
                     f"*Teléfono:* {urllib.parse.quote(telefono)}%0a"
                     f"*Fecha boda:* {fecha_boda}%0a"
                     f"*Ciudad:* {urllib.parse.quote(ciudad or 'No especificada')}%0a"
-                    f"*Mensaje:* {urllib.parse.quote(mensaje or 'Ninguno')}%0a%0a"
-                    f"Revisa el panel admin para aprobar el plan."
                 )
                 wa_url = f"https://wa.me/593989387657?text={wa_msg}"
                 messages.success(
@@ -100,9 +100,33 @@ def dejar_regalos_matrimonios(request):
 
 def detalle_regalo_matrimonio(request, id):
     """Página de detalle para dejar un regalo a una pareja específica."""
+    from django.db.models import Sum
+    from apps.planes.models import MovimientoPlan
+    
     solicitud = get_object_or_404(SolicitudPlanNovios, pk=id, estado='aprobado')
+    
+    # Calcular cuánto se ha abonado a cada producto
+    abonos_por_producto = {}
+    movimientos = MovimientoPlan.objects.filter(plan=solicitud, tipo='aporte').values('producto_id').annotate(total_abono=Sum('monto'))
+    for m in movimientos:
+        if m['producto_id']:
+            abonos_por_producto[m['producto_id']] = m['total_abono']
+            
+    # Adjuntamos esta info a los productos
+    productos_con_abono = []
+    for prod in solicitud.productos_regalo.all():
+        abono = abonos_por_producto.get(prod.id, 0)
+        completado = abono >= prod.precio_final()
+        productos_con_abono.append({
+            'producto': prod,
+            'abono': abono,
+            'completado': completado,
+            'faltante': prod.precio_final() - abono if not completado else 0
+        })
+
     return render(request, 'planes/detalle_regalo_matrimonio.html', {
         's': solicitud,
+        'productos_con_abono': productos_con_abono,
     })
 
 
@@ -140,6 +164,11 @@ def portal_novios(request):
     plan_data = None
     error = None
 
+    resumen_productos = []
+    resumen_efectivo = []
+    total_efectivo = 0
+    saldo_total = 0
+
     if request.method == 'POST':
         email = request.POST.get('email', '').strip().lower()
         clave = request.POST.get('clave', '').strip()
@@ -150,6 +179,38 @@ def portal_novios(request):
             if registro:
                 if registro.clave and (registro.clave == clave_hash or registro.clave == clave):
                     plan_data = registro
+                    
+                    # Calcular desglose dinámico para el portal
+                    from django.db.models import Sum
+                    from apps.planes.models import MovimientoPlan
+                    
+                    # 1. Efectivo Libre (Sin producto asociado)
+                    movimientos_efectivo = MovimientoPlan.objects.filter(plan=registro, producto__isnull=True).order_by('-fecha')
+                    resumen_efectivo = movimientos_efectivo
+                    total_efectivo = movimientos_efectivo.aggregate(Sum('monto'))['monto__sum'] or 0
+                    
+                    # 2. Productos Físicos (Abonos específicos)
+                    abonos_por_producto = {}
+                    movs_prod = MovimientoPlan.objects.filter(plan=registro, producto__isnull=False).values('producto_id').annotate(total_abono=Sum('monto'))
+                    for m in movs_prod:
+                        abonos_por_producto[m['producto_id']] = m['total_abono']
+                        
+                    total_productos = 0
+                    for prod in registro.productos_regalo.all():
+                        abono = abonos_por_producto.get(prod.id, 0)
+                        total_productos += abono
+                        p_final = prod.precio_final()
+                        completado = abono >= p_final
+                        resumen_productos.append({
+                            'producto': prod,
+                            'abono': abono,
+                            'completado': completado,
+                            'porcentaje': min(int((abono / p_final) * 100), 100) if p_final > 0 else 0
+                        })
+                    
+                    # 3. Saldo Total Dinámico
+                    saldo_total = total_efectivo + total_productos
+                    
                 elif not registro.clave:
                     error = 'Tu plan está aprobado pero aún no se te ha asignado una clave. Contacta a Liven.'
                 else:
@@ -161,6 +222,10 @@ def portal_novios(request):
 
     return render(request, 'planes/portal_novios.html', {
         'plan_data': plan_data,
+        'resumen_productos': resumen_productos,
+        'resumen_efectivo': resumen_efectivo,
+        'total_efectivo': total_efectivo,
+        'saldo_total': saldo_total,
         'error': error,
     })
 
@@ -198,6 +263,35 @@ def panel_admin_solicitud_cambiar_estado(request, solicitud_id):
         messages.success(request, f'Estado actualizado a "{solicitud.get_estado_display()}".')
     return redirect('planes:panel_admin_solicitudes')
 
+
+@staff_member_required(login_url='usuarios:login')
+def buscar_productos_admin(request):
+    """API para buscar productos desde el panel admin (Plan Novios)."""
+    from apps.productos.models import Producto
+    from django.db.models import Q
+    from django.http import JsonResponse
+    
+    q = request.GET.get('q', '').strip()
+    if not q:
+        return JsonResponse({'productos': []})
+        
+    productos = Producto.objects.filter(activo=True).filter(
+        Q(nombre__icontains=q) | Q(categoria__nombre__icontains=q) | Q(slug=q)
+    )[:10]
+    
+    data = []
+    for p in productos:
+        img = p.imagenes.first()
+        data.append({
+            'id': p.id,
+            'nombre': p.nombre,
+            'precio': str(p.precio_final()),
+            'slug': p.slug,
+            'categoria': p.categoria.nombre if p.categoria else 'Sin categoría',
+            'descripcion': p.descripcion_corta or 'Sin descripción',
+            'imagen': img.imagen.url if img and img.imagen else '/static/images/products/placeholder.jpg'
+        })
+    return JsonResponse({'productos': data})
 
 @staff_member_required(login_url='usuarios:login')
 def panel_admin_solicitud_editar(request, solicitud_id):

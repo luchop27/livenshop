@@ -13,21 +13,29 @@ class Cart:
         self.session = request.session
         self.user = request.user
         
+        # Siempre inicializar desde la sesión para no perder items temporales (como regalos)
+        cart = self.session.get(settings.CART_SESSION_ID)
+        if not cart:
+            cart = self.session[settings.CART_SESSION_ID] = {}
+        self.cart = cart
+
+        # Si el usuario está autenticado, sincronizar con la BD
         if self.user.is_authenticated:
             self._load_from_db()
-        else:
-            cart = self.session.get(settings.CART_SESSION_ID)
-            if not cart:
-                cart = self.session[settings.CART_SESSION_ID] = {}
-            self.cart = cart
     
     def _load_from_db(self):
+        """
+        Carga items de la BD y los mezcla con los de la sesión.
+        Los regalos se mantienen en la sesión (ya que CarritoItem no los soporta actualmente).
+        """
         items_db = CarritoItem.objects.filter(usuario=self.user).select_related('producto')
         
-        self.cart = {}
+        # Preservamos lo que ya hay en la sesión (como regalos u otros items añadidos en este request)
         for item in items_db:
             product_key = str(item.producto_id)
             
+            # Solo cargamos de la BD si no estaba ya en la sesión (o si queremos que la BD mande)
+            # Generalmente en Liven, la BD es el estado persistente de productos físicos.
             self.cart[product_key] = {
                 'producto_id': item.producto_id,
                 'nombre': item.producto.nombre,
@@ -101,15 +109,23 @@ class Cart:
         import time
         gift_key = f"gift_{plan_id}_{int(time.time())}"
         
+        # El nombre que ve el INVITADO en el carrito es más romántico/genérico
+        display_name = f"Aporte al Plan de Novios: {nombres_novios}"
+        
+        # Formatear nombres para la tarjeta del carrito
+        nombres_html = nombres_novios.replace(" y ", " <span>&</span> ").replace(" Y ", " <span>&</span> ")
+        
         self.cart[gift_key] = {
             'is_gift': True,
             'plan_id': plan_id,
             'nombres_novios': nombres_novios,
+            'nombres_novios_html': nombres_html,
             'nombre_invitado': nombre_invitado,
             'mensaje': mensaje,
             'precio': str(monto),
             'quantity': quantity,
-            'nombre': nombre_producto if nombre_producto else f"Aporte en Efectivo: Matrimonio de {nombres_novios}",
+            'nombre': display_name,
+            'detalle_producto': nombre_producto if nombre_producto else "Efectivo",
             'imagen': imagen_url,
             'producto_slug': '#',
             'producto_id': producto_id,
@@ -164,7 +180,14 @@ class Cart:
         return sum(item['quantity'] for key, item in self.cart.items() if not key.startswith('_') and isinstance(item, dict))
 
     def get_total_price(self):
-        subtotal = sum(Decimal(item['precio']) * item['quantity'] for key, item in self.cart.items() if not key.startswith('_') and isinstance(item, dict))
+        """
+        Calcula el precio total de todos los items en el carrito.
+        """
+        subtotal = sum(
+            Decimal(item['precio']) * item['quantity'] 
+            for key, item in self.cart.items() 
+            if not key.startswith('_') and isinstance(item, dict) and 'precio' in item
+        )
         if self.has_gift_wrap():
             subtotal += Decimal('5.00')
         return subtotal

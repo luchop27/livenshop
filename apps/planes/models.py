@@ -149,6 +149,7 @@ class MovimientoPlan(models.Model):
         ('ajuste', 'Ajuste'),
     ]
     plan = models.ForeignKey('SolicitudPlanNovios', related_name='movimientos', on_delete=models.CASCADE)
+    producto = models.ForeignKey('productos.Producto', null=True, blank=True, on_delete=models.SET_NULL, related_name='movimientos_plan', help_text="Si es un abono a un producto específico")
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='aporte')
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.CharField(max_length=250, blank=True)

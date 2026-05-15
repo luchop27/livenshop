@@ -18,6 +18,7 @@ urlpatterns = [
 
     # ── PANEL ADMIN — SOLICITUDES ─────────────────────────
     path('panel-admin/solicitudes-novios/', views.panel_admin_solicitudes, name='panel_admin_solicitudes'),
+    path('panel-admin/solicitudes-novios/buscar-productos/', views.buscar_productos_admin, name='buscar_productos_admin'),
     path('panel-admin/solicitudes-novios/<int:solicitud_id>/estado/', views.panel_admin_solicitud_cambiar_estado, name='panel_admin_solicitud_estado'),
     path('panel-admin/solicitudes-novios/<int:solicitud_id>/editar/', views.panel_admin_solicitud_editar, name='panel_admin_solicitud_editar'),
 

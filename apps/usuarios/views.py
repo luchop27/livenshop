@@ -38,86 +38,63 @@ def obtener_logo_base64():
         return ""
 
 
-def enviar_email_directo(destinatario, asunto, mensaje_html, incluir_logo=True):
+def enviar_email_directo(destinatario, asunto, mensaje_html):
     """
-    Envía emails usando Resend API (prioritario) o SMTP (fallback).
+    Envía emails usando el sistema nativo de Django (SMTP/SES) con fallback a Resend.
     """
-    import json
-    import urllib.request
+    from django.core.mail import EmailMultiAlternatives
+    from django.utils.html import strip_tags
     
-    # 1. Intentar con RESEND API
-    if hasattr(settings, 'RESEND_API_KEY') and settings.RESEND_API_KEY:
-        try:
-            print(f"🚀 Iniciando envío vía Resend API a {destinatario}")
-            api_key = settings.RESEND_API_KEY
-            url = "https://api.resend.com/emails"
-            
-            # Si el dominio no está verificado en Resend, usar el email de onboarding
-            # o el remitente configurado si ya verificaron dominio.
-            sender_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'onboarding@resend.dev')
-            
-            payload = {
-                "from": f"LivenShop <{sender_email}>",
-                "to": [destinatario],
-                "subject": asunto,
-                "html": mensaje_html
-            }
-            
-            req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), method='POST')
-            req.add_header('Authorization', f'Bearer {api_key}')
-            req.add_header('Content-Type', 'application/json')
-            
-            with urllib.request.urlopen(req) as response:
-                res_status = response.getcode()
-                res_body = response.read().decode('utf-8')
-                if 200 <= res_status < 300:
-                    print(f"✅ Email enviado exitosamente vía Resend: {res_body}")
-                    return True, ""
-                else:
-                    print(f"❌ Error en respuesta de Resend ({res_status}): {res_body}")
-                    return False, f"Resend Error {res_status}: {res_body}"
-                    
-        except Exception as e:
-            print(f"❌ Excepción en Resend API: {e}")
-            # Si falla Resend, intentamos seguir con SMTP como respaldo o retornar error
-            return False, f"Error en Resend: {str(e)}"
-
-    # 2. Fallback a SMTP (Original)
-    import smtplib
-    import ssl
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.image import MIMEImage
-    
+    # 1. Intentar con SMTP de Django (Configurado para Amazon SES)
     try:
-        print(f"🔌 Fallback: Iniciando envío de email SMTP a {destinatario}")
-        context = ssl.create_default_context()
-        context.check_hostname = False
-        context.verify_mode = ssl.CERT_NONE
+        print(f"🚀 Intentando envío vía SMTP/SES a {destinatario}...")
+        sender_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'hola@liven.ec')
+        text_content = strip_tags(mensaje_html)
         
-        sender_email = getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER)
-        msg = MIMEMultipart('related')
-        msg['Subject'] = asunto
-        msg['From'] = f"LivenShop <{sender_email}>"
-        msg['To'] = destinatario
+        email = EmailMultiAlternatives(
+            asunto,
+            text_content,
+            f"LivenShop <{sender_email}>",
+            [destinatario]
+        )
+        email.attach_alternative(mensaje_html, "text/html")
         
-        msg_alternative = MIMEMultipart('alternative')
-        msg.attach(msg_alternative)
-        msg_alternative.attach(MIMEText(mensaje_html, 'html', 'utf-8'))
-        
-        with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
-            server.ehlo()
-            server.starttls(context=context)
-            server.ehlo()
-            server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-            server.sendmail(sender_email, destinatario, msg.as_string())
-        
+        # Enviar
+        email.send(fail_silently=False)
         print(f"✅ Email enviado exitosamente vía SMTP a {destinatario}")
         return True, ""
         
     except Exception as e:
-        print(f"❌ Error crítico en envío SMTP: {e}")
-        return False, f"Error SMTP: {str(e)}"
+        print(f"❌ Error en envío SMTP: {str(e)}")
+        # Si falla SMTP, intentamos con Resend API como respaldo
+        if hasattr(settings, 'RESEND_API_KEY') and settings.RESEND_API_KEY:
+            import json
+            import urllib.request
+            try:
+                print(f"🔌 Fallback: Intentando envío vía Resend API...")
+                url = "https://api.resend.com/emails"
+                sender_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'onboarding@resend.dev')
+                
+                payload = {
+                    "from": f"LivenShop <{sender_email}>",
+                    "to": [destinatario],
+                    "subject": asunto,
+                    "html": mensaje_html
+                }
+                
+                req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), method='POST')
+                req.add_header('Authorization', f'Bearer {settings.RESEND_API_KEY}')
+                req.add_header('Content-Type', 'application/json')
+                
+                with urllib.request.urlopen(req) as response:
+                    if 200 <= response.getcode() < 300:
+                        print(f"✅ Email enviado exitosamente vía Resend")
+                        return True, ""
+            except Exception as re_e:
+                print(f"❌ Error también en Resend: {re_e}")
+                return False, f"Error SMTP: {str(e)}. Fallback Resend: {str(re_e)}"
+        
+        return False, f"Error en envío: {str(e)}"
 
 
 def enviar_email_verificacion(request, usuario):
@@ -363,7 +340,7 @@ def enviar_email_verificacion(request, usuario):
 def enviar_email_codigo_recuperacion(request, usuario, codigo):
     """Envía el email con el código de 6 dígitos para recuperación de contraseña"""
     try:
-        logo_src = "cid:logoselena"
+        logo_src = obtener_logo_base64() or "https://livenshop-media.s3.amazonaws.com/static/images/logo/logoliven.png"
         nombre_usuario = usuario.nombre or usuario.email.split('@')[0]
         
         mensaje_html = f"""
@@ -373,27 +350,109 @@ def enviar_email_codigo_recuperacion(request, usuario, codigo):
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body {{ font-family: sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }}
-                .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }}
-                .header {{ background: #000; padding: 30px; text-align: center; color: white; }}
-                .content {{ padding: 40px; text-align: center; }}
-                .code-box {{ background: #f8f8f8; border: 2px dashed #c9a96e; padding: 20px; font-size: 32px; font-weight: bold; letter-spacing: 10px; margin: 30px 0; color: #000; display: inline-block; }}
-                .footer {{ background: #f8f8f8; padding: 20px; text-align: center; font-size: 12px; color: #888; }}
+                body {{
+                    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                    background-color: #f0f2f5;
+                    margin: 0;
+                    padding: 40px 20px;
+                }}
+                .email-card {{
+                    max-width: 550px;
+                    margin: 0 auto;
+                    background: #ffffff;
+                    border-radius: 20px;
+                    overflow: hidden;
+                    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+                }}
+                .header {{
+                    background: #0C2038;
+                    padding: 40px;
+                    text-align: center;
+                }}
+                .logo {{
+                    max-width: 130px;
+                    height: auto;
+                }}
+                .body {{
+                    padding: 50px 40px;
+                    text-align: center;
+                    color: #2D3748;
+                }}
+                .greeting {{
+                    font-size: 24px;
+                    font-weight: 700;
+                    margin-bottom: 10px;
+                    color: #1A202C;
+                }}
+                .subtitle {{
+                    font-size: 16px;
+                    color: #718096;
+                    margin-bottom: 30px;
+                }}
+                .code-container {{
+                    background: #F7FAFC;
+                    border: 2px solid #E2E8F0;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin: 30px 0;
+                }}
+                .code-label {{
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    color: #A0AEC0;
+                    margin-bottom: 15px;
+                    display: block;
+                }}
+                .code {{
+                    font-size: 42px;
+                    font-weight: 800;
+                    color: #C9A96E;
+                    letter-spacing: 8px;
+                    margin: 0;
+                }}
+                .instructions {{
+                    font-size: 14px;
+                    line-height: 1.6;
+                    color: #4A5568;
+                    margin-bottom: 30px;
+                }}
+                .footer {{
+                    background: #F7FAFC;
+                    padding: 30px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #A0AEC0;
+                    border-top: 1px solid #EDF2F7;
+                }}
+                .footer a {{
+                    color: #C9A96E;
+                    text-decoration: none;
+                }}
             </style>
         </head>
         <body>
-            <div class="container">
+            <div class="email-card">
                 <div class="header">
-                    <h2 style="margin:0;">Restablecer Contraseña</h2>
+                    <img src="{logo_src}" alt="Liven Shop" class="logo">
                 </div>
-                <div class="content">
-                    <p>Hola <strong>{nombre_usuario}</strong>,</p>
-                    <p>Has solicitado restablecer tu contraseña en LivenShop. Tu código de verificación de 6 dígitos es:</p>
-                    <div class="code-box">{codigo}</div>
-                    <p>Este código expira en 15 minutos. Si no solicitaste este cambio, puedes ignorar este correo.</p>
+                <div class="body">
+                    <h1 class="greeting">Hola, {nombre_usuario}</h1>
+                    <p class="subtitle">Has solicitado restablecer tu contraseña. Utiliza el siguiente código para continuar:</p>
+                    
+                    <div class="code-container">
+                        <span class="code-label">Código de Verificación</span>
+                        <div class="code">{codigo}</div>
+                    </div>
+                    
+                    <p class="instructions">
+                        Este código es válido por <strong>15 minutos</strong>.<br>
+                        Si no has solicitado este cambio, puedes ignorar este mensaje de forma segura.
+                    </p>
                 </div>
                 <div class="footer">
-                    © 2026 LivenShop — Todos los derechos reservados.
+                    © 2026 Liven Shop — Boutique de Regalos & Decoración<br>
+                    ¿Tienes dudas? <a href="https://wa.me/593989387657">Contáctanos por WhatsApp</a>
                 </div>
             </div>
         </body>
