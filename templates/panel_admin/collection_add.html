@@ -81,6 +81,25 @@
                             </label>
                         </div>
                     </fieldset>
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">¿Es una promoción o novedad?</div>
+                        <div class="flex items-center gap10">
+                            <input type="checkbox" name="es_promocion" id="col-es-promocion" style="width:18px;height:18px;"
+                                {% if coleccion.es_promocion %}checked{% endif %}>  {# quitar "coleccion." en el form de crear #}
+                            <label for="col-es-promocion" class="body-title-2" style="margin:0;">
+                                Marcar como promoción (Día del Padre, San Valentín, ofertas, etc.)
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="name mb-20" id="campo-texto-anuncio" style="{% if not coleccion.es_promocion %}display:none;{% endif %}">
+                        <div class="body-title mb-10">Texto para la barra de anuncios</div>
+                        <input class="flex-grow tf-input" type="text" name="texto_anuncio" id="id_texto_anuncio"
+                            value="{{ coleccion.texto_anuncio|default:'' }}"
+                            placeholder="Ej: OFERTA DÍA DEL PADRE — 20% DE DESCUENTO EN TODA LA TIENDA"
+                            maxlength="200">
+                        <small class="text-muted">Aparece en la barra superior animada. Máx. 200 caracteres.</small>
+                    </fieldset>
 
                     <div class="bot">
                         <a href="{% url 'productos:panel_admin_collections' %}" class="tf-button style-1 w208">Cancelar</a>
@@ -134,5 +153,12 @@ function removeColImage() {
     colImagePreview.innerHTML = '';
     uploadAreaCol.style.display = 'block';
 }
+// Mostrar/ocultar campo de texto según checkbox de promoción
+const esPromocionCheck = document.getElementById('col-es-promocion');
+const campoTextoAnuncio = document.getElementById('campo-texto-anuncio');
+
+esPromocionCheck.addEventListener('change', function() {
+    campoTextoAnuncio.style.display = this.checked ? 'block' : 'none';
+});
 </script>
 {% endblock %}

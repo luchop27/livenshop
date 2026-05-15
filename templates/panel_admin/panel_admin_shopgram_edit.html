@@ -1,0 +1,136 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Editar Publicación | Panel Admin{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <h3>Editar Publicación</h3>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><a href="{% url 'productos:panel_admin_shopgram_list' %}"><div class="text-tiny">Shop Gram</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Editar</div></li>
+                </ul>
+            </div>
+
+            {% if messages %}{% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+            {% endfor %}{% endif %}
+
+            <div class="wg-box">
+                <form class="form-new-product form-style-1" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">URL de Instagram <span class="tf-color-1">*</span></div>
+                        <input class="flex-grow tf-input" type="url" name="instagram_url" value="{{ post.instagram_url }}" required>
+                    </fieldset>
+
+                    <fieldset class="name mb-20">
+                        <div class="body-title mb-10">Imagen</div>
+                        {% if post.imagen %}
+                        <div id="imagen-actual" style="margin-bottom:12px;">
+                            <div style="position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;max-width:250px;">
+                                <img src="{{ post.imagen.url }}" style="width:100%;height:auto;display:block;">
+                                <button type="button" onclick="removeCurrentImage()"
+                                    style="position:absolute;top:8px;right:8px;background:rgba(220,53,69,.9);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+                                <div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.7);color:white;padding:3px 8px;border-radius:4px;font-size:11px;">Imagen actual</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <input type="hidden" id="remove-imagen" name="remove_imagen" value="">
+                        <div id="upload-container" {% if post.imagen %}style="display:none;"{% endif %}>
+                            <div class="up-load" id="upload-area" style="min-height:120px;border:2px dashed #ddd;border-radius:8px;padding:16px;text-align:center;">
+                                <label for="postImagen" style="cursor:pointer;display:block;">
+                                    <i class="icon-upload-cloud" style="font-size:1.8rem;"></i>
+                                    <div class="text-tiny mt-6">Haz clic o arrastra para cambiar imagen</div>
+                                    <input type="file" id="postImagen" name="imagen" accept="image/*" style="display:none;">
+                                </label>
+                            </div>
+                            <div id="imagen-preview-nueva" style="display:none;margin-top:10px;"></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="mb-20">
+                        <div class="body-title mb-10">Estado</div>
+                        <div class="radio-buttons">
+                            <div class="item">
+                                <input type="radio" name="activo" value="True" id="post-activo" {% if post.activo %}checked{% endif %}>
+                                <label for="post-activo"><span class="body-title-2">Activo</span></label>
+                            </div>
+                            <div class="item">
+                                <input type="radio" name="activo" value="False" id="post-inactivo" {% if not post.activo %}checked{% endif %}>
+                                <label for="post-inactivo"><span class="body-title-2">Inactivo</span></label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="bot">
+                        <a href="{% url 'productos:panel_admin_shopgram_list' %}" class="tf-button style-1 w208">Cancelar</a>
+                        <button class="tf-button w208" type="submit">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Zona de Peligro -->
+            <div class="wg-box mt-30" style="border:1px solid #fca5a5;">
+                <div class="body-title mb-10" style="color:#dc2626;">Zona de Peligro</div>
+                <p class="text-tiny mb-14">Eliminar esta publicación es una acción irreversible.</p>
+                <form method="post" action="{% url 'productos:panel_admin_shopgram_delete' post.pk %}" onsubmit="return confirm('¿Eliminar esta publicación?')">
+                    {% csrf_token %}
+                    <button type="submit" class="tf-button" style="background:#dc2626;border-color:#dc2626;">
+                        <i class="icon-trash-2"></i> Eliminar Publicación
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function removeCurrentImage() {
+    if (!confirm('¿Eliminar la imagen actual?')) return;
+    document.getElementById('remove-imagen').value = '1';
+    const actual = document.getElementById('imagen-actual');
+    if (actual) actual.style.display = 'none';
+    document.getElementById('upload-container').style.display = 'block';
+}
+
+const imageInput = document.getElementById('postImagen');
+const uploadArea = document.getElementById('upload-area');
+const previewNueva = document.getElementById('imagen-preview-nueva');
+
+if (imageInput) {
+    imageInput.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadArea.style.display = 'none';
+                previewNueva.style.display = 'block';
+                previewNueva.innerHTML = `
+                    <div style="position:relative;border:1px solid #ddd;border-radius:8px;overflow:hidden;max-width:350px;">
+                        <img src="${e.target.result}" style="width:100%;height:auto;display:block;">
+                        <button type="button" onclick="removeNewImage()"
+                            style="position:absolute;top:8px;right:8px;background:rgba(220,53,69,.9);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+                    </div>`;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+}
+
+function removeNewImage() {
+    imageInput.value = '';
+    previewNueva.style.display = 'none';
+    uploadArea.style.display = 'block';
+}
+</script>
+{% endblock %}

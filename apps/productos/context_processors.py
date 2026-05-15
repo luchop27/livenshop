@@ -1,4 +1,5 @@
-from .models import Categoria, CarritoItem, Marca
+from .models import Categoria, CarritoItem, Coleccion, Marca, ShopGramPost
+
 
 def menu_categorias(request):
     return {
@@ -14,3 +15,20 @@ from .cart import Cart
 def carrito_count(request):
     cart = Cart(request)
     return {'cart': cart, 'carrito_count': len(cart)}
+def shop_gram(request):
+    return {
+        'shop_gram_posts': ShopGramPost.objects.filter(activo=True)[:10]
+    }
+def anuncios_bar(request):
+    anuncios = Coleccion.objects.filter(
+        activo=True,
+        es_promocion=True
+    ).exclude(
+        texto_anuncio__isnull=True
+    ).exclude(
+        texto_anuncio__exact=''
+    )
+
+    return {
+        'anuncios_bar': anuncios
+    }

@@ -4,7 +4,7 @@
 {% block content %}
 
         <!-- Slider -->
-        <section class="tf-slideshow about-us-page position-relative">
+        <!-- <section class="tf-slideshow about-us-page position-relative">
             <div class="banner-wrapper">
                 <img class="lazyload" src="{% static 'images/slider/about-banner-01.jpg' %}"
                     data-src="{% static 'images/slider/about-banner-01.jpg' %}" alt="image-collection">
@@ -14,24 +14,36 @@
                     </div>
                 </div>
             </div>
-        </section>
-        <!-- /Slider -->
+        </section> -->
+        <!-- /Slider -->    
         <!-- flat-title -->
         <section class="flat-spacing-9">
             <div class="container">
-                <div class="flat-title my-0">
-                    <span class="title">Somos Liven</span>
-                    <p class="sub-title text_black-2">
-                        Bienvenidos a nuestra tienda de ropa clásica para mujeres, donde creemos <br class="d-xl-block d-none">
-                        que el estilo atemporal nunca pasa de moda. Nuestra colección destaca por sus <br
-                            class="d-xl-block d-none">
-                        piezas clásicas que son tanto elegantes como versátiles, ideales para construir un <br
-                            class="d-xl-block d-none">
-                        armario que durará años.
-                    </p>
+                <div class="row align-items-center">
+                    <!-- Texto a la izquierda -->
+                    <div class="col-lg-6">
+                        <div class="flat-title my-0" style="text-align: justify;">
+                            <span class="title">Somos Liven</span>
+                            <p class="sub-title" style="text-align: justify;">
+                                Bienvenidos a Liven Concept Store, donde creemos que cada espacio merece reflejar la esencia de quienes lo habitan. 
+                                De la mano de Michelle Salazar, diseñadora y directora creativa, ofrecemos proyectos de diseño interior personalizados 
+                                que combinan identidad, funcionalidad y estética cuidadosamente curada. Creamos ambientes residenciales y comerciales 
+                                únicos, transformando cada lugar en una experiencia elegante y auténtica.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Video a la derecha -->
+                    <div class="col-lg-6 text-center">
+                        <video autoplay muted loop playsinline class="img-fluid rounded shadow">
+                            <source src="{% static 'images/video/livene.mp4' %}" type="video/mp4">
+                            Tu navegador no soporta video HTML5.
+                        </video>
+                    </div>
                 </div>
             </div>
         </section>
+
         <!-- /flat-title -->
         <div class="container">
             <div class="line"></div>
@@ -41,8 +53,8 @@
             <div class="container">
                 <div class="tf-grid-layout md-col-2 tf-img-with-text style-4">
                     <div class="tf-image-wrap">
-                        <img class="lazyload w-100" data-src="{% static 'images/collections/collection-69.jpg' %}"
-                            src="{% static 'images/collections/collection-69.jpg' %}" alt="collection-img">
+                        <img class="lazyload w-100" data-src="{% static 'images/collections/michelle_about.png' %}"
+                            src="{% static 'images/collections/michelle_about.png' %}" alt="collection-img">
                     </div>
                     <div class="tf-content-wrap px-0 d-flex justify-content-center w-100">
                         <div>

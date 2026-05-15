@@ -9,7 +9,9 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="heading text-center">
-                            {% if categoria_actual %}
+                            {% if q %}
+                                Resultados para "{{ q }}"
+                            {% elif categoria_actual %}
                                 {{ categoria_actual.nombre }}
                             {% elif coleccion_actual %}
                                 {{ coleccion_actual.nombre }}

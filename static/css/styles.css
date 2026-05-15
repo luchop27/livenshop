@@ -2627,9 +2627,11 @@ a.mb-menu-link.text_liven-blue {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #fff;
+  background-color: transparent;
 }
-.nav-ul-mb .btn-open-sub:after, .nav-ul-mb .btn-open-sub::before {
+
+.nav-ul-mb .btn-open-sub:after,
+.nav-ul-mb .btn-open-sub::before {
   content: "";
   position: absolute;
   z-index: 1;
@@ -2637,20 +2639,19 @@ a.mb-menu-link.text_liven-blue {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--main);
   transition: 0.4s ease 0.1s;
   margin: auto;
   background-color: #fff;
 }
+
 .nav-ul-mb .btn-open-sub::before {
   width: 2px;
   height: 12px;
-  background-color: #fff;
 }
+
 .nav-ul-mb .btn-open-sub::after {
   width: 12px;
   height: 2px;
-  background-color: #fff;
 }
 .nav-ul-mb .sub-nav-menu {
   margin-left: 10px;
