@@ -642,13 +642,39 @@
                     </div>
                 </li>
                 <!-- DEJAR REGALOS mobile -->
+                <!-- DEJAR REGALOS mobile -->
                 <li class="nav-mb-item">
-                    <a href="{% url 'planes:dejar_regalos_matrimonios' %}" class="mb-menu-link">Dejar Regalos</a>
-                    <div class="sub-nav-mb">
-                        <ul class="sub-nav-list">
-                            <li><a href="{% url 'planes:dejar_regalos_matrimonios' %}" class="sub-nav-link force-menu-liven">Matrimonios</a></li>
-                            <li><a href="{% url 'planes:dejar_regalos_cumpleanos' %}" class="sub-nav-link force-menu-liven">Cumpleaños</a></li>
-                            <li><a href="{% url 'planes:dejar_regalos_otros' %}" class="sub-nav-link force-menu-liven">Otros Eventos</a></li>
+                    <a href="#mb-dropdown-regalos" class="collapsed mb-menu-link force-menu-liven"
+                        data-bs-toggle="collapse" aria-expanded="false" aria-controls="mb-dropdown-regalos">
+
+                        <span>Dejar Regalos</span>
+                        <span class="btn-open-sub"></span>
+                    </a>
+
+                    <div id="mb-dropdown-regalos" class="collapse">
+                        <ul class="sub-nav-menu">
+
+                            <li>
+                                <a href="{% url 'planes:dejar_regalos_matrimonios' %}"
+                                    class="sub-nav-link force-menu-liven">
+                                    Matrimonios
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{% url 'planes:dejar_regalos_cumpleanos' %}"
+                                    class="sub-nav-link force-menu-liven">
+                                    Cumpleaños
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{% url 'planes:dejar_regalos_otros' %}"
+                                    class="sub-nav-link force-menu-liven">
+                                    Otros Eventos
+                                </a>
+                            </li>
+
                         </ul>
                     </div>
                 </li>
@@ -668,11 +694,8 @@
             <div class="mb-other-content">
                 <div class="d-flex group-icon">
                     <a href="{% url 'productos:wishlist' %}" class="site-nav-icon"><i class="icon icon-heart"></i>Favoritos</a>
-                    <a href="#canvasSearch" data-bs-toggle="offcanvas" class="site-nav-icon"><i class="icon icon-search"></i>Search</a>
-                </div>
-                <div class="mb-notice">
-                    <a href="{% url 'contact' %}" class="text-need">Need help?</a>
-                </div>
+                </div>    
+                
                 <ul class="mb-info">
                     <li>Address: 1234 Fashion Street, Suite 567, <br> New York, NY 10001</li>
                     <li>Email: <b>info@fashionshop.com</b></li>

@@ -1,4 +1,4 @@
-from .models import Categoria, CarritoItem, Marca, ShopGramPost
+from .models import Categoria, CarritoItem, Coleccion, Marca, ShopGramPost
 
 
 def menu_categorias(request):
@@ -18,4 +18,17 @@ def carrito_count(request):
 def shop_gram(request):
     return {
         'shop_gram_posts': ShopGramPost.objects.filter(activo=True)[:10]
+    }
+def anuncios_bar(request):
+    anuncios = Coleccion.objects.filter(
+        activo=True,
+        es_promocion=True
+    ).exclude(
+        texto_anuncio__isnull=True
+    ).exclude(
+        texto_anuncio__exact=''
+    )
+
+    return {
+        'anuncios_bar': anuncios
     }
