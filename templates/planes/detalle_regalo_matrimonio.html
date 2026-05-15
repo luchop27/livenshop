@@ -142,6 +142,37 @@
         .gift-form-col { padding: 30px 20px; }
         .gift-card-col { padding: 20px; }
     }
+
+    /* Estilos para Selección y Zoom */
+    .gift-product-item.selected {
+        border-color: #1a2744;
+        background-color: #f0f4ff;
+        box-shadow: 0 0 0 2px #1a2744;
+    }
+    .gift-product-item.selected .gift-product-add {
+        background: #1a2744;
+        color: #fff;
+    }
+    
+    .zoom-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center;
+        z-index: 10000; cursor: zoom-out;
+    }
+    .zoom-overlay img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; }
+    
+    #giftDonationSection {
+        display: none; /* Oculto inicialmente */
+        border-top: 1px solid #eee;
+        padding-top: 30px;
+        margin-top: 20px;
+        animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 
@@ -166,25 +197,67 @@
                 Acompaña a la pareja en este momento tan especial. Puedes elegir uno de los productos de su lista o realizar un aporte económico directo para ayudarles a construir su nuevo hogar.
             </p>
             
-            {% if s.productos_regalo.exists %}
+            {% if productos_con_abono %}
             <div class="gift-products-wrapper">
-                <div class="gift-products-title">Su Lista de Productos Físicos</div>
+                <div class="gift-products-title">Opciones de Regalo</div>
                 <div class="gift-product-list">
-                    {% for prod in s.productos_regalo.all %}
-                        <div class="gift-product-item" style="cursor:pointer;" onclick="selectPhysicalGift('{{ prod.id }}', '{{ prod.nombre|escapejs }}', '{{ prod.precio_final }}', '{% if prod.imagenes.first %}{{ prod.imagenes.first.src }}{% endif %}')">
+                    
+                    <!-- Tarjeta Efectivo Libre -->
+                    <div class="gift-product-item gift-option-card" id="card-cash" onclick="selectCashGift()">
+                        <img src="/media/tarjeta/targetaregalo.jpg" class="gift-product-img zoomable-img" alt="Regalo en Efectivo">
+                        <div class="gift-product-info">
+                            <div class="gift-product-name">Dejar Regalo en Efectivo</div>
+                            <div class="gift-product-price" style="color:#888; font-size:12px; font-weight:normal;">Aporte libre (Tú decides el monto)</div>
+                        </div>
+                        <div class="gift-product-add">
+                            +
+                        </div>
+                    </div>
+
+                    {% for item in productos_con_abono %}
+                        {% with prod=item.producto %}
+                        <div class="gift-product-item gift-option-card {% if item.completado %}completed-item{% endif %}" 
+                             id="card-{{ prod.id }}"
+                             data-prod-id="{{ prod.id }}"
+                             style="{% if item.completado %}opacity:0.6; cursor:not-allowed;{% endif %} position:relative;"
+                             {% if not item.completado %}onclick="selectPhysicalGift('{{ prod.id }}', '{{ prod.nombre|escapejs }}', '{{ item.faltante|stringformat:'.2f'|default:prod.precio_final }}', '{% if prod.imagenes.first %}{{ prod.imagenes.first.src }}{% endif %}')"{% endif %}>
+                            
                             {% if prod.imagenes.first %}
-                                <img src="{{ prod.imagenes.first.src }}" class="gift-product-img" alt="{{ prod.nombre }}">
+                                <img src="{{ prod.imagenes.first.src }}" class="gift-product-img zoomable-img" alt="{{ prod.nombre }}">
                             {% else %}
-                                <img src="{% static 'images/products/placeholder.jpg' %}" class="gift-product-img" alt="{{ prod.nombre }}">
+                                <img src="{% static 'images/products/placeholder.jpg' %}" class="gift-product-img zoomable-img" alt="{{ prod.nombre }}">
                             {% endif %}
+                            
                             <div class="gift-product-info">
                                 <div class="gift-product-name">{{ prod.nombre|truncatechars:40 }}</div>
-                                <div class="gift-product-price">${{ prod.precio_final }}</div>
+                                
+                                {% if item.completado %}
+                                    <div class="gift-product-price" style="color:#10b981;">✓ Completado</div>
+                                {% else %}
+                                    <div class="gift-product-price">${{ prod.precio_final }} 
+                                        {% if item.abono > 0 %}
+                                            <span style="font-size:11px; color:#888; font-weight:normal; display:block; margin-top:2px;">(Abonado: ${{ item.abono }} · Falta: ${{ item.faltante }})</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
                             </div>
-                            <div class="gift-product-add" style="width:32px;height:32px;background:#f5f5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;">
+                            
+                            <!-- Ojo previsualización global -->
+                            <a href="javascript:void(0);" 
+                               class="preview-eye quickview" 
+                               data-producto-id="{{ prod.id }}"
+                               style="position:absolute; right:55px; color:#1a2744; padding:8px; font-size:16px;" 
+                               title="Ver detalles">
+                                👁️
+                            </a>
+
+                            {% if not item.completado %}
+                            <div class="gift-product-add">
                                 +
                             </div>
+                            {% endif %}
                         </div>
+                        {% endwith %}
                     {% endfor %}
                 </div>
             </div>
@@ -198,48 +271,57 @@
                 <input type="hidden" name="producto_id" id="hiddenProductId" value="">
                 <input type="hidden" name="nombre_producto" id="hiddenProductName" value="">
                 <input type="hidden" name="imagen_url" id="hiddenProductImage" value="">
-                
-                <div class="gift-products-title" style="margin-top:20px;" id="giftSectionTitle">
-                    Aporte en Efectivo 
-                    <a href="javascript:void(0)" id="resetPhysicalGift" style="display:none; font-size:12px; color:#c9a96e; text-transform:none; margin-left:10px;">(Volver a Aporte Libre)</a>
-                </div>
-                
-                <div class="g-form-group">
-                    <label class="g-form-label">Tu Nombre (Invitado) *</label>
-                    <input type="text" class="g-form-input" name="nombre_invitado" required placeholder="Ej: Familia Pérez">
-                </div>
-                
-                <div class="g-form-group">
-                    <label class="g-form-label">Mensaje para los novios</label>
-                    <textarea class="g-form-input" name="mensaje" rows="3" placeholder="Escribe tus mejores deseos..."></textarea>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr auto; gap: 20px;">
-                    <div class="g-form-group">
-                        <label class="g-form-label">Monto del Regalo *</label>
-                        <div class="g-monto-wrap">
-                            <input type="number" class="g-form-input" id="detailGiftAmount" name="monto" min="1" step="1" value="50" required>
-                        </div>
+
+                <!-- Sección de Datos del Donante (Oculta hasta seleccionar algo) -->
+                <div id="giftDonationSection">
+                    <div class="gift-products-title" style="margin-top:0px; font-size:16px; font-weight:bold; color:#1a2744;" id="giftSectionTitle">
+                        Aporte en Efectivo 
                     </div>
                     
                     <div class="g-form-group">
-                        <label class="g-form-label">Cant.</label>
-                        <div class="g-qty-wrap">
-                            <button type="button" class="g-qty-btn" id="detailGiftMinus">-</button>
-                            <input type="number" class="g-qty-input" id="detailGiftQty" name="quantity" value="1" min="1" readonly>
-                            <button type="button" class="g-qty-btn" id="detailGiftPlus">+</button>
+                        <label class="g-form-label">Tu Nombre (Invitado) *</label>
+                        <input type="text" class="g-form-input" name="nombre_invitado" required placeholder="Ej: Familia Pérez">
+                    </div>
+                    
+                    <div class="g-form-group">
+                        <label class="g-form-label">Mensaje para los novios</label>
+                        <textarea class="g-form-input" name="mensaje" rows="3" placeholder="Escribe tus mejores deseos..."></textarea>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 20px;">
+                        <div class="g-form-group">
+                            <label class="g-form-label">Monto del Aporte *</label>
+                            <div class="g-monto-wrap">
+                                <input type="number" class="g-form-input" id="detailGiftAmount" name="monto" min="1" step="0.01" value="50.00" required>
+                            </div>
+                            <small id="giftAmountHint" style="color:#888; font-size:11px; display:block; margin-top:4px;">Puedes modificar este valor si deseas dar un abono parcial.</small>
+                        </div>
+                        
+                        <div class="g-form-group" style="display:none;">
+                            <label class="g-form-label">Cant.</label>
+                            <div class="g-qty-wrap">
+                                <button type="button" class="g-qty-btn" id="detailGiftMinus">-</button>
+                                <input type="number" class="g-qty-input" id="detailGiftQty" name="quantity" value="1" min="1" readonly>
+                                <button type="button" class="g-qty-btn" id="detailGiftPlus">+</button>
+                            </div>
                         </div>
                     </div>
+                    
+                    <div class="g-total-row">
+                        <div class="g-total-label">Subtotal a Pagar:</div>
+                        <div class="g-total-val" id="detailGiftTotalVal">$50.00</div>
+                    </div>
+                    
+                    <button type="submit" class="g-submit-btn" id="detailGiftSubmit">
+                        Añadir al Carrito
+                    </button>
                 </div>
-                
-                <div class="g-total-row">
-                    <div class="g-total-label">Subtotal:</div>
-                    <div class="g-total-val" id="detailGiftTotalVal">$50.00</div>
+
+                <!-- Mensaje de instrucción -->
+                <div id="giftInstructionMsg" style="text-align:center; padding:30px; border:2px dashed #eee; border-radius:12px; color:#999;">
+                    <i class="icon-plus" style="font-size:24px; display:block; margin-bottom:10px;"></i>
+                    Selecciona un producto de la lista o elige "Regalo en Efectivo" para continuar.
                 </div>
-                
-                <button type="submit" class="g-submit-btn" id="detailGiftSubmit">
-                    Añadir al Carrito
-                </button>
             </form>
         </div>
     </div>
@@ -247,56 +329,83 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Generar nombres centrados
+    // --- Nombres en la Tarjeta ---
     const rawNames = "{{ s.nombres_novios|escapejs }}";
     const formattedNames = rawNames.replace(/ y /gi, '<br><span style="font-size:0.6em;color:#c9a96e;">&</span><br>');
-    document.getElementById('cardNamesOverlay').innerHTML = formattedNames;
-    
-    // Funciones para seleccionar producto físico
-    window.selectPhysicalGift = function(id, name, price, imageUrl) {
+    const cardOverlay = document.getElementById('cardNamesOverlay');
+    if (cardOverlay) cardOverlay.innerHTML = formattedNames;
+
+    // --- Lógica de Selección de Regalo ---
+    const donationSection = document.getElementById('giftDonationSection');
+    const instructionMsg = document.getElementById('giftInstructionMsg');
+    const giftTitle = document.getElementById('giftSectionTitle');
+    const amtInput = document.getElementById('detailGiftAmount');
+    const amountHint = document.getElementById('giftAmountHint');
+
+    window.selectCashGift = function() {
+        highlightCard('card-cash');
+        donationSection.style.display = 'block';
+        instructionMsg.style.display = 'none';
+        
+        document.getElementById('hiddenProductId').value = '';
+        document.getElementById('hiddenProductName').value = 'Aporte en Efectivo';
+        document.getElementById('hiddenProductImage').value = '/media/tarjeta/targetaregalo.jpg';
+        
+        giftTitle.innerText = 'Aporte en Efectivo';
+        amtInput.value = '50.00';
+        amtInput.max = '';
+        amountHint.innerText = 'Tú decides el monto que deseas regalar.';
+        
+        updateTotal();
+        donationSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    window.selectPhysicalGift = function(id, name, faltantePrice, imageUrl) {
+        highlightCard('card-' + id);
+        donationSection.style.display = 'block';
+        instructionMsg.style.display = 'none';
+        
         document.getElementById('hiddenProductId').value = id;
         document.getElementById('hiddenProductName').value = name;
         document.getElementById('hiddenProductImage').value = imageUrl;
         
-        // Cambiar títulos y habilitar reseteo
-        document.getElementById('giftSectionTitle').innerHTML = 'Regalar: ' + name + ' <a href="javascript:void(0)" id="resetPhysicalGift" style="font-size:12px; color:#c9a96e; text-transform:none; margin-left:10px;">(Volver a Aporte Libre)</a>';
+        giftTitle.innerText = 'Regalar: ' + name;
         
-        // Asignar eventos de nuevo al enlace de reseteo
-        document.getElementById('resetPhysicalGift').addEventListener('click', resetPhysicalGift);
+        const price = parseFloat(faltantePrice.replace(',', '.'));
+        amtInput.value = price.toFixed(2);
+        amtInput.max = price.toFixed(2);
+        amountHint.innerText = 'Puedes regalar el total o dar un abono parcial (máximo $' + price.toFixed(2) + ').';
         
-        // Cambiar precio e inhabilitarlo
-        const amtInput = document.getElementById('detailGiftAmount');
-        amtInput.value = parseFloat(price.replace(',', '.')).toFixed(2);
-        amtInput.setAttribute('readonly', 'true');
-        amtInput.style.backgroundColor = '#f9f9f9';
-        amtInput.style.color = '#333';
-        
-        // Actualizar subtotal
-        document.getElementById('detailGiftQty').value = 1;
         updateTotal();
-        
-        // Bajar al formulario
-        document.getElementById('giftFormDetail').scrollIntoView({ behavior: 'smooth' });
+        donationSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
-    function resetPhysicalGift() {
-        document.getElementById('hiddenProductId').value = '';
-        document.getElementById('hiddenProductName').value = '';
-        document.getElementById('hiddenProductImage').value = '';
-        
-        document.getElementById('giftSectionTitle').innerHTML = 'Aporte en Efectivo';
-        
-        const amtInput = document.getElementById('detailGiftAmount');
-        amtInput.value = '50';
-        amtInput.removeAttribute('readonly');
-        amtInput.style.backgroundColor = '';
-        amtInput.style.color = '';
-        
-        updateTotal();
+    function highlightCard(cardId) {
+        document.querySelectorAll('.gift-option-card').forEach(c => c.classList.remove('selected'));
+        const card = document.getElementById(cardId);
+        if (card) card.classList.add('selected');
     }
+
+    // --- Lógica de Zoom ---
+    const zoomOverlay = document.createElement('div');
+    zoomOverlay.className = 'zoom-overlay';
+    zoomOverlay.innerHTML = '<img src="" id="zoomedImg">';
+    document.body.appendChild(zoomOverlay);
     
-    // Cálculos
-    const amtInput = document.getElementById('detailGiftAmount');
+    document.querySelectorAll('.zoomable-img, .card-image').forEach(img => {
+        img.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const zoomedImg = document.getElementById('zoomedImg');
+            zoomedImg.src = img.src;
+            zoomOverlay.style.display = 'flex';
+        });
+    });
+    
+    zoomOverlay.addEventListener('click', () => {
+        zoomOverlay.style.display = 'none';
+    });
+
+    // --- Cálculos y AJAX ---
     const qtyInput = document.getElementById('detailGiftQty');
     const totalVal = document.getElementById('detailGiftTotalVal');
     const btnMinus = document.getElementById('detailGiftMinus');
@@ -321,10 +430,15 @@ document.addEventListener('DOMContentLoaded', function() {
         qtyInput.value = val + 1; updateTotal();
     });
     
-    // AJAX
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
+        const maxAmt = amtInput.getAttribute('max');
+        if (maxAmt && parseFloat(amtInput.value) > parseFloat(maxAmt)) {
+            alert('El monto máximo permitido para este producto es $' + maxAmt);
+            return;
+        }
+
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = 'Añadiendo...';
         submitBtn.disabled = true;

@@ -1283,7 +1283,8 @@ def checkout_process(request):
     notas_regalos = ""
     for item in cart:
         if item.get('is_gift'):
-            notas_regalos += f"Regalo: {item['nombre']} | De: {item.get('nombre_invitado', '')} | Mensaje: {item.get('mensaje', '')}\n"
+            detalle = item.get('detalle_producto', 'Efectivo')
+            notas_regalos += f"Regalo: {item['nombre']} ({detalle}) | De: {item.get('nombre_invitado', '')} | Mensaje: {item.get('mensaje', '')}\n"
             
     if notas_regalos:
         notas = notas_regalos + ("\nNotas adicionales: " + notas if notas else "")
@@ -1320,9 +1321,24 @@ def checkout_process(request):
                 precio=item['precio'],
                 cantidad=item['quantity']
             )
-            # NOTA: No se crea el MovimientoPlan ni se suma el saldo_acumulado aquí 
-            # porque el pedido está en estado "pendiente". El administrador debe 
-            # agregar el saldo/movimiento manualmente cuando confirme el pago.
+            # Registrar Movimiento en el Plan de Novios
+            try:
+                from decimal import Decimal
+                plan_id = item.get('plan_id')
+                if plan_id:
+                    plan = SolicitudPlanNovios.objects.filter(id=plan_id).first()
+                    if plan:
+                        MovimientoPlan.objects.create(
+                            plan=plan,
+                            producto_id=item.get('producto_id'), # Puede ser None si es efectivo
+                            monto=Decimal(item['precio']) * item['quantity'],
+                            descripcion=f"Aporte de {item.get('nombre_invitado', 'Invitado')}: {item.get('mensaje', '')}"
+                        )
+                        # Actualizar campo estático por redundancia
+                        plan.saldo_acumulado += Decimal(item['precio']) * item['quantity']
+                        plan.save()
+            except Exception as e:
+                print(f"Error registrando movimiento de regalo: {e}")
                 
         else:
             producto_obj = item['producto']
@@ -1532,4 +1548,4 @@ def panel_admin_order_update_status(request, pedido_id):
         messages.success(request, f'Estado del pedido #{pedido.id} actualizado a {pedido.get_estado_display()}.')
     else:
         messages.error(request, 'Estado no válido.')
-    return redirect('productos:panel_admin_order_detail', pedido_id=pedido.id)
+    return redirect('productos:panel_admin_orders')

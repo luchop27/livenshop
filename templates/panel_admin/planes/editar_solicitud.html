@@ -77,8 +77,20 @@
                                 <h5 class="mb-4 mt-4" style="color:#1a2744; font-weight:700; border-bottom:1px solid #eee; padding-bottom:10px;">Asignar Productos (Lista de Bodas)</h5>
                                 <div class="mb-3">
                                     <label class="form-label" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#888;">Buscar y Añadir Productos</label>
-                                    <p style="font-size:12px; color:#666; margin-bottom:8px;">Escribe el nombre del producto para buscarlo. Puedes seleccionar varios.</p>
-                                    {{ form.productos_regalo }}
+                                    <p style="font-size:12px; color:#666; margin-bottom:8px;">Escribe el nombre del producto para buscarlo. Haz clic para añadir a la lista.</p>
+                                    
+                                    <div style="display:none;">
+                                        {{ form.productos_regalo }}
+                                    </div>
+                                    
+                                    <div class="search-product-box mb-3 position-relative">
+                                        <input type="text" id="customProductSearch" class="form-control" placeholder="Buscar por nombre o categoría..." style="border-radius:8px; padding:12px;">
+                                        <div id="productSearchResults" class="list-group position-absolute w-100" style="z-index:100; display:none; max-height:300px; overflow-y:auto; box-shadow:0 10px 30px rgba(0,0,0,0.15); border-radius:8px; border:1px solid #eee;"></div>
+                                    </div>
+                                    
+                                    <div id="selectedProductsContainer" style="display:flex; flex-direction:column; gap:10px;">
+                                        <!-- Selected products rendered here by JS -->
+                                    </div>
                                 </div>
 
                                 <h5 class="mb-4 mt-4" style="color:#1a2744; font-weight:700; border-bottom:1px solid #eee; padding-bottom:10px;">Acceso al Portal 24/7</h5>
@@ -127,23 +139,176 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Previsualización de Producto -->
+<div id="productPreviewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; width:90%; max-width:600px; border-radius:16px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,0.2); position:relative; display:flex; flex-direction:column; max-height:90vh;">
+        <button type="button" onclick="document.getElementById('productPreviewModal').style.display='none'" style="position:absolute; top:15px; right:15px; background:#f1f1f1; border:none; border-radius:50%; width:32px; height:32px; font-size:18px; font-weight:bold; color:#555; cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center;">×</button>
+        
+        <div style="width:100%; height:300px; background:#f9f9f9; display:flex; align-items:center; justify-content:center;">
+            <img id="pvModalImg" src="" style="width:100%; height:100%; object-fit:contain;">
+        </div>
+        
+        <div style="padding:25px; overflow-y:auto;">
+            <div id="pvModalCat" style="font-size:12px; font-weight:700; color:#c9a96e; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px;">CATEGORÍA</div>
+            <h3 id="pvModalName" style="font-size:1.4rem; font-weight:700; color:#1a2744; margin:0 0 10px 0; line-height:1.2;">Nombre del Producto</h3>
+            <div id="pvModalPrice" style="font-size:1.2rem; font-weight:700; color:#222; margin-bottom:15px;">$0.00</div>
+            
+            <div style="border-top:1px solid #eee; padding-top:15px; margin-top:5px;">
+                <h4 style="font-size:13px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:8px;">Descripción</h4>
+                <p id="pvModalDesc" style="font-size:14px; color:#555; line-height:1.6; margin:0;"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#id_productos_regalo').select2({
-            placeholder: "Buscar productos...",
-            allowClear: true,
-            width: '100%',
-            language: {
-                noResults: function() {
-                    return "No se encontraron productos";
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectElement = document.getElementById('id_productos_regalo');
+        const searchInput = document.getElementById('customProductSearch');
+        const searchResults = document.getElementById('productSearchResults');
+        const selectedContainer = document.getElementById('selectedProductsContainer');
+        
+        let debounceTimer;
+        
+        // Renderizar los iniciales seleccionados
+        function renderSelectedProducts() {
+            selectedContainer.innerHTML = '';
+            Array.from(selectElement.options).forEach(option => {
+                if(option.selected) {
+                    // Extraer data si la cargamos después, o solo mostrar el texto temporalmente
+                    const id = option.value;
+                    const text = option.text;
+                    const img = option.getAttribute('data-img') || '/static/images/products/placeholder.jpg';
+                    const price = option.getAttribute('data-price') || '';
+                    const slug = option.getAttribute('data-slug') || '';
+                    
+                    const el = document.createElement('div');
+                    el.style.cssText = 'display:flex; align-items:center; justify-content:space-between; background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;';
+                    el.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <img src="${img}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
+                            <div>
+                                <div style="font-size:13px; font-weight:600; color:#1a2744;">${text}</div>
+                                <div style="font-size:12px; color:#888;">${price ? '$'+price : 'Añadido'}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            ${slug ? `<a href="javascript:void(0)" onclick="openQuickView('${slug}')" style="color:#1a2744; text-decoration:none;" title="Previsualizar">👁️</a>` : ''}
+                            <button type="button" class="btn btn-sm" style="background:#fee2e2; color:#dc2626; border:none; border-radius:50%; width:28px; height:28px; padding:0; display:flex; align-items:center; justify-content:center;" onclick="removeProduct('${id}')">×</button>
+                        </div>
+                    `;
+                    selectedContainer.appendChild(el);
                 }
+            });
+        }
+        
+        window.removeProduct = function(id) {
+            Array.from(selectElement.options).forEach(opt => {
+                if(opt.value == id) opt.selected = false;
+            });
+            renderSelectedProducts();
+        };
+        
+        window.addProduct = function(id, name, price, imgUrl, slug) {
+            // Verificar si ya existe el option, si no, lo creamos
+            let option = selectElement.querySelector(`option[value="${id}"]`);
+            if(!option) {
+                option = new Option(name, id);
+                selectElement.add(option);
+            }
+            option.selected = true;
+            option.setAttribute('data-img', imgUrl);
+            option.setAttribute('data-price', price);
+            option.setAttribute('data-slug', slug);
+            
+            searchResults.style.display = 'none';
+            searchInput.value = '';
+            renderSelectedProducts();
+        };
+        
+        window.productDataCache = {};
+        
+        function showModal(p) {
+            document.getElementById('pvModalImg').src = p.imagen;
+            document.getElementById('pvModalName').innerText = p.nombre;
+            document.getElementById('pvModalCat').innerText = p.categoria;
+            document.getElementById('pvModalDesc').innerText = p.descripcion;
+            document.getElementById('pvModalPrice').innerText = '$' + p.precio;
+            document.getElementById('productPreviewModal').style.display = 'flex';
+        }
+        
+        window.openQuickView = function(slug) {
+            const p = window.productDataCache[slug];
+            if(p) {
+                showModal(p);
+            } else {
+                fetch(`{% url 'planes:buscar_productos_admin' %}?q=${encodeURIComponent(slug)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        const found = data.productos.find(x => x.slug === slug);
+                        if(found) {
+                            window.productDataCache[slug] = found;
+                            showModal(found);
+                        }
+                    });
+            }
+        };
+
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(debounceTimer);
+            const query = e.target.value.trim();
+            
+            if(query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            debounceTimer = setTimeout(() => {
+                fetch(`{% url 'planes:buscar_productos_admin' %}?q=${encodeURIComponent(query)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        searchResults.innerHTML = '';
+                        if(data.productos.length === 0) {
+                            searchResults.innerHTML = '<div class="list-group-item" style="color:#888; font-size:13px;">No se encontraron productos</div>';
+                        } else {
+                            data.productos.forEach(p => {
+                                window.productDataCache[p.slug] = p; // Guardar para previsualización
+                                
+                                const item = document.createElement('a');
+                                item.href = 'javascript:void(0)';
+                                item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
+                                item.style.padding = '10px 15px';
+                                item.innerHTML = `
+                                    <div style="display:flex; align-items:center; gap:12px;" onclick="addProduct('${p.id}', '${p.nombre.replace(/'/g,"\\'").replace(/"/g,'&quot;')}', '${p.precio}', '${p.imagen}', '${p.slug}')">
+                                        <img src="${p.imagen}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
+                                        <div>
+                                            <div style="font-size:13px; font-weight:600; color:#1a2744;">${p.nombre}</div>
+                                            <div style="font-size:12px; color:#c9a96e; font-weight:700;">$${p.precio}</div>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="openQuickView('${p.slug}'); event.stopPropagation();" style="background:none; border:none; color:#1a2744; font-size:16px;" title="Ver Detalles">👁️</button>
+                                `;
+                                searchResults.appendChild(item);
+                            });
+                        }
+                        searchResults.style.display = 'block';
+                    });
+            }, 300);
+        });
+        
+        // Cerrar resultados al hacer clic afuera
+        document.addEventListener('click', function(e) {
+            if(!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
             }
         });
+        
+        // Init
+        renderSelectedProducts();
     });
 </script>
 {% endblock %}

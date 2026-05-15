@@ -1,4 +1,6 @@
 /* Custom Overrides for Mobile Menu Colors */
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
 /* Fondo azul del toolbar */
 
 .bg_celeste {
@@ -314,4 +316,77 @@ a.mb-menu-link.text_liven-blue,
     transform: scale(1.8) !important; /* era 2.8, ajusta a tu gusto */
     padding-left: 3px !important;
   }
+}
+
+/* Registry Card Styles for Cart */
+.cart-registry-card, 
+div.cart-registry-card {
+    width: 90px !important;
+    height: 90px !important;
+    min-width: 90px !important;
+    min-height: 90px !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #0C2038 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    margin-bottom: 10px;
+}
+
+/* En mobile alineamos a la izquierda si el contenedor lo hace */
+@media (max-width: 767px) {
+    .cart-registry-card, div.cart-registry-card {
+        margin-left: 0 !important;
+        margin-right: auto !important;
+        width: 80px !important;
+        height: 80px !important;
+        min-width: 80px !important;
+        min-height: 80px !important;
+    }
+}
+
+.cart-registry-card img,
+div.cart-registry-card img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    opacity: 0.55 !important;
+    display: block !important;
+}
+
+.cart-registry-card .names-overlay,
+div.cart-registry-card .names-overlay {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    color: #ffffff !important;
+    font-family: 'Great Vibes', cursive !important;
+    font-size: 14px !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    width: 95% !important;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.8) !important;
+    pointer-events: none !important;
+    z-index: 5 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+@media (max-width: 767px) {
+    .cart-registry-card .names-overlay {
+        font-size: 12px !important;
+    }
+}
+
+.cart-registry-card .names-overlay span,
+div.cart-registry-card .names-overlay span {
+    font-size: 0.85em !important;
+    color: #c9a96e !important;
+    display: inline-block !important; /* Cambiado a inline-block para que no siempre salte de línea si es corto */
+    margin: 0 4px !important;
 }

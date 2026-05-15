@@ -315,7 +315,12 @@
                                             <div class="tf-mini-cart-image">
                                                 <a href="{% if item.producto %}{{ item.producto.get_absolute_url }}{% else %}javascript:void(0){% endif %}">
                                                     {% if item.is_gift %}
-                                                        <img src="/media/tarjeta/tarjetaplannovios.png" alt="Tarjeta Plan Novios">
+                                                        <div class="cart-registry-card" style="width: 70px; height: 70px;">
+                                                            <img src="/media/tarjeta/tarjetaplannovios.png" alt="Tarjeta Plan Novios">
+                                                            <div class="names-overlay" style="font-size: 11px;">
+                                                                {{ item.nombres_novios_html|safe }}
+                                                            </div>
+                                                        </div>
                                                     {% elif item.imagen %}
                                                         <img src="{{ item.imagen }}" alt="{{ item.nombre }}">
                                                     {% else %}
