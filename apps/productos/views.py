@@ -776,6 +776,17 @@ class ProductoListView(ListView):
             activo=True
         ).prefetch_related('imagenes').select_related('categoria', 'coleccion', 'marca')
 
+        # --- Búsqueda por texto ---
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            qs = qs.filter(
+                Q(nombre__icontains=q) |
+                Q(marca__nombre__icontains=q) |
+                Q(categoria__nombre__icontains=q) |
+                Q(material__icontains=q) |
+                Q(descripcion_corta__icontains=q)
+            )  # ← paréntesis de cierre que faltaba
+
         # --- Categoría (incluye subcategorías) ---
         categoria_slug = self.request.GET.get('categoria')
         if categoria_slug:
@@ -797,22 +808,23 @@ class ProductoListView(ListView):
             qs = qs.filter(material__iexact=material)
 
         # --- Oferta ---
+  
         oferta = self.request.GET.get('oferta')
         if oferta == 'si':
             qs = qs.exclude(precio_oferta__isnull=True).filter(
-                precio_oferta__lt=models.F('precio')
+                precio_oferta__lt=F('precio')   # ← sin models.
             )
         elif oferta == 'no':
             qs = qs.filter(
-                Q(precio_oferta__isnull=True) | Q(precio_oferta__gte=models.F('precio'))
+                Q(precio_oferta__isnull=True) | Q(precio_oferta__gte=F('precio'))  # ← sin models.
             )
 
         orden = self.request.GET.get('orden', '')
         orden_map = {
-            'a-z':        'nombre',
-            'z-a':        '-nombre',
-            'precio-asc': 'precio',
-            'precio-desc':'-precio',
+            'a-z':         'nombre',
+            'z-a':         '-nombre',
+            'precio-asc':  'precio',
+            'precio-desc': '-precio',
         }
         qs = qs.order_by(orden_map.get(orden, '-created_at'))
 
@@ -820,9 +832,13 @@ class ProductoListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Todos los Productos'
 
-        # ← NUEVO: objetos para el título
+        # --- Búsqueda activa ---
+        q = self.request.GET.get('q', '').strip()
+        context['q'] = q
+        context['titulo'] = f'Resultados para "{q}"' if q else 'Todos los Productos'
+
+        # --- Título por categoría / marca ---
         categoria_slug = self.request.GET.get('categoria')
         if categoria_slug:
             try:
@@ -837,13 +853,13 @@ class ProductoListView(ListView):
             except Marca.DoesNotExist:
                 pass
 
-        # Datos para el panel de filtros
+        # --- Datos para el panel de filtros ---
         context['categorias'] = (
             Categoria.objects
             .filter(activo=True, padre=None)
             .prefetch_related('subcategorias')
         )
-        context['marcas'] = Marca.objects.filter(activo=True).order_by('nombre')
+        context['marcas']     = Marca.objects.filter(activo=True).order_by('nombre')
         context['materiales'] = (
             Producto.objects
             .filter(activo=True, material__isnull=False)
@@ -853,7 +869,7 @@ class ProductoListView(ListView):
             .order_by('material')
         )
 
-        # Para que el template sepa qué filtro está activo
+        # --- Filtros activos para el template ---
         context['categoria_activa'] = self.request.GET.get('categoria', '')
         context['marca_activa']     = self.request.GET.get('marca', '')
         context['material_activo']  = self.request.GET.get('material', '')

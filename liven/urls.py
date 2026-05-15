@@ -21,6 +21,7 @@ urlpatterns = [
     path('', include('apps.productos.urls')),
     path('', include('apps.planes.urls')),
     path('', include('apps.portafolio.urls', namespace='portafolio')),
+    path('', include(('apps.productos.urls', 'productos'))),
     path('usuarios/', include('apps.usuarios.urls')),
     path('about/', TemplateView.as_view(template_name='about-us.html'), name='about'),
     path('categorias/', TemplateView.as_view(template_name='shop-fullwidth.html'), name='categorias'),

@@ -28,7 +28,7 @@ urlpatterns = [
     path('panel-admin/pedidos/<int:pedido_id>/estado/', views.panel_admin_order_update_status, name='panel_admin_order_update_status'),
 
     # ── CATÁLOGO ──────────────────────────────────────
-    path('', views.ProductoListView.as_view(), name='lista_productos'),
+    path('shop/', views.ProductoListView.as_view(), name='lista_productos'),
     path('producto/<slug:slug>/', views.ProductoDetailView.as_view(), name='detalle_producto'),
     path('categoria/<slug:slug>/', views.CategoriaListView.as_view(), name='lista_por_categoria'),
     path('coleccion/<slug:slug>/', views.ColeccionListView.as_view(), name='lista_por_coleccion'),

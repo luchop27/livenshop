@@ -342,12 +342,38 @@
             <div class="col-xl-3 col-md-4 col-3">
                 <ul class="nav-icon d-flex justify-content-end align-items-center gap-20">
 
-                    <!-- Búsqueda -->
-                    <li class="nav-search">
-                        <a href="#canvasSearch" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="link nav-icon-item">
-                            <i class="icon icon-search"></i>
-                        </a>
-                    </li>
+                    <!-- NAVBAR SEARCH -->
+                <li class="nav-search" style="position: relative;">
+
+                <!-- Icono que siempre se ve -->
+                <button id="searchToggle" class="link nav-icon-item" aria-label="Buscar"
+                    style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center;">
+                    <i class="icon icon-search"></i>
+                </button>
+
+                <!-- Dropdown con el input -->
+                <div id="searchDropdown"
+                    style="display:none; position:absolute; right:0; top:calc(100% + 12px);
+                        width:280px; background:#fff; border:1px solid #e0e0e0;
+                        border-radius:8px; padding:10px 14px; z-index:9999;
+                        box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                    <i class="icon icon-search" style="color:#999; flex-shrink:0;"></i>
+                    <input
+                    id="globalSearchInput"
+                    type="text"
+                    placeholder="Buscar productos..."
+                    autocomplete="off"
+                    data-search-url="{% url 'productos:lista_productos' %}"
+                    style="flex:1; border:none; outline:none; font-size:14px; background:transparent; color:#333 !important;">
+                    <button id="searchClose" aria-label="Cerrar"
+                        style="background:none; border:none; cursor:pointer; padding:2px; display:flex; align-items:center; color:#999;">
+                        <i class="icon icon-close"></i>
+                    </button>
+                    </div>
+                </div>
+
+                </li>
                     <!-- Cuenta -->
                     {% if user.is_authenticated %}
                     <li class="nav-account" style="position:relative;">
@@ -881,6 +907,64 @@
         <span id="custom-toast-msg" style="font-size: 14px; font-weight: 500;">Producto agregado correctamente.</span>
     </div>
 
+    
+<script>
+(function () {
+  const toggle   = document.getElementById('searchToggle');
+  const dropdown = document.getElementById('searchDropdown');
+  const closeBtn = document.getElementById('searchClose');
+  const input    = document.getElementById('globalSearchInput');
+  if (!toggle || !input) return;
+
+  const baseUrl = input.dataset.searchUrl;
+  let timer;
+
+  // Abrir / cerrar al click del icono
+  toggle.addEventListener('click', function (e) {
+    e.stopPropagation();
+    const isOpen = dropdown.style.display === 'block';
+    dropdown.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) setTimeout(() => input.focus(), 50);
+  });
+
+  // Cerrar con la X
+  closeBtn.addEventListener('click', function () {
+    dropdown.style.display = 'none';
+    input.value = '';
+  });
+
+  // Cerrar al hacer click fuera
+  document.addEventListener('click', function (e) {
+    if (!toggle.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  // Debounce: espera 600ms y redirige
+  input.addEventListener('input', function () {
+    clearTimeout(timer);
+    const q = this.value.trim();
+    timer = setTimeout(function () {
+      if (q.length >= 2) {
+        window.location.href = baseUrl + '?q=' + encodeURIComponent(q);
+      } else if (q.length === 0) {
+        window.location.href = baseUrl;
+      }
+    }, 600);
+  });
+
+  // Enter para buscar inmediatamente
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      clearTimeout(timer);
+      const q = this.value.trim();
+      if (q.length >= 1) {
+        window.location.href = baseUrl + '?q=' + encodeURIComponent(q);
+      }
+    }
+  });
+})();
+</script>
     <script>
     function showCustomToast(message) {
         const toast = document.getElementById('custom-toast');
