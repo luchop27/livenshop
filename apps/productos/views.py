@@ -1238,28 +1238,9 @@ def checkout_process(request):
                 precio=item['precio'],
                 cantidad=item['quantity']
             )
-            
-            # Sumar al plan de novios y crear movimiento
-            plan_id = item.get('plan_id')
-            monto_total_regalo = Decimal(item['precio']) * int(item['quantity'])
-            
-            try:
-                if plan_id:
-                    plan = SolicitudPlanNovios.objects.get(id=plan_id)
-                    
-                    # 1. Crear el registro en el historial de movimientos
-                    MovimientoPlan.objects.create(
-                        plan=plan,
-                        tipo='aporte',
-                        monto=monto_total_regalo,
-                        descripcion=f"Aporte de Invitado: {item.get('nombre_invitado', 'Anónimo')} | Pedido #{pedido.id}"
-                    )
-                    
-                    # 2. Actualizar el saldo acumulado general del plan
-                    plan.saldo_acumulado += monto_total_regalo
-                    plan.save(update_fields=['saldo_acumulado'])
-            except Exception as e:
-                print(f"Error actualizando plan de novios: {e}")
+            # NOTA: No se crea el MovimientoPlan ni se suma el saldo_acumulado aquí 
+            # porque el pedido está en estado "pendiente". El administrador debe 
+            # agregar el saldo/movimiento manualmente cuando confirme el pago.
                 
         else:
             producto_obj = item['producto']
