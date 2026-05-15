@@ -18,7 +18,6 @@ urlpatterns = [
     path('', home, name='home'),
     path('panel-admin/', panel_admin_demo, name='panel_admin_demo'),
     # ← Includes PRIMERO para que Django resuelva rutas específicas antes
-    path('', include('apps.productos.urls')),
     path('', include('apps.planes.urls')),
     path('', include('apps.portafolio.urls', namespace='portafolio')),
     path('', include(('apps.productos.urls', 'productos'))),

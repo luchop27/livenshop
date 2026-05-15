@@ -26,26 +26,43 @@ def _active_marcas():
 # ══════════════════════════════════════════════════════
 
 def home(request):
-    """
-    Vista de la página de inicio.
-    Muestra productos destacados/trending, categorías principales y colecciones destacadas.
-    """
+
     productos = Producto.objects.filter(
         activo=True
     ).select_related('marca').prefetch_related('imagenes')[:12]
-    
-    # Categorías principales (sin padre)
+
     categorias = Categoria.objects.filter(
         activo=True,
         padre=None
     ).order_by('posicion', 'nombre')[:6]
-    
-    # Colecciones destacadas para el slider
-    colecciones = Coleccion.objects.filter(activo=True, destacada=True)
-    marcas_slider = Marca.objects.filter(activo=True, mostrar_en_slider=True)
-    shop_gram_posts = ShopGramPost.objects.filter(activo=True)[:10]
-    marcas = Marca.objects.filter(activo=True).order_by('nombre')
-    
+
+    colecciones = Coleccion.objects.filter(
+        activo=True,
+        destacada=True
+    )
+
+    marcas_slider = Marca.objects.filter(
+        activo=True,
+        mostrar_en_slider=True
+    )
+
+    shop_gram_posts = ShopGramPost.objects.filter(
+        activo=True
+    )[:10]
+
+    marcas = Marca.objects.filter(
+        activo=True
+    ).order_by('nombre')
+
+    anuncios_bar = Coleccion.objects.filter(
+        activo=True,
+        es_promocion=True
+    ).exclude(
+        texto_anuncio__isnull=True
+    ).exclude(
+        texto_anuncio__exact=''
+    )
+
     return render(request, 'home.html', {
         'productos': productos,
         'categorias': categorias,
@@ -53,7 +70,65 @@ def home(request):
         'marcas_slider': marcas_slider,
         'shop_gram_posts': shop_gram_posts,
         'marcas': marcas,
+        'tiene_slides': marcas_slider.exists() or colecciones.exists(),
+        'anuncios_bar': anuncios_bar,
     })
+
+def panel_admin_shopgram_list(request):
+    search = request.GET.get('q', '').strip()
+    posts = ShopGramPost.objects.all()
+    if search:
+        posts = posts.filter(instagram_url__icontains=search)
+    return render(request, 'panel_admin/panel_admin_shopgram_list.html', {'posts': posts, 'search': search})
+
+def panel_admin_shopgram_add(request):
+    if request.method == 'POST':
+        instagram_url = request.POST.get('instagram_url', '').strip()
+        activo = request.POST.get('activo') == 'True'
+        imagen = request.FILES.get('imagen')
+
+        if not instagram_url:
+            messages.error(request, 'La URL de Instagram es obligatoria.')
+        else:
+            post = ShopGramPost(instagram_url=instagram_url, activo=activo)
+            if imagen:
+                post.imagen = imagen
+            post.save()
+            messages.success(request, 'Publicación creada correctamente.')
+            return redirect('productos:panel_admin_shopgram_list')
+
+    return render(request, 'panel_admin/panel_admin_shopgram_add.html')
+
+def panel_admin_shopgram_edit(request, pk):
+    post = get_object_or_404(ShopGramPost, pk=pk)
+
+    if request.method == 'POST':
+        post.instagram_url = request.POST.get('instagram_url', '').strip()
+        post.activo = request.POST.get('activo') == 'True'
+
+        if request.POST.get('remove_imagen') == '1' and post.imagen:
+            post.imagen.delete(save=False)
+            post.imagen = None
+
+        if request.FILES.get('imagen'):
+            if post.imagen:
+                post.imagen.delete(save=False)
+            post.imagen = request.FILES['imagen']
+
+        post.save()
+        messages.success(request, 'Publicación actualizada correctamente.')
+        return redirect('productos:panel_admin_shopgram_list')
+
+    return render(request, 'panel_admin/panel_admin_shopgram_edit.html', {'post': post})
+
+def panel_admin_shopgram_delete(request, pk):
+    post = get_object_or_404(ShopGramPost, pk=pk)
+    if request.method == 'POST':
+        if post.imagen:
+            post.imagen.delete(save=False)
+        post.delete()
+        messages.success(request, 'Publicación eliminada.')
+    return redirect('productos:panel_admin_shopgram_list')
 
 def productos_por_marca(request, slug):
     if slug == 'todos':
@@ -478,9 +553,7 @@ def panel_admin_collections(request):
 
 @staff_member_required(login_url='usuarios:login')
 def panel_admin_collection_add(request):
-    """
-    Formulario para crear una nueva colección.
-    """
+
     if request.method == 'POST':
         nombre = request.POST.get('nombre', '').strip()
         slug_manual = request.POST.get('slug', '').strip()
@@ -488,6 +561,8 @@ def panel_admin_collection_add(request):
         activo = request.POST.get('estado', 'True') == 'True'
         destacada = request.POST.get('destacada') == 'on'
         imagen = request.FILES.get('imagen') or None
+        es_promocion = request.POST.get('es_promocion') == 'on'
+        texto_anuncio = request.POST.get('texto_anuncio', '').strip() if es_promocion else ''
 
         if not nombre:
             messages.error(request, 'El nombre de la colección es obligatorio.')
@@ -508,6 +583,8 @@ def panel_admin_collection_add(request):
                 activo=activo,
                 destacada=destacada,
                 imagen=imagen,
+                es_promocion=es_promocion,       # ← añadido
+                texto_anuncio=texto_anuncio,     # ← añadido
             )
             messages.success(request, f'Colección "{nombre}" creada exitosamente.')
             return redirect('productos:panel_admin_collections')
@@ -530,6 +607,11 @@ def panel_admin_collection_edit(request, coleccion_id):
         destacada = request.POST.get('destacada') == 'on'
         remove_imagen = request.POST.get('remove_imagen')
         nueva_imagen = request.FILES.get('imagen')
+        es_promocion = request.POST.get('es_promocion') == 'on'
+        texto_anuncio = request.POST.get('texto_anuncio', '').strip()
+
+        coleccion.es_promocion = es_promocion
+        coleccion.texto_anuncio = texto_anuncio if es_promocion else ''
 
         if not nombre:
             messages.error(request, 'El nombre de la colección es obligatorio.')

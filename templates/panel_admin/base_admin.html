@@ -223,6 +223,16 @@
                                             </li>
                                         </ul>
                                     </li>
+                                    <li class="menu-item has-children {% block menu_shopgram %}{% endblock %}">
+                                        <a href="#" class="menu-item-button">
+                                            <div class="icon"><i class="icon-instagram"></i></div>
+                                            <div class="text">Shop Gram</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item"><a href="{% url 'productos:panel_admin_shopgram_list' %}"><div class="text">Lista de publicaciones</div></a></li>
+                                            <li class="sub-menu-item"><a href="{% url 'productos:panel_admin_shopgram_add' %}"><div class="text">Nueva publicación</div></a></li>
+                                        </ul>
+                                    </li>
                                     <li class="menu-item has-children {% block menu_planes %}{% endblock %}">
                                         <a href="#" class="menu-item-button">
                                             <div class="icon"><i class="icon-clipboard"></i></div>

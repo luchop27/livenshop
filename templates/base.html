@@ -41,65 +41,65 @@
     </div>
     <!-- /preload -->
     <div id="wrapper">
+<!-- announcement-bar -->
+<div class="announcement-bar bg_liven-blue">
+    <div class="wrap-announcement-bar">
+        <div class="box-sw-announcement-bar run-reverse">
 
-        <!-- announcement-bar -->
-        <div class="announcement-bar bg_liven-blue">
-            <div class="wrap-announcement-bar">
-                <div class="box-sw-announcement-bar run-reverse">
-                    <div class="announcement-bar-item">
-                        <p>FREE SHIPPING AND RETURNS</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>NEW SEASON, NEW STYLES: FASHION SALE YOU CAN'T MISS</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>LIMITED TIME OFFER: FASHION SALE YOU CAN'T RESIST</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>FREE SHIPPING AND RETURNS</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>NEW SEASON, NEW STYLES: FASHION SALE YOU CAN'T MISS</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>LIMITED TIME OFFER: FASHION SALE YOU CAN'T RESIST</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>FREE SHIPPING AND RETURNS</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>NEW SEASON, NEW STYLES: FASHION SALE YOU CAN'T MISS</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>LIMITED TIME OFFER: FASHION SALE YOU CAN'T RESIST</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>FREE SHIPPING AND RETURNS</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>NEW SEASON, NEW STYLES: FASHION SALE YOU CAN'T MISS</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>LIMITED TIME OFFER: FASHION SALE YOU CAN'T RESIST</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>FREE SHIPPING AND RETURNS</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>NEW SEASON, NEW STYLES: FASHION SALE YOU CAN'T MISS</p>
-                    </div>
-                    <div class="announcement-bar-item">
-                        <p>LIMITED TIME OFFER: FASHION SALE YOU CAN'T RESIST</p>
-                    </div>
+            {% if anuncios_bar %}
+
+                {% for anuncio in anuncios_bar %}
+                <div class="announcement-bar-item">
+                    <p>{{ anuncio.texto_anuncio|upper }}</p>
                 </div>
-            </div>
-            <span class="icon-close close-announcement-bar"></span>
+                {% endfor %}
+
+                {% for anuncio in anuncios_bar %}
+                <div class="announcement-bar-item">
+                    <p>{{ anuncio.texto_anuncio|upper }}</p>
+                </div>
+                {% endfor %}
+
+                {% for anuncio in anuncios_bar %}
+                <div class="announcement-bar-item">
+                    <p>{{ anuncio.texto_anuncio|upper }}</p>
+                </div>
+                {% endfor %}
+
+                {% for anuncio in anuncios_bar %}
+                <div class="announcement-bar-item">
+                    <p>{{ anuncio.texto_anuncio|upper }}</p>
+                </div>
+                {% endfor %}
+
+                {% for anuncio in anuncios_bar %}
+                <div class="announcement-bar-item">
+                    <p>{{ anuncio.texto_anuncio|upper }}</p>
+                </div>
+                {% endfor %}
+
+            {% else %}
+
+                <div class="announcement-bar-item">
+                    <p>ENVÍO GRATIS EN PEDIDOS MAYORES A $50</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>NUEVA TEMPORADA — DESCUBRE LOS ÚLTIMOS DISEÑOS</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>CALIDAD Y ELEGANCIA EN CADA PIEZA</p>
+                </div>
+
+            {% endif %}
 
         </div>
-        <!-- /announcement-bar -->
+    </div>
 
-        
-        <!-- Animated Divider -->
+    <span class="icon-close close-announcement-bar"></span>
+</div>
+<!-- /announcement-bar -->        <!-- Animated Divider -->
         <!-- <div class="divider-wrap"></div> removed to fix white line -->
 
 
