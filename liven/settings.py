@@ -51,6 +51,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'apps.productos.context_processors.menu_categorias',
                 'apps.productos.context_processors.carrito_count',
+                'apps.productos.context_processors.shop_gram',
+                'apps.productos.context_processors.anuncios_bar',
             ],
         },
     },

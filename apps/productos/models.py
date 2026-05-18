@@ -104,6 +104,17 @@ class Coleccion(models.Model):
     destacada = models.BooleanField(default=False, help_text="Mostrar en página principal")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    es_promocion = models.BooleanField(
+        default=False,
+        help_text="Marcar si es una promoción/novedad (Día del Padre, San Valentín, etc.)"
+    )
+    texto_anuncio = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="Texto que aparece en la barra de anuncios superior"
+    )
 
     class Meta:
         ordering = ['nombre']
@@ -121,6 +132,7 @@ class Coleccion(models.Model):
             self.imagen = compress_image_to_webp(self.imagen)
             
         super().save(*args, **kwargs)
+        
 
 
 # -----------------------------
