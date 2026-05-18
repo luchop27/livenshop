@@ -56,6 +56,12 @@ class Marca(models.Model):
         null=True,
         help_text="Imagen especial para el slider del home (solo se usa si 'mostrar en slider' está marcado)"
     )
+    imagen_slider_movil = models.ImageField(
+        upload_to='marcas/slider_movil/',
+        blank=True,
+        null=True,
+        help_text="Imagen especial para el slider del home en versión celular/móvil (solo se usa si 'mostrar en slider' está marcado)"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

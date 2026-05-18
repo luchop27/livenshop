@@ -38,7 +38,7 @@ class MarcaAdmin(admin.ModelAdmin):
             'fields': ('imagen',)
         }),
         ('Configuración Home Slider', {
-            'fields': ('mostrar_en_slider', 'imagen_slider'),
+            'fields': ('mostrar_en_slider', 'imagen_slider', 'imagen_slider_movil'),
             'description': 'Si marcas esta opción, la marca aparecerá en el slider principal de la página de inicio.'
         }),
         ('Estado', {

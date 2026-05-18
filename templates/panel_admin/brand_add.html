@@ -64,16 +64,29 @@
                     </fieldset>
 
                     <fieldset class="name mb-20" id="fieldset_imagen_slider" style="display: none;">
-                        <div class="body-title mb-10">Imagen para el Slider</div>
+                        <div class="body-title mb-10">Imagen para el Slider (Computadora)</div>
                         <div class="up-load" id="upload-area-slider" style="min-height:140px;border:2px dashed #ddd;border-radius:8px;padding:16px;text-align:center;">
                             <label for="sliderImagen" style="cursor:pointer;display:block;">
                                 <i class="icon-upload-cloud" style="font-size:1.8rem;"></i>
-                                <div class="text-tiny mt-6">Haz clic o arrastra la imagen del slider aquí</div>
+                                <div class="text-tiny mt-6">Haz clic o arrastra la imagen del slider de computadora aquí</div>
                                 <input type="file" id="sliderImagen" name="imagen_slider" accept="image/*" style="display:none;">
                             </label>
                         </div>
                         <div id="imagen-preview-slider" style="display:none;margin-top:12px;"></div>
-                        <small class="text-muted">Imagen horizontal optimizada para el banner de inicio.</small>
+                        <small class="text-muted">Imagen horizontal optimizada para el banner de inicio en computadoras.</small>
+                    </fieldset>
+
+                    <fieldset class="name mb-20" id="fieldset_imagen_slider_movil" style="display: none;">
+                        <div class="body-title mb-10">Imagen para el Slider (Celular / Teléfono)</div>
+                        <div class="up-load" id="upload-area-slider-movil" style="min-height:140px;border:2px dashed #ddd;border-radius:8px;padding:16px;text-align:center;">
+                            <label for="sliderImagenMovil" style="cursor:pointer;display:block;">
+                                <i class="icon-upload-cloud" style="font-size:1.8rem;"></i>
+                                <div class="text-tiny mt-6">Haz clic o arrastra la imagen del slider de celular aquí</div>
+                                <input type="file" id="sliderImagenMovil" name="imagen_slider_movil" accept="image/*" style="display:none;">
+                            </label>
+                        </div>
+                        <div id="imagen-preview-slider-movil" style="display:none;margin-top:12px;"></div>
+                        <small class="text-muted">Imagen vertical optimizada para el banner de inicio en dispositivos móviles.</small>
                     </fieldset>
 
                     <fieldset class="mb-20">
@@ -113,11 +126,13 @@ nombreInput.addEventListener('input', function() {
 });
 slugInput.addEventListener('input', function() { this.dataset.manuallyEdited = 'true'; });
 
-// Toggle Slider Image Field
+// Toggle Slider Image Fields
 const mostrarEnSlider = document.getElementById('id_mostrar_en_slider');
 const fieldsetSlider = document.getElementById('fieldset_imagen_slider');
+const fieldsetSliderMovil = document.getElementById('fieldset_imagen_slider_movil');
 mostrarEnSlider.addEventListener('change', function() {
     fieldsetSlider.style.display = this.checked ? 'block' : 'none';
+    fieldsetSliderMovil.style.display = this.checked ? 'block' : 'none';
 });
 
 const marcaImageInput = document.getElementById('marcaImagen');
@@ -128,12 +143,20 @@ const sliderImageInput = document.getElementById('sliderImagen');
 const sliderImagePreview = document.getElementById('imagen-preview-slider');
 const uploadAreaSlider = document.getElementById('upload-area-slider');
 
+const sliderImageInputMovil = document.getElementById('sliderImagenMovil');
+const sliderImagePreviewMovil = document.getElementById('imagen-preview-slider-movil');
+const uploadAreaSliderMovil = document.getElementById('upload-area-slider-movil');
+
 marcaImageInput.addEventListener('change', function(e) {
     if (e.target.files && e.target.files[0]) handlePreview(e.target.files[0], uploadAreaMarca, marcaImagePreview, 'removeMarcaImage');
 });
 
 sliderImageInput.addEventListener('change', function(e) {
     if (e.target.files && e.target.files[0]) handlePreview(e.target.files[0], uploadAreaSlider, sliderImagePreview, 'removeSliderImage');
+});
+
+sliderImageInputMovil.addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) handlePreview(e.target.files[0], uploadAreaSliderMovil, sliderImagePreviewMovil, 'removeSliderImageMovil');
 });
 
 function handlePreview(file, area, preview, removeFnName) {
@@ -161,6 +184,12 @@ function removeSliderImage() {
     sliderImageInput.value = '';
     sliderImagePreview.style.display = 'none';
     uploadAreaSlider.style.display = 'block';
+}
+
+function removeSliderImageMovil() {
+    sliderImageInputMovil.value = '';
+    sliderImagePreviewMovil.style.display = 'none';
+    uploadAreaSliderMovil.style.display = 'block';
 }
 </script>
 {% endblock %}

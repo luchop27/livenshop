@@ -436,6 +436,7 @@ def panel_admin_brand_add(request):
         imagen = request.FILES.get('imagen') or None
         mostrar_en_slider = request.POST.get('mostrar_en_slider') == 'on'
         imagen_slider = request.FILES.get('imagen_slider') or None
+        imagen_slider_movil = request.FILES.get('imagen_slider_movil') or None
 
 
         if not nombre:
@@ -456,6 +457,7 @@ def panel_admin_brand_add(request):
                 imagen=imagen,
                 mostrar_en_slider=mostrar_en_slider,
                 imagen_slider=imagen_slider,
+                imagen_slider_movil=imagen_slider_movil,
             )
 
             messages.success(request, f'Marca "{nombre}" creada exitosamente.')
@@ -478,6 +480,8 @@ def panel_admin_brand_edit(request, brand_id):
         mostrar_en_slider = request.POST.get('mostrar_en_slider') == 'on'
         remove_imagen_slider = request.POST.get('remove_imagen_slider')
         nueva_imagen_slider = request.FILES.get('imagen_slider')
+        remove_imagen_slider_movil = request.POST.get('remove_imagen_slider_movil')
+        nueva_imagen_slider_movil = request.FILES.get('imagen_slider_movil')
 
 
         if not nombre:
@@ -506,6 +510,11 @@ def panel_admin_brand_edit(request, brand_id):
                 marca.imagen_slider = None
             if nueva_imagen_slider:
                 marca.imagen_slider = nueva_imagen_slider
+
+            if remove_imagen_slider_movil:
+                marca.imagen_slider_movil = None
+            if nueva_imagen_slider_movil:
+                marca.imagen_slider_movil = nueva_imagen_slider_movil
 
             marca.save()
 

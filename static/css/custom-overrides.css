@@ -92,6 +92,16 @@ a.mb-menu-link.text_liven-blue,
   background-color: #0C2038 !important;
 }
 
+/* Solución definitiva para eliminar la línea blanca/sombra debajo del navbar en el home al hacer scroll (evita subpixel gaps) */
+.header-liven-white-text,
+.header-liven-white-text.header-bg,
+.header-liven-white-text .wrapper-header {
+  border-bottom: none !important;
+  border-top: none !important;
+  outline: none !important;
+  box-shadow: 0 1px 0 #0C2038 !important; /* Rellena cualquier subpixel gap con el color exacto azul del navbar */
+}
+
 /* Todos los textos, iconos y enlaces del header en blanco */
 .header-liven-white-text,
 .header-liven-white-text *,

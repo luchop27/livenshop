@@ -16,12 +16,17 @@
                 <div class="swiper-slide" lazy="true">
                     <div class="wrap-slider">
                     <a href="{{ marca.get_absolute_url }}" style="display: block; width: 100%; height: 100%;">
-                        {% if marca.imagen_slider %}
-                        <img class="lazyload" data-src="{{ marca.imagen_slider.url }}"
-                            src="{{ marca.imagen_slider.url }}" alt="{{ marca.nombre }}">
+                        {% if marca.imagen_slider and marca.imagen_slider_movil %}
+                            <img class="lazyload d-none d-md-block" data-src="{{ marca.imagen_slider.url }}"
+                                src="{{ marca.imagen_slider.url }}" alt="{{ marca.nombre }}">
+                            <img class="lazyload d-block d-md-none" data-src="{{ marca.imagen_slider_movil.url }}"
+                                src="{{ marca.imagen_slider_movil.url }}" alt="{{ marca.nombre }}">
+                        {% elif marca.imagen_slider %}
+                            <img class="lazyload" data-src="{{ marca.imagen_slider.url }}"
+                                src="{{ marca.imagen_slider.url }}" alt="{{ marca.nombre }}">
                         {% else %}
-                        <img class="lazyload" data-src="{% static 'images/slider/plant_slide_1.jpg' %}"
-                            src="{% static 'images/slider/plant_slide_1.jpg' %}" alt="{{ marca.nombre }}">
+                            <img class="lazyload" data-src="{% static 'images/slider/plant_slide_1.jpg' %}"
+                                src="{% static 'images/slider/plant_slide_1.jpg' %}" alt="{{ marca.nombre }}">
                         {% endif %}
                     </a>
                     </div>
