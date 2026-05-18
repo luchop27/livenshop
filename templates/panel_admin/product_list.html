@@ -58,7 +58,7 @@
                         <li><div class="body-title">ID</div></li>
                         <li><div class="body-title">Coleccion</div></li>
                         <li><div class="body-title">Precio</div></li>
-                        <li><div class="body-title">Stock</div></li>
+                        <li><div class="body-title">Disponibilidad</div></li>
                         <li><div class="body-title">Estado</div></li>
                         <li><div class="body-title">Fecha</div></li>
                         <li><div class="body-title">Acciones</div></li>
@@ -118,11 +118,7 @@
                             <div class="body-text text-main-dark mt-4">${{ producto.precio_final|floatformat:2 }}</div>
 
                             <div class="body-text text-main-dark mt-4">
-                                {% if producto.stock > 0 %}
-                                    <span class="text-success fw-7">{{ producto.stock }}</span>
-                                {% else %}
-                                    <span class="text-danger fw-7">0</span>
-                                {% endif %}
+                                <span class="badge" style="background:#28a745;color:white;padding:3px 8px;border-radius:3px;font-size:11px;">Bajo Pedido</span>
                             </div>
 
                             <div>

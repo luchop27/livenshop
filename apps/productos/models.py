@@ -275,7 +275,7 @@ class Producto(models.Model):
             return f"/producto/{self.slug}/"
 
     def tiene_stock(self):
-        return self.stock > 0
+        return True
 
     def tiene_oferta(self):
         return self.precio_oferta is not None and self.precio_oferta < self.precio

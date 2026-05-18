@@ -81,7 +81,7 @@
                             </thead>
                             <tbody>
                                 {% for item in cart_items %}
-                                    <tr class="tf-cart-item" data-product-id="{{ item.cart_key }}" data-stock="{{ item.producto.stock|default:0 }}">
+                                    <tr class="tf-cart-item" data-product-id="{{ item.cart_key }}" data-stock="99999">
                                         <td class="tf-cart-item_product">
                                             {% if item.is_gift %}
                                                 <div class="cart-registry-card">
@@ -114,7 +114,6 @@
                                                 {% endif %}
                                                 
                                                 <div class="cart-meta-variant">
-                                                    {% if item.producto and item.producto.stock %}<span class="text-muted ms-2">(Stock: {{ item.producto.stock }})</span>{% endif %}
                                                 </div>
                                                 <span class="remove-cart link remove" data-product-id="{{ item.cart_key }}">Eliminar</span>
                                             </div>
@@ -131,7 +130,7 @@
                                                         </svg>
                                                     </span>
                                                     <input type="text" name="number" value="{{ item.quantity }}" readonly>
-                                                    <span class="btn-quantity plus-btn" data-action="increase" {% if item.producto and item.quantity >= item.producto.stock %}style="opacity: 0.5; cursor: not-allowed; pointer-events: none;"{% endif %}>
+                                                    <span class="btn-quantity plus-btn" data-action="increase">
                                                         <svg class="d-inline-block" width="9" height="9" viewBox="0 0 9 9" fill="currentColor">
                                                             <path d="M9 5.14286H5.14286V9H3.85714V5.14286H0V3.85714H3.85714V0H5.14286V3.85714H9V5.14286Z"></path>
                                                         </svg>

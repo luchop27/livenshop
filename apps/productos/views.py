@@ -177,7 +177,7 @@ def panel_admin_product_add(request):
         nombre = request.POST.get('nombre', '').strip()
         precio = request.POST.get('precio', '0')
         precio_oferta = request.POST.get('precio_oferta', '').strip() or None
-        stock = request.POST.get('stock', '0')
+        stock = request.POST.get('stock', '9999')
         categoria_id = request.POST.get('categoria') or None
         coleccion_id = request.POST.get('coleccion') or None
         descripcion_corta = request.POST.get('descripcion_corta', '').strip()
@@ -256,7 +256,7 @@ def panel_admin_product_edit(request, producto_id):
         nombre = request.POST.get('nombre', '').strip()
         precio = request.POST.get('precio', '0')
         precio_oferta = request.POST.get('precio_oferta', '').strip() or None
-        stock = request.POST.get('stock', '0')
+        stock = request.POST.get('stock', '9999')
         categoria_id = request.POST.get('categoria') or None
         coleccion_id = request.POST.get('coleccion') or None
         descripcion_corta = request.POST.get('descripcion_corta', '').strip()
@@ -1251,10 +1251,8 @@ def checkout_process(request):
                 precio=item['precio'],
                 cantidad=item['quantity']
             )
-            # Opcional: reducir stock aquí o cuando el pedido sea pagado
-            if producto_obj and hasattr(producto_obj, 'stock') and producto_obj.stock and producto_obj.stock >= item['quantity']:
-                producto_obj.stock -= item['quantity']
-                producto_obj.save()
+            # Bajo pedido: no reducimos stock
+            pass
     
     # ── Enviar Notificación WhatsApp al Administrador si hay regalos ──
     if has_gifts:

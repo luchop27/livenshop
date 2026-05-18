@@ -211,36 +211,8 @@ class Cart:
             self.save()
 
     def sync_with_stock(self, adjust_to_stock=True):
-        # Ignoramos los items de regalo porque no tienen stock real
-        valid_items = {key: item for key, item in self.cart.items() if not key.startswith('_') and isinstance(item, dict) and not item.get('is_gift')}
-        has_changes = False
-
-        for product_key, item_data in list(valid_items.items()):
-            try:
-                producto = Producto.objects.get(id=item_data['producto_id'])
-            except Producto.DoesNotExist:
-                self.cart.pop(product_key, None)
-                has_changes = True
-                continue
-
-            stock_real = int(producto.stock or 0)
-            quantity = int(item_data.get('quantity') or 0)
-
-            if stock_real <= 0 or quantity <= 0:
-                self.cart.pop(product_key, None)
-                has_changes = True
-                continue
-
-            if quantity > stock_real:
-                if adjust_to_stock:
-                    self.cart[product_key]['quantity'] = stock_real
-                    has_changes = True
-                else:
-                    self.cart.pop(product_key, None)
-                    has_changes = True
-
-        if has_changes:
-            self.save()
+        # Todo es bajo pedido, no se valida stock
+        return
 
     def set_note(self, note):
         cart_data = self.session.get(settings.CART_SESSION_ID, {})
