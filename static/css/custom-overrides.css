@@ -400,3 +400,19 @@ div.cart-registry-card .names-overlay span {
     display: inline-block !important; /* Cambiado a inline-block para que no siempre salte de línea si es corto */
     margin: 0 4px !important;
 }
+
+/* Mostrar la imagen del slider móvil completa (sin recortar) con altura dinámica */
+@media (max-width: 767px) {
+    .tf-slideshow .wrap-slider {
+        height: auto !important;
+    }
+    .tf-slideshow .wrap-slider a {
+        height: auto !important;
+        display: block !important;
+    }
+    .tf-slideshow .wrap-slider img {
+        height: auto !important;
+        max-height: unset !important;
+        object-fit: contain !important; /* Muestra el 100% de la imagen sin recortar */
+    }
+}
