@@ -4,7 +4,28 @@
 {% block content %}
 
 <!-- Slider -->
-<section class="tf-slideshow slider-effect-fade slider-home-5 position-relative">
+<style>
+    /* Fix espacio en blanco en slider móvil */
+    .tf-slideshow {
+        overflow: hidden !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+    }
+    .tf-slideshow .swiper,
+    .tf-slideshow .swiper-wrapper,
+    .tf-slideshow .swiper-slide,
+    .tf-slideshow .wrap-slider {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .tf-slideshow .wrap-slider img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+</style>
+<section class="tf-slideshow slider-effect-fade slider-home-5 position-relative" style="overflow:hidden;">
     <div dir="ltr" class="swiper tf-sw-slideshow" data-preview="1" data-tablet="1" data-mobile="1" data-centered="false"
         data-space="0" data-loop="true" data-auto-play="true" data-delay="2000" data-speed="1000">
         <div class="swiper-wrapper">
@@ -366,7 +387,7 @@
 
 <style>
     .card-design-michelle {
-        background-color: rgba(255, 255, 255, 0.75) !important;
+        background-color: rgba(255, 255, 255, 0.78) !important;
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
@@ -379,20 +400,37 @@
         margin-bottom: 20px;
         color: #001d3d;
     }
+    /* Sección banner con altura controlada en móvil */
     @media (max-width: 767px) {
+        .banner-hero-collection-wrap.banner-parallax {
+            min-height: unset !important;
+            padding: 40px 0 !important;
+        }
         .card-design-michelle {
-            padding: 25px 15px !important;
+            padding: 20px 16px !important;
+            margin: 0 auto !important;
+            max-width: 92% !important;
         }
         .card-design-michelle h3 {
-            font-size: 18px !important;
+            font-size: 16px !important;
             font-weight: 700 !important;
             font-style: italic !important;
-            margin-bottom: 12px !important;
+            margin-bottom: 8px !important;
+            line-height: 1.3 !important;
         }
         .card-design-michelle p {
-            font-size: 12px !important;
-            line-height: 1.4 !important;
-            margin-bottom: 8px !important;
+            font-size: 11.5px !important;
+            line-height: 1.45 !important;
+            margin-bottom: 6px !important;
+            color: #333 !important;
+        }
+        .michelle-p-extra {
+            display: none !important;
+        }
+        .card-design-michelle .tf-btn {
+            padding: 10px 22px !important;
+            font-size: 13px !important;
+            margin-top: 10px !important;
         }
     }
 </style>
@@ -402,9 +440,11 @@
         <div class="container">
             <div class="card-box card-design-michelle text-md-start text-center rounded-0">
                 <h3 class="fw-7">Diseño Interior by Michelle Salazar</h3>
-                <p class="text">En <b>Liven Concept Store</b> ofrecemos el servicio de diseño interior personalizado de la mano de Michelle Salazar, diseñadora y directora creativa.</p>
-                <p class="text">Creamos espacios residenciales y comerciales con identidad, funcionalidad y una estética cuidadosamente curada, adaptándonos al estilo y esencia de cada cliente.</p>
-                <p class="text">Diseño, decoración y selección de piezas exclusivas para transformar tus espacios.</p>
+                <!-- Párrafo principal visible en móvil y desktop -->
+                <p class="text">Espacios con identidad, creados por <b>Michelle Salazar</b>, diseñadora y directora creativa de Liven.</p>
+                <!-- Párrafos extendidos — solo desktop -->
+                <p class="text michelle-p-extra">En <b>Liven Concept Store</b> ofrecemos el servicio de diseño interior personalizado, adaptándonos al estilo y esencia de cada cliente.</p>
+                <p class="text michelle-p-extra">Diseño, decoración y selección de piezas exclusivas para transformar tus espacios.</p>
                 <div class="wow fadeInUp" data-wow-delay="0s">
                     <a href="{% url 'productos:lista_productos' %}" class="tf-btn style-2 fw-7 text-2 btn-fill animate-hover-btn">
                         <span>Comienza hoy</span>
