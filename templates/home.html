@@ -5,24 +5,25 @@
 
 <!-- Slider -->
 <style>
-    /* Fix espacio en blanco en slider móvil */
-    .tf-slideshow {
-        overflow: hidden !important;
-        width: 100% !important;
-        max-width: 100vw !important;
-    }
-    .tf-slideshow .swiper,
-    .tf-slideshow .swiper-wrapper,
-    .tf-slideshow .swiper-slide,
-    .tf-slideshow .wrap-slider {
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-    .tf-slideshow .wrap-slider img {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
-        display: block !important;
+    /* Fix espacio en blanco en slider — solo móvil */
+    @media (max-width: 767px) {
+        .tf-slideshow {
+            overflow: hidden !important;
+            width: 100% !important;
+            max-width: 100vw !important;
+        }
+        .tf-slideshow .swiper,
+        .tf-slideshow .swiper-wrapper,
+        .tf-slideshow .swiper-slide,
+        .tf-slideshow .wrap-slider {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        .tf-slideshow .wrap-slider img:not(.d-none) {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
     }
 </style>
 <section class="tf-slideshow slider-effect-fade slider-home-5 position-relative" style="overflow:hidden;">
@@ -153,16 +154,14 @@
             data-tablet="2" data-mobile="1" data-space-lg="0" data-space-md="0">
             <div class="swiper-wrapper">
                 {% for marca in marcas %}
+                {% if marca.imagen %}
                 <div class="swiper-slide">
                     <div class="brand-item border-0">
-                        {% if marca.imagen %}
                         <img class="lazyload" data-src="{{ marca.imagen.url }}" src="{{ marca.imagen.url }}"
                             alt="{{ marca.nombre }}">
-                        {% else %}
-                        <span class="brand-name fw-6">{{ marca.nombre }}</span>
-                        {% endif %}
                     </div>
                 </div>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -183,9 +182,11 @@
                 <div class="nav-brand-list d-flex gap-2">
                     <!-- Botón "Todos" -->
                     {% for marca in marcas %}
+                    {% if marca.imagen %}
                     <a href="#" class="brand-item mb_30 fw-7 text-center" data-slug="{{ marca.slug }}">
                         {{ marca.nombre }}
                     </a>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -440,11 +441,9 @@
         <div class="container">
             <div class="card-box card-design-michelle text-md-start text-center rounded-0">
                 <h3 class="fw-7">Diseño Interior by Michelle Salazar</h3>
-                <!-- Párrafo principal visible en móvil y desktop -->
-                <p class="text">Espacios con identidad, creados por <b>Michelle Salazar</b>, diseñadora y directora creativa de Liven.</p>
-                <!-- Párrafos extendidos — solo desktop -->
-                <p class="text michelle-p-extra">En <b>Liven Concept Store</b> ofrecemos el servicio de diseño interior personalizado, adaptándonos al estilo y esencia de cada cliente.</p>
-                <p class="text michelle-p-extra">Diseño, decoración y selección de piezas exclusivas para transformar tus espacios.</p>
+                <p class="text">En <b>Liven Concept Store</b> ofrecemos el servicio de diseño interior personalizado de la mano de Michelle Salazar, diseñadora y directora creativa.</p>
+                <p class="text d-none d-md-block">Creamos espacios residenciales y comerciales con identidad, funcionalidad y una estética cuidadosamente curada, adaptándonos al estilo y esencia de cada cliente.</p>
+                <p class="text d-none d-md-block">Diseño, decoración y selección de piezas exclusivas para transformar tus espacios.</p>
                 <div class="wow fadeInUp" data-wow-delay="0s">
                     <a href="{% url 'productos:lista_productos' %}" class="tf-btn style-2 fw-7 text-2 btn-fill animate-hover-btn">
                         <span>Comienza hoy</span>
