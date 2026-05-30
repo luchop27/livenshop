@@ -134,8 +134,12 @@
                 {% for marca in marcas %}
                 <div class="swiper-slide">
                     <div class="brand-item border-0">
+                        {% if marca.imagen %}
                         <img class="lazyload" data-src="{{ marca.imagen.url }}" src="{{ marca.imagen.url }}"
                             alt="{{ marca.nombre }}">
+                        {% else %}
+                        <span class="brand-name fw-6">{{ marca.nombre }}</span>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
@@ -418,6 +422,7 @@
             data-space-lg="0" data-space-md="0">
             <div class="swiper-wrapper">
                 {% for post in shop_gram_posts %}
+                {% if post.imagen %}
                 <div class="swiper-slide">
                     <a href="{{ post.instagram_url }}" target="_blank" rel="noopener noreferrer">
                         <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
@@ -428,6 +433,7 @@
                         </div>
                     </a>
                 </div>
+                {% endif %}
                 {% empty %}
                 <p class="text-center w-100 py-4">No hay publicaciones aún.</p>
                 {% endfor %}
