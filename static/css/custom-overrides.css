@@ -416,3 +416,17 @@ div.cart-registry-card .names-overlay span {
         object-fit: contain !important; /* Muestra el 100% de la imagen sin recortar */
     }
 }
+
+/* --- FIX DE DESPLAZAMIENTO HORIZONTAL / ESPACIO EN BLANCO EN MÓVIL --- */
+html, body {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    position: relative;
+    width: 100%;
+}
+
+#wrapper {
+    overflow: hidden !important;
+    max-width: 100% !important;
+    width: 100%;
+}
