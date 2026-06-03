@@ -258,6 +258,7 @@ def panel_admin_product_add(request):
         descripcion_corta = request.POST.get('descripcion_corta', '').strip()
         descripcion_completa = request.POST.get('descripcion_completa', '').strip()
         marca_id = request.POST.get('marca') or None
+        sku = request.POST.get('sku', '').strip() or None
         material = request.POST.get('material', '').strip()
         dimensiones = request.POST.get('dimensiones', '').strip()
         capacidad = request.POST.get('capacidad', '').strip()
@@ -279,6 +280,7 @@ def panel_admin_product_add(request):
             producto = Producto.objects.create(
                 nombre=nombre,
                 slug=slug,
+                sku=sku,
                 precio=precio,
                 precio_oferta=precio_oferta,
                 stock=stock,
@@ -337,6 +339,7 @@ def panel_admin_product_edit(request, producto_id):
         descripcion_corta = request.POST.get('descripcion_corta', '').strip()
         descripcion_completa = request.POST.get('descripcion_completa', '').strip()
         marca_id = request.POST.get('marca') or None
+        sku = request.POST.get('sku', '').strip() or None
         material = request.POST.get('material', '').strip()
         dimensiones = request.POST.get('dimensiones', '').strip()
         capacidad = request.POST.get('capacidad', '').strip()
@@ -358,6 +361,7 @@ def panel_admin_product_edit(request, producto_id):
                 producto.slug = slug
 
             producto.nombre = nombre
+            producto.sku = sku
             producto.precio = precio
             producto.precio_oferta = precio_oferta
             producto.stock = stock

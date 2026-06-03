@@ -233,6 +233,13 @@ class Producto(models.Model):
 
     nombre = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
+    sku = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        unique=True,
+        help_text="Código SKU del producto"
+    )
     descripcion_corta = models.TextField(blank=True, null=True)
     descripcion_completa = models.TextField(blank=True, null=True)
 
@@ -285,6 +292,15 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(Producto, self.nombre, self.pk)
+        if not self.sku or self.sku.strip() == "":
+            self.sku = self.slug
+        else:
+            self.sku = self.sku.strip()
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         try:

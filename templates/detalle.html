@@ -141,10 +141,10 @@
 
                                     <!-- SKU y Categorías/Marca — estilo referencia -->
                                     <div class="tf-product-info-meta" style="margin-top: 20px; border-top: 1px solid #e8e8e8; padding-top: 16px;">
-                                        {% if producto.slug %}
+                                        {% if producto.sku or producto.slug %}
                                         <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; font-size: 13px;">
                                             <span style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #111; min-width: 110px;">SKU</span>
-                                            <span style="color: #555;">{{ producto.slug|upper }}</span>
+                                            <span style="color: #555;">{{ producto.sku|default:producto.slug|upper }}</span>
                                         </div>
                                         {% endif %}
                                         <div style="display: flex; align-items: baseline; gap: 12px; font-size: 13px;">
