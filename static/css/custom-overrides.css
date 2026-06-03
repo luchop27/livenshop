@@ -430,3 +430,10 @@ html, body {
     max-width: 100% !important;
     width: 100%;
 }
+
+/* --- EFECTO HOVER PROFESIONAL PARA PRODUCTOS CON UNA SOLA IMAGEN --- */
+.card-product .card-product-wrapper:hover .product-img .img-product:only-child {
+  opacity: 1 !important;
+  -webkit-transform: scale(1.06);
+  transform: scale(1.06);
+}

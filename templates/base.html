@@ -278,19 +278,6 @@
                                     <li class="menu-item-2">
                                         <a href="{% url 'planes:portal_novios' %}" class="menu-link-text link text_black-2">Portal Novios</a>
                                     </li>
-                                    <li style="border-top:1px solid #f0ece6;margin:8px 0 4px;"></li>
-                                    <li class="menu-item-2">
-                                        <a href="{% url 'planes:detalle' 'eventos' %}" class="menu-link-text link text_black-2">Plan Eventos</a>
-                                    </li>
-                                    <li class="menu-item-2">
-                                        <a href="{% url 'planes:detalle' 'decoradores' %}" class="menu-link-text link text_black-2">Inscripción Decoradores</a>
-                                    </li>
-                                    <li class="menu-item-2">
-                                        <a href="{% url 'planes:detalle' 'restaurantes' %}" class="menu-link-text link text_black-2">Restaurantes</a>
-                                    </li>
-                                    <li class="menu-item-2">
-                                        <a href="{% url 'planes:detalle' 'casa_nueva' %}" class="menu-link-text link text_black-2">Casa Nueva</a>
-                                    </li>
                                     {% if user.is_staff %}
                                     <li style="border-top:1px solid #f0ece6;margin:8px 0 4px;"></li>
                                     <li class="menu-item-2">
@@ -620,18 +607,6 @@
                             </li>
                             <li>
                                 <a href="{% url 'planes:portal_novios' %}" class="sub-nav-link force-menu-liven">Portal Novios</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'planes:detalle' 'eventos' %}" class="sub-nav-link force-menu-liven">Plan Eventos</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'planes:detalle' 'decoradores' %}" class="sub-nav-link force-menu-liven">Inscripción Decoradores</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'planes:detalle' 'restaurantes' %}" class="sub-nav-link force-menu-liven">Restaurantes</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'planes:detalle' 'casa_nueva' %}" class="sub-nav-link force-menu-liven">Casa Nueva</a>
                             </li>
                             {% if user.is_staff %}
                             <li>

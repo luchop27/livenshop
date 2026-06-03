@@ -300,7 +300,7 @@ def panel_admin_solicitud_editar(request, solicitud_id):
     solicitud = get_object_or_404(SolicitudPlanNovios, pk=solicitud_id)
     
     if request.method == 'POST':
-        form = SolicitudPlanNoviosForm(request.POST, instance=solicitud)
+        form = SolicitudPlanNoviosForm(request.POST, request.FILES, instance=solicitud)
         if form.is_valid():
             form.save()
             messages.success(request, f'La solicitud de {solicitud.nombres_novios} ha sido actualizada con éxito.')

@@ -191,6 +191,12 @@ class SolicitudPlanNovios(models.Model):
         blank=True, 
         verbose_name='Productos elegidos como regalo'
     )
+    foto_pareja = models.ImageField(
+        upload_to='planes/parejas/',
+        blank=True, null=True,
+        verbose_name='Foto de la Pareja',
+        help_text='Foto que se mostrará en la página para dejar regalos (en lugar de la tarjeta azul por defecto)'
+    )
     clave = models.CharField(max_length=128, blank=True, verbose_name='Clave Portal (Hash)')
     saldo_acumulado = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Saldo Acumulado ($)')
     procesado = models.BooleanField(default=False, verbose_name='¿Ya se contactó?')
@@ -200,6 +206,11 @@ class SolicitudPlanNovios(models.Model):
         verbose_name = 'Solicitud de Plan'
         verbose_name_plural = 'Solicitudes de Planes'
         ordering = ['-fecha_solicitud']
+
+    def save(self, *args, **kwargs):
+        if self.foto_pareja and not self.foto_pareja.name.lower().endswith('.webp'):
+            self.foto_pareja = compress_image_to_webp(self.foto_pareja)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.nombres_novios} — {self.get_estado_display()} — {self.fecha_solicitud.strftime('%d/%m/%Y')}"

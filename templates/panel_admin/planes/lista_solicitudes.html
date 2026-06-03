@@ -105,8 +105,15 @@
         <ul class="flex flex-column" style="list-style:none; padding-left:0;">
             {% for sol in solicitudes %}
             <li class="wg-product item-row" style="padding:15px 0; border-bottom:1px solid #f9f9f9;">
-                <div class="name" style="display:flex; flex-direction:column; justify-content:center;">
-                    <div class="title mb-0">
+                <div class="name" style="display:flex; align-items:center; gap:15px;">
+                    <div class="image" style="width:52px; height:52px; border-radius:8px; overflow:hidden; border:1px solid #eee; flex-shrink:0; background:#f5f5f5; display:flex; align-items:center; justify-content:center;">
+                        {% if sol.foto_pareja %}
+                            <img src="{{ sol.foto_pareja.url }}" style="width:100%; height:100%; object-fit:cover;">
+                        {% else %}
+                            <span style="font-size:22px; color:#ccc;">💍</span>
+                        {% endif %}
+                    </div>
+                    <div class="title mb-0" style="display:flex; flex-direction:column; justify-content:center;">
                         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                             <a href="{% url 'planes:panel_admin_solicitud_editar' sol.pk %}" class="body-text" style="font-size:15px; font-weight:700; color:#1a2744;" title="Clic para editar">
                                 {{ sol.nombres_novios }}

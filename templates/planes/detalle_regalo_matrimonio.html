@@ -180,8 +180,38 @@
     <div class="gift-page-wrapper">
         <!-- Columna Izquierda: Tarjeta -->
         <div class="gift-card-col">
-            <div class="card-container">
-                <img src="/media/tarjeta/tarjetaplannovios.png" alt="Tarjeta Plan Novios" class="card-image">
+            <style>
+                .has-couple-photo {
+                    position: relative;
+                    width: 100%;
+                    max-width: 450px;
+                    aspect-ratio: 4 / 5;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 12px;
+                    overflow: hidden;
+                }
+                .has-couple-photo::after {
+                    content: '';
+                    position: absolute;
+                    top: 0; left: 0; width: 100%; height: 100%;
+                    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
+                    border-radius: 12px;
+                    pointer-events: none;
+                    z-index: 2;
+                }
+                .has-couple-photo .card-names-overlay {
+                    z-index: 3;
+                    text-shadow: 0 3px 12px rgba(0,0,0,0.9);
+                }
+            </style>
+            <div class="{% if s.foto_pareja %}has-couple-photo{% else %}card-container{% endif %}">
+                {% if s.foto_pareja %}
+                    <img src="{{ s.foto_pareja.url }}" alt="Matrimonio {{ s.nombres_novios }}" class="card-image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                {% else %}
+                    <img src="/media/tarjeta/tarjetaplannovios.png" alt="Tarjeta Plan Novios" class="card-image">
+                {% endif %}
                 <div class="card-names-overlay" id="cardNamesOverlay">
                     <!-- Nombres generados por JS -->
                 </div>
@@ -192,9 +222,12 @@
         <div class="gift-form-col">
             <a href="{% url 'planes:dejar_regalos_matrimonios' %}" class="back-link">← Volver a matrimonios</a>
             
-            <h1 class="gift-form-title" style="font-family: 'Jost', sans-serif;">Matrimonio {{ s.nombres_novios }}</h1>
-            <p class="gift-form-desc" style="font-size: 16px;">
-                Acompaña a la pareja en este momento tan especial. Puedes elegir uno de los productos de su lista o realizar un aporte económico directo para ayudarles a construir su nuevo hogar.
+            <h1 class="gift-form-title" style="font-family: 'Jost', sans-serif; font-size: 26px; color: #1a2744; display: flex; align-items: center; flex-wrap: wrap;">
+                Matrimonio de <span style="font-family: 'Great Vibes', cursive; color: #8A9BA8; font-weight: normal; font-size: 1.55em; text-transform: none; margin-left: 8px; line-height: 1;">{{ s.nombres_novios }}</span>
+            </h1>
+            <p class="gift-form-desc" style="font-size: 15px; line-height: 1.6; color: #555; margin-bottom: 30px;">
+                Celebra el amor regalando momentos para toda la vida. En Liven, cada aporte ayuda a los novios a transformar su casa en un hogar lleno de estilo, calidez y recuerdos inolvidables.<br><br>
+                Porque cada detalle cuenta y tu regalo será parte de la historia que está por comenzar.
             </p>
             
             {% if productos_con_abono %}
