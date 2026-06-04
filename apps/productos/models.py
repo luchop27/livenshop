@@ -38,7 +38,7 @@ def generate_unique_slug(model_class, value, instance_pk=None):
         counter += 1
 
 
-from .utils import compress_image_to_webp
+from .utils import compress_image_to_webp, resize_brand_logo_to_webp
 
 # -----------------------------
 # MARCA
@@ -79,12 +79,13 @@ class Marca(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_unique_slug(Marca, self.nombre, self.pk)
-        
-        # Procesar imagen principal
-        if self.imagen and not self.imagen.name.lower().endswith('.webp'):
-            self.imagen = compress_image_to_webp(self.imagen)
-        
-        # Nota: Ya no comprimimos a WebP la imagen_slider porque el cliente pidió mantener la máxima calidad original.
+
+        # Procesar imagen principal de marca a 398x164px WEBP
+        if self.imagen:
+            self.imagen = resize_brand_logo_to_webp(self.imagen)
+
+        # Nota: No procesar imagen_slider ni imagen_slider_movil.
+        # Esas imágenes deben conservar su calidad y formato original.
 
         super().save(*args, **kwargs)
 

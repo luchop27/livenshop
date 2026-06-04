@@ -3009,3 +3009,39 @@
         font-size: 18px;
     }
 }
+
+// ════════════════════════════════════════════════════════
+// BRAND SECTION CUSTOM - Logos 398x164px
+// ════════════════════════════════════════════════════════
+.brand-section-custom {
+    .swiper-wrapper {
+        align-items: center;
+    }
+    
+    .swiper-slide {
+        height: 164px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .brand-item {
+        width: 398px;
+        max-width: 100%;
+        height: 164px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #fff;
+        padding: 0;
+    }
+    
+    .brand-logo-img {
+        width: 398px;
+        height: 164px;
+        object-fit: contain;
+        object-position: center;
+        display: block;
+    }
+}
