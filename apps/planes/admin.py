@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import Plan, SeccionPlan, AliadoBeneficio, PlanNovios, MovimientoPlan, SolicitudPlanNovios
 
 
@@ -44,9 +45,15 @@ class PlanNoviosAdmin(admin.ModelAdmin):
 
 @admin.register(SolicitudPlanNovios)
 class SolicitudPlanNoviosAdmin(admin.ModelAdmin):
-    list_display = ['nombres_novios', 'email', 'telefono', 'fecha_boda', 'estado', 'procesado', 'fecha_solicitud']
+    list_display = ['foto_miniatura', 'nombres_novios', 'email', 'telefono', 'fecha_boda', 'estado', 'procesado', 'fecha_solicitud']
     list_filter = ['estado', 'procesado', 'fecha_solicitud']
     list_editable = ['estado', 'procesado']
     search_fields = ['nombres_novios', 'email', 'telefono']
     filter_horizontal = ['productos_regalo']
     inlines = [MovimientoPlanInline]
+
+    def foto_miniatura(self, obj):
+        if obj.foto_pareja:
+            return format_html('<img src="{}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px;" />', obj.foto_pareja.url)
+        return "Sin Foto"
+    foto_miniatura.short_description = 'Foto'

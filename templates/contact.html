@@ -11,7 +11,7 @@
         <!-- map -->
         <div class="w-100">
             <iframe
-                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d317859.6089702069!2d-0.075949!3d51.508112!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48760349331f38dd%3A0xa8bf49dde1d56467!2sTower%20of%20London!5e0!3m2!1sen!2sus!4v1719221598456!5m2!1sen!2sus"
+                src="{{ tienda_config.mapa_embed_url }}"
                 width="100%" height="646" style="border:0;" allowfullscreen="" loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
@@ -24,33 +24,42 @@
                         <h5 class="mb_20">Visita Nuestro Almacén</h5>
                         <div class="mb_20">
                             <p class="mb_15"><strong>Dirección</strong></p>
-                            <p>66 Mott St, New York, New York, Código Postal: 10006, AS</p>
+                            <p>{{ tienda_config.direccion|linebreaksbr }}</p>
                         </div>
                         <div class="mb_20">
-                            <p class="mb_15"><strong>Phone</strong></p>
-                            <p>(623) 934-2400</p>
+                            <p class="mb_15"><strong>Teléfono</strong></p>
+                            <p><a href="tel:{{ tienda_config.telefono }}">{{ tienda_config.telefono }}</a></p>
                         </div>
                         <div class="mb_20">
                             <p class="mb_15"><strong>Email</strong></p>
-                            <p>EComposer@example.com</p>
+                            <p><a href="mailto:{{ tienda_config.email }}">{{ tienda_config.email }}</a></p>
                         </div>
                         <div class="mb_36">
                             <p class="mb_15"><strong>Open Time</strong></p>
-                            <p class="mb_15">Nuestro almacén ha reabierto para compras, </p>
-                            <p>exchange Every day 11am to 7pm</p>
+                            <p>{{ tienda_config.horario_apertura|linebreaksbr }}</p>
                         </div>
                         <div>
                             <ul class="tf-social-icon d-flex gap-20 style-default">
-                                <li><a href="#" class="box-icon link round social-facebook border-line-black"><i
+                                {% if tienda_config.facebook_url and tienda_config.facebook_url != "#" %}
+                                <li><a href="{{ tienda_config.facebook_url }}" target="_blank" class="box-icon link round social-facebook border-line-black"><i
                                             class="icon fs-14 icon-fb"></i></a></li>
-                                <li><a href="#" class="box-icon link round social-twiter border-line-black"><i
+                                {% endif %}
+                                {% if tienda_config.twitter_url and tienda_config.twitter_url != "#" %}
+                                <li><a href="{{ tienda_config.twitter_url }}" target="_blank" class="box-icon link round social-twiter border-line-black"><i
                                             class="icon fs-12 icon-Icon-x"></i></a></li>
-                                <li><a href="#" class="box-icon link round social-instagram border-line-black"><i
+                                {% endif %}
+                                {% if tienda_config.instagram_url and tienda_config.instagram_url != "#" %}
+                                <li><a href="{{ tienda_config.instagram_url }}" target="_blank" class="box-icon link round social-instagram border-line-black"><i
                                             class="icon fs-14 icon-instagram"></i></a></li>
-                                <li><a href="#" class="box-icon link round social-tiktok border-line-black"><i
+                                {% endif %}
+                                {% if tienda_config.tiktok_url and tienda_config.tiktok_url != "#" %}
+                                <li><a href="{{ tienda_config.tiktok_url }}" target="_blank" class="box-icon link round social-tiktok border-line-black"><i
                                             class="icon fs-14 icon-tiktok"></i></a></li>
-                                <li><a href="#" class="box-icon link round social-pinterest border-line-black"><i
+                                {% endif %}
+                                {% if tienda_config.pinterest_url and tienda_config.pinterest_url != "#" %}
+                                <li><a href="{{ tienda_config.pinterest_url }}" target="_blank" class="box-icon link round social-pinterest border-line-black"><i
                                             class="icon fs-14 icon-pinterest-1"></i></a></li>
+                                {% endif %}
                             </ul>
                         </div>
                     </div>
