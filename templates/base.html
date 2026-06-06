@@ -672,9 +672,9 @@
                 </div>    
                 
                 <ul class="mb-info">
-                    <li>Address: 1234 Fashion Street, Suite 567, <br> New York, NY 10001</li>
-                    <li>Email: <b>info@fashionshop.com</b></li>
-                    <li>Phone: <b>(212) 555-1234</b></li>
+                    <li>Dirección: {{ tienda_config.direccion|linebreaksbr }}</li>
+                    <li>Email: <b>{{ tienda_config.email }}</b></li>
+                    <li>Teléfono: <b>{{ tienda_config.telefono }}</b></li>
                 </ul>
             </div>
         </div>
@@ -731,28 +731,38 @@
                                     </div>
                                     <ul>
                                         <li>
-                                            <p>Address: 1234 Fashion Street, Suite 567, <br> New York, NY 10001</p>
+                                            <p>Dirección: {{ tienda_config.direccion|linebreaksbr }}</p>
                                         </li>
                                         <li>
-                                            <p>Email: <a href="#">info@fashionshop.com</a></p>
+                                            <p>Email: <a href="mailto:{{ tienda_config.email }}">{{ tienda_config.email }}</a></p>
                                         </li>
                                         <li>
-                                            <p>Phone: <a href="#">(212) 555-1234</a></p>
+                                            <p>Teléfono: <a href="tel:{{ tienda_config.telefono }}">{{ tienda_config.telefono }}</a></p>
                                         </li>
                                     </ul>
-                                    <a href="contact-1.html" class="tf-btn btn-line">Get direction<i
+                                    <a href="{% url 'contact' %}" class="tf-btn btn-line">Get direction<i
                                             class="icon icon-arrow1-top-left"></i></a>
                                     <ul class="tf-social-icon d-flex gap-10 style-white">
-                                        <li><a href="#" class="box-icon w_34 round social-facebook social-line"><i
+                                        {% if tienda_config.facebook_url and tienda_config.facebook_url != "#" %}
+                                        <li><a href="{{ tienda_config.facebook_url }}" target="_blank" class="box-icon w_34 round social-facebook social-line"><i
                                                     class="icon fs-14 icon-fb"></i></a></li>
-                                        <li><a href="#" class="box-icon w_34 round social-twiter social-line"><i
+                                        {% endif %}
+                                        {% if tienda_config.twitter_url and tienda_config.twitter_url != "#" %}
+                                        <li><a href="{{ tienda_config.twitter_url }}" target="_blank" class="box-icon w_34 round social-twiter social-line"><i
                                                     class="icon fs-12 icon-Icon-x"></i></a></li>
-                                        <li><a href="#" class="box-icon w_34 round social-instagram social-line"><i
+                                        {% endif %}
+                                        {% if tienda_config.instagram_url and tienda_config.instagram_url != "#" %}
+                                        <li><a href="{{ tienda_config.instagram_url }}" target="_blank" class="box-icon w_34 round social-instagram social-line"><i
                                                     class="icon fs-14 icon-instagram"></i></a></li>
-                                        <li><a href="#" class="box-icon w_34 round social-tiktok social-line"><i
+                                        {% endif %}
+                                        {% if tienda_config.tiktok_url and tienda_config.tiktok_url != "#" %}
+                                        <li><a href="{{ tienda_config.tiktok_url }}" target="_blank" class="box-icon w_34 round social-tiktok social-line"><i
                                                     class="icon fs-14 icon-tiktok"></i></a></li>
-                                        <li><a href="#" class="box-icon w_34 round social-pinterest social-line"><i
+                                        {% endif %}
+                                        {% if tienda_config.pinterest_url and tienda_config.pinterest_url != "#" %}
+                                        <li><a href="{{ tienda_config.pinterest_url }}" target="_blank" class="box-icon w_34 round social-pinterest social-line"><i
                                                     class="icon fs-14 icon-pinterest-1"></i></a></li>
+                                        {% endif %}
                                     </ul>
                                 </div>
                             </div>
@@ -1318,6 +1328,34 @@
             }
         });
     });
+
+    // --- Scroll reveal navbar on mobile ---
+    document.addEventListener('DOMContentLoaded', function() {
+        let lastScrollTop = 0;
+        const header = document.getElementById('header');
+        
+        if (header) {
+            window.addEventListener('scroll', function() {
+                if (window.innerWidth <= 768) {
+                    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    
+                    if (scrollTop > 80) {
+                        if (scrollTop > lastScrollTop) {
+                            header.classList.remove('nav-visible');
+                            header.classList.add('nav-hidden');
+                        } else {
+                            header.classList.remove('nav-hidden');
+                            header.classList.add('nav-visible');
+                        }
+                    } else {
+                        header.classList.remove('nav-hidden');
+                        header.classList.remove('nav-visible');
+                    }
+                    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+                }
+            }, { passive: true });
+        }
+    });
     </script>
 </body>
 <style>
@@ -1524,6 +1562,28 @@
 }
 
 
+/* Scroll reveal header on mobile */
+@media (max-width: 768px) {
+    #header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        transition: transform 0.3s ease-in-out, background-color 0.3s ease;
+    }
+    #header.nav-hidden {
+        transform: translateY(-100%);
+    }
+    #header.nav-visible {
+        transform: translateY(0);
+        background-color: #1a2744 !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    body {
+        padding-top: 60px;
+    }
+}
 </style>
 
 </html>

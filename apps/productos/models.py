@@ -621,3 +621,33 @@ class PedidoItem(models.Model):
     
     def get_costo(self):
         return self.precio * self.cantidad
+
+
+# -----------------------------
+# CONFIGURACIÓN GLOBAL DE LA TIENDA
+# -----------------------------
+class TiendaConfig(models.Model):
+    direccion = models.TextField(default="1234 Fashion Street, Suite 567, New York, NY 10001", verbose_name="Dirección de la Tienda")
+    email = models.EmailField(default="info@fashionshop.com", verbose_name="Correo Electrónico de Contacto")
+    telefono = models.CharField(max_length=50, default="(212) 555-1234", verbose_name="Teléfono de Contacto")
+    horario_apertura = models.TextField(default="Nuestro almacén ha reabierto para compras, exchange Every day 11am to 7pm", verbose_name="Horario de Apertura")
+    mapa_embed_url = models.TextField(default="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d317859.6089702069!2d-0.075949!3d51.508112!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48760349331f38dd%3A0xa8bf49dde1d56467!2sTower%20of%20London!5e0!3m2!1sen!2sus!4v1719221598456!5m2!1sen!2sus", verbose_name="Enlace Iframe de Google Maps", help_text="Pega la URL de src del iframe de compartir mapa")
+    
+    # Redes sociales
+    facebook_url = models.CharField(max_length=200, blank=True, null=True, default="#", verbose_name="Facebook URL")
+    twitter_url = models.CharField(max_length=200, blank=True, null=True, default="#", verbose_name="Twitter / X URL")
+    instagram_url = models.CharField(max_length=200, blank=True, null=True, default="#", verbose_name="Instagram URL")
+    tiktok_url = models.CharField(max_length=200, blank=True, null=True, default="#", verbose_name="TikTok URL")
+    pinterest_url = models.CharField(max_length=200, blank=True, null=True, default="#", verbose_name="Pinterest URL")
+
+    class Meta:
+        verbose_name = "Configuración de la Tienda"
+        verbose_name_plural = "Configuración de la Tienda"
+
+    def __str__(self):
+        return "Configuración General de la Tienda"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+

@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Marca, Coleccion, Categoria, Producto, Imagen, Atributo, 
     AtributoProducto, CarritoItem, ShippingInfo, ReturnPolicy,
-    Pedido, PedidoItem
+    Pedido, PedidoItem, TiendaConfig
 )
 
 
@@ -303,3 +303,31 @@ class PedidoAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+# =====================
+# CONFIGURACIÓN TIENDA ADMIN
+# =====================
+@admin.register(TiendaConfig)
+class TiendaConfigAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Contacto e Identidad', {
+            'fields': ('direccion', 'email', 'telefono', 'horario_apertura')
+        }),
+        ('Ubicación y Mapa', {
+            'fields': ('mapa_embed_url',),
+            'description': 'Pega el enlace src del mapa embebido de Google Maps.'
+        }),
+        ('Redes Sociales', {
+            'fields': ('facebook_url', 'twitter_url', 'instagram_url', 'tiktok_url', 'pinterest_url')
+        }),
+    )
+
+    def has_add_permission(self, request):
+        # Evitar crear más de una instancia
+        if TiendaConfig.objects.exists():
+            return False
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        return False

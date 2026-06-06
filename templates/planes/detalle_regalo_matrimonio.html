@@ -179,7 +179,7 @@
 <div class="container">
     <div class="gift-page-wrapper">
         <!-- Columna Izquierda: Tarjeta -->
-        <div class="gift-card-col">
+        <div class="gift-card-col" {% if s.foto_pareja %}style="background: transparent !important;"{% endif %}>
             <style>
                 .has-couple-photo {
                     position: relative;
@@ -197,25 +197,44 @@
                     position: absolute;
                     top: 0; left: 0; width: 100%; height: 100%;
                     background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
-                    border-radius: 12px;
                     pointer-events: none;
                     z-index: 2;
                 }
                 .has-couple-photo .card-names-overlay {
+                    position: absolute;
+                    top: auto;
+                    bottom: 10%;
+                    left: 50%;
+                    transform: translateX(-50%);
                     z-index: 3;
                     text-shadow: 0 3px 12px rgba(0,0,0,0.9);
+                    width: 90%;
+                    font-size: clamp(30px, 4.5vw, 50px);
+                    line-height: 1.2;
                 }
             </style>
-            <div class="{% if s.foto_pareja %}has-couple-photo{% else %}card-container{% endif %}">
-                {% if s.foto_pareja %}
-                    <img src="{{ s.foto_pareja.url }}" alt="Matrimonio {{ s.nombres_novios }}" class="card-image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
-                {% else %}
-                    <img src="/media/tarjeta/tarjetaplannovios.png" alt="Tarjeta Plan Novios" class="card-image">
-                {% endif %}
+            {% if s.foto_pareja %}
+            <div class="couple-card-white-container" style="width: 100%; max-width: 100%; background: #ffffff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; align-items: center; padding: 20px;">
+                <div style="width: 100%; overflow: hidden; border-radius: 8px;">
+                    <img src="{{ s.foto_pareja.url }}" alt="Matrimonio {{ s.nombres_novios }}" class="card-image" style="width: 100%; height: auto; object-fit: contain; display: block; border-radius: 8px;">
+                </div>
+                <div style="width: 100%; text-align: center; margin-top: 25px; padding-bottom: 10px;">
+                    <div style="font-family: 'Great Vibes', cursive; font-size: clamp(32px, 4.5vw, 48px); color: #1a2744; line-height: 1.2; margin-bottom: 15px;" id="cardNamesOverlay">
+                        <!-- Nombres generados por JS -->
+                    </div>
+                    <div style="display: flex; justify-content: center; margin-top: 20px;">
+                        <img src="{% static 'images/logo/logoliven.png' %}" alt="Liven" style="max-width: 120px; height: auto;">
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card-container">
+                <img src="/media/tarjeta/tarjetaplannovios.png" alt="Tarjeta Plan Novios" class="card-image">
                 <div class="card-names-overlay" id="cardNamesOverlay">
                     <!-- Nombres generados por JS -->
                 </div>
             </div>
+            {% endif %}
         </div>
         
         <!-- Columna Derecha: Formulario y Productos -->
@@ -364,7 +383,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     // --- Nombres en la Tarjeta ---
     const rawNames = "{{ s.nombres_novios|escapejs }}";
-    const formattedNames = rawNames.replace(/ y /gi, '<br><span style="font-size:0.6em;color:#c9a96e;">&</span><br>');
+    const isCouplePhoto = document.querySelector('.couple-card-white-container') !== null;
+    let formattedNames;
+    if (isCouplePhoto) {
+        formattedNames = rawNames.replace(/ y /gi, ' <span style="font-size:0.9em; color:#c9a96e; margin: 0 6px;">&</span> ');
+    } else {
+        formattedNames = rawNames.replace(/ y /gi, '<br><span style="font-size:0.6em;color:#c9a96e;">&</span><br>');
+    }
     const cardOverlay = document.getElementById('cardNamesOverlay');
     if (cardOverlay) cardOverlay.innerHTML = formattedNames;
 
