@@ -147,7 +147,7 @@
 <!-- /Slider -->
 
 <!-- brand -->
-<section class="flat-spacing-2 pb_0">
+<section class="flat-spacing-2 pb_0 brand-section-custom">
     <div class="container">
         <div class="mb_30 fw-7 text-center">MARCAS</div>
         <div dir="ltr" class="swiper tf-sw-brand border-0" data-loop="false" data-play="false" data-preview="4"
@@ -157,7 +157,7 @@
                 {% if marca.imagen %}
                 <div class="swiper-slide">
                     <div class="brand-item border-0">
-                        <img class="lazyload" data-src="{{ marca.imagen.url }}" src="{{ marca.imagen.url }}"
+                        <img class="lazyload brand-logo-img" data-src="{{ marca.imagen.url }}" src="{{ marca.imagen.url }}"
                             alt="{{ marca.nombre }}">
                     </div>
                 </div>

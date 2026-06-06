@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pago no completado{% endblock %}
+
+{% block content %}
+<section class="flat-spacing-11">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Pago no completado</h2>
+                {% if status == 'cancelado' %}
+                    <p class="lead text-warning">El pago ha sido cancelado. Puedes intentar nuevamente o elegir otro método de pago.</p>
+                {% elif status == 'rechazado' %}
+                    <p class="lead text-danger">El pago fue rechazado. Por favor intenta de nuevo o utiliza otro método de pago.</p>
+                {% else %}
+                    <p class="lead text-secondary">No se pudo confirmar el pago. Revisa los datos y vuelve a intentarlo.</p>
+                {% endif %}
+
+                {% if pedido %}
+                <div class="bg-light p-4 rounded mb-4 text-start">
+                    <h5>Pedido #{{ pedido.id }}</h5>
+                    <p><strong>Cliente:</strong> {{ pedido.nombres }} {{ pedido.apellidos }}</p>
+                    <p><strong>Total:</strong> ${{ pedido.total }}</p>
+                    <p><strong>Estado de pago:</strong> {{ pedido.get_estado_pago_display }}</p>
+                    {% if pedido.payphone_transaction_id %}
+                        <p><strong>ID de transacción:</strong> {{ pedido.payphone_transaction_id }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="{% url 'productos:checkout' %}" class="tf-btn btn-outline-dark radius-3">Volver al checkout</a>
+                    {% if pedido %}
+                    <a href="{% url 'productos:order_payment_payphone' pedido.id %}" class="tf-btn btn-fill radius-3">Intentar pago de nuevo</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
