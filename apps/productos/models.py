@@ -591,8 +591,19 @@ class Pedido(models.Model):
     
     # Estado y seguimiento
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
+    ESTADO_PAGO_CHOICES = (
+        ('pendiente', 'Pendiente'),
+        ('aprobado', 'Aprobado'),
+        ('rechazado', 'Rechazado'),
+        ('cancelado', 'Cancelado'),
+    )
+    estado_pago = models.CharField(max_length=20, choices=ESTADO_PAGO_CHOICES, default='pendiente')
     metodo_pago = models.CharField(max_length=50, blank=True, null=True)
     transaccion_id = models.CharField(max_length=100, blank=True, null=True)
+    payphone_transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    payphone_client_transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    payphone_authorization_code = models.CharField(max_length=100, blank=True, null=True)
+    payphone_response = models.JSONField(blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

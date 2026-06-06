@@ -48,6 +48,8 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('checkout/process/', views.checkout_process, name='checkout_process'),
     path('checkout/payment/<int:pedido_id>/', views.order_payment_payphone, name='order_payment_payphone'),
+    path('pagos/payphone/respuesta/', views.payphone_respuesta, name='payphone_respuesta'),
+    path('pagos/payphone/cancelado/', views.payphone_cancelado, name='payphone_cancelado'),
     path('checkout/confirmation/<int:pedido_id>/', views.order_confirmation, name='order_confirmation'),
     path('checkout/validate-discount/', views.validate_discount_code, name='validate_discount_code'),
 
