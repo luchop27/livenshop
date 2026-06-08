@@ -1382,6 +1382,7 @@ def checkout_process(request):
             direct_url = (
                 payphone_data.get('paymentUrl') or
                 payphone_data.get('payUrl') or
+                payphone_data.get('checkoutUrl') or
                 payphone_data.get('url') or
                 payphone_data.get('redirectUrl') or
                 payphone_data.get('payment_url')
@@ -1415,6 +1416,7 @@ def order_payment_payphone(request, pedido_id):
     payment_url = (
         payphone_data.get('paymentUrl') or
         payphone_data.get('payUrl') or
+        payphone_data.get('checkoutUrl') or
         payphone_data.get('url') or
         payphone_data.get('redirectUrl') or
         payphone_data.get('payment_url')
