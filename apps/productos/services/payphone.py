@@ -44,6 +44,12 @@ def preparar_pago_payphone(pedido):
 
     if settings.PAYPHONE_APP_ID:
         payload['appId'] = settings.PAYPHONE_APP_ID
+    if settings.PAYPHONE_CLIENT_ID:
+        payload['clientId'] = settings.PAYPHONE_CLIENT_ID
+    if settings.PAYPHONE_CLIENT_SECRET:
+        payload['clientSecret'] = settings.PAYPHONE_CLIENT_SECRET
+    if settings.PAYPHONE_ENCODING_PASSWORD:
+        payload['encodingPassword'] = settings.PAYPHONE_ENCODING_PASSWORD
 
     headers = {
         'Authorization': f'Bearer {settings.PAYPHONE_TOKEN}',
@@ -76,6 +82,12 @@ def confirmar_pago_payphone(transaction_id, client_transaction_id):
 
     if settings.PAYPHONE_APP_ID:
         payload['appId'] = settings.PAYPHONE_APP_ID
+    if settings.PAYPHONE_CLIENT_ID:
+        payload['clientId'] = settings.PAYPHONE_CLIENT_ID
+    if settings.PAYPHONE_CLIENT_SECRET:
+        payload['clientSecret'] = settings.PAYPHONE_CLIENT_SECRET
+    if settings.PAYPHONE_ENCODING_PASSWORD:
+        payload['encodingPassword'] = settings.PAYPHONE_ENCODING_PASSWORD
 
     headers = {
         'Authorization': f'Bearer {settings.PAYPHONE_TOKEN}',
