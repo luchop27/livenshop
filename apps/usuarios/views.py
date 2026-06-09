@@ -44,6 +44,8 @@ def enviar_email_directo(destinatario, asunto, mensaje_html):
     import json
     import requests
     
+    resend_error_info = "No Resend key configured"
+    
     # 1. Intentar con Resend API primero
     resend_key = getattr(settings, 'RESEND_API_KEY', None)
     if resend_key:
@@ -76,6 +78,7 @@ def enviar_email_directo(destinatario, asunto, mensaje_html):
                 except Exception:
                     error_data = {}
                 
+                resend_error_info = f"Resend API error {response.status_code}: {response.text}"
                 print(f"⚠️ Resend devolvió error {response.status_code}: {response.text}")
                 
                 # Si es un error de dominio no verificado o prohibido, reintentamos con onboarding@resend.dev (Sandbox)
@@ -90,8 +93,10 @@ def enviar_email_directo(destinatario, asunto, mensaje_html):
                         print(f"✅ Email enviado exitosamente vía Resend Sandbox a {destinatario}")
                         return True, ""
                     else:
+                        resend_error_info = f"Resend Sandbox error {retry_response.status_code}: {retry_response.text}"
                         print(f"❌ Falló reintento con onboarding: {retry_response.text}")
         except Exception as re_e:
+            resend_error_info = f"Resend Connection Exception: {str(re_e)}"
             print(f"❌ Error conectando a la API de Resend: {re_e}")
 
     # 2. Fallback: Intentar con SMTP de Django (Configurado para Amazon SES)
@@ -118,7 +123,7 @@ def enviar_email_directo(destinatario, asunto, mensaje_html):
         
     except Exception as e:
         print(f"❌ Error final en envío SMTP: {str(e)}")
-        return False, f"Resend API y SMTP/SES fallaron. Último error: {str(e)}"
+        return False, f"Resend falló ({resend_error_info}) y SMTP falló ({str(e)})"
 
 
 def enviar_email_verificacion(request, usuario):
