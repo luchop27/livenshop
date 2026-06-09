@@ -92,6 +92,54 @@
                     <p>CALIDAD Y ELEGANCIA EN CADA PIEZA</p>
                 </div>
 
+                <div class="announcement-bar-item">
+                    <p>ENVÍO GRATIS EN PEDIDOS MAYORES A $50</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>NUEVA TEMPORADA — DESCUBRE LOS ÚLTIMOS DISEÑOS</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>CALIDAD Y ELEGANCIA EN CADA PIEZA</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>ENVÍO GRATIS EN PEDIDOS MAYORES A $50</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>NUEVA TEMPORADA — DESCUBRE LOS ÚLTIMOS DISEÑOS</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>CALIDAD Y ELEGANCIA EN CADA PIEZA</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>ENVÍO GRATIS EN PEDIDOS MAYORES A $50</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>NUEVA TEMPORADA — DESCUBRE LOS ÚLTIMOS DISEÑOS</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>CALIDAD Y ELEGANCIA EN CADA PIEZA</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>ENVÍO GRATIS EN PEDIDOS MAYORES A $50</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>NUEVA TEMPORADA — DESCUBRE LOS ÚLTIMOS DISEÑOS</p>
+                </div>
+
+                <div class="announcement-bar-item">
+                    <p>CALIDAD Y ELEGANCIA EN CADA PIEZA</p>
+                </div>
+
             {% endif %}
 
         </div>
@@ -1340,6 +1388,7 @@
                     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
                     
                     if (scrollTop > 80) {
+                        header.classList.add('is-fixed');
                         if (scrollTop > lastScrollTop) {
                             header.classList.remove('nav-visible');
                             header.classList.add('nav-hidden');
@@ -1348,6 +1397,7 @@
                             header.classList.add('nav-visible');
                         }
                     } else {
+                        header.classList.remove('is-fixed');
                         header.classList.remove('nav-hidden');
                         header.classList.remove('nav-visible');
                     }
@@ -1564,24 +1614,21 @@
 
 /* Scroll reveal header on mobile */
 @media (max-width: 768px) {
-    #header {
+    #header.is-fixed {
         position: fixed !important;
         top: 0;
         left: 0;
         width: 100%;
         z-index: 1000;
-        transition: transform 0.3s ease-in-out, background-color 0.3s ease;
-    }
-    #header.nav-hidden {
-        transform: translateY(-100%);
-    }
-    #header.nav-visible {
-        transform: translateY(0);
         background-color: #1a2744 !important;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: transform 0.3s ease-in-out;
     }
-    body {
-        padding-top: 60px;
+    #header.is-fixed.nav-hidden {
+        transform: translateY(-100%);
+    }
+    #header.is-fixed.nav-visible {
+        transform: translateY(0);
     }
 }
 </style>
