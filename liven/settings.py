@@ -1,9 +1,9 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-7fl0mqpzwr&8*svjqtgew8qncr&)+@v(uymf@y+233n8l-2yik')
 
