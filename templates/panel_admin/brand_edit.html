@@ -76,6 +76,12 @@
                         </div>
                     </fieldset>
 
+                    <fieldset class="name mb-20" id="fieldset_orden_slider" {% if not marca.mostrar_en_slider %}style="display: none;"{% endif %}>
+                        <div class="body-title mb-10">Orden en el Slider</div>
+                        <input class="flex-grow tf-input" type="number" name="orden_slider" id="id_orden_slider" value="{{ marca.orden_slider }}" min="0">
+                        <small class="text-muted">Indica la posición en el carrusel (1 es el primero, 2 el segundo, etc. 0 significa sin prioridad). Si hay colisión con otra marca, esta se desplazará automáticamente.</small>
+                    </fieldset>
+
                     <fieldset class="name mb-20" id="fieldset_imagen_slider" {% if not marca.mostrar_en_slider %}style="display: none;"{% endif %}>
                         <div class="body-title mb-10">Imagen para el Slider (Computadora)</div>
                         {% if marca.imagen_slider %}
@@ -181,10 +187,12 @@ slugInput.addEventListener('input', function() { this.dataset.manuallyEdited = '
 const mostrarEnSlider = document.getElementById('id_mostrar_en_slider');
 const fieldsetSlider = document.getElementById('fieldset_imagen_slider');
 const fieldsetSliderMovil = document.getElementById('fieldset_imagen_slider_movil');
+const fieldsetOrdenSlider = document.getElementById('fieldset_orden_slider');
 if (mostrarEnSlider) {
     mostrarEnSlider.addEventListener('change', function() {
         fieldsetSlider.style.display = this.checked ? 'block' : 'none';
         fieldsetSliderMovil.style.display = this.checked ? 'block' : 'none';
+        fieldsetOrdenSlider.style.display = this.checked ? 'block' : 'none';
     });
 }
 

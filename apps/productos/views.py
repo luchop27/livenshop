@@ -42,7 +42,7 @@ def home(request):
     marcas_slider = Marca.objects.filter(
         activo=True,
         mostrar_en_slider=True
-    )
+    ).order_by('orden_slider', 'nombre')
 
     shop_gram_posts = ShopGramPost.objects.filter(
         activo=True
@@ -437,6 +437,7 @@ def panel_admin_brand_add(request):
         activo = request.POST.get('estado', 'True') == 'True'
         imagen = request.FILES.get('imagen') or None
         mostrar_en_slider = request.POST.get('mostrar_en_slider') == 'on'
+        orden_slider = int(request.POST.get('orden_slider', 0) or 0)
         imagen_slider = request.FILES.get('imagen_slider') or None
         imagen_slider_movil = request.FILES.get('imagen_slider_movil') or None
 
@@ -458,6 +459,7 @@ def panel_admin_brand_add(request):
                 activo=activo,
                 imagen=imagen,
                 mostrar_en_slider=mostrar_en_slider,
+                orden_slider=orden_slider,
                 imagen_slider=imagen_slider,
                 imagen_slider_movil=imagen_slider_movil,
             )
@@ -480,6 +482,7 @@ def panel_admin_brand_edit(request, brand_id):
         remove_imagen = request.POST.get('remove_imagen')
         nueva_imagen = request.FILES.get('imagen')
         mostrar_en_slider = request.POST.get('mostrar_en_slider') == 'on'
+        orden_slider = int(request.POST.get('orden_slider', 0) or 0)
         remove_imagen_slider = request.POST.get('remove_imagen_slider')
         nueva_imagen_slider = request.FILES.get('imagen_slider')
         remove_imagen_slider_movil = request.POST.get('remove_imagen_slider_movil')
@@ -502,6 +505,7 @@ def panel_admin_brand_edit(request, brand_id):
             marca.descripcion = descripcion
             marca.activo = activo
             marca.mostrar_en_slider = mostrar_en_slider
+            marca.orden_slider = orden_slider
 
             if remove_imagen:
                 marca.imagen = None

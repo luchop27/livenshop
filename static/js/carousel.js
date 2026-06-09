@@ -446,7 +446,7 @@ if ($(".tf-sw-brand").length > 0) {
     autoplay: play,
     observer: true,
     observeParents: true,
-    slidesPerGroup: 2,
+    slidesPerGroup: 1,
     navigation: {
       clickable: true,
       nextEl: ".nav-prev-brand",
@@ -456,12 +456,12 @@ if ($(".tf-sw-brand").length > 0) {
       768: {
         slidesPerView: tablet,
         spaceBetween: spacingLg,
-        slidesPerGroup: 3,
+        slidesPerGroup: 1,
       },
       1150: {
         slidesPerView: preview,
         spaceBetween: spacingLg,
-        slidesPerGroup: 3,
+        slidesPerGroup: 1,
       },
     },
   });

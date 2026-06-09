@@ -62,6 +62,11 @@ class Marca(models.Model):
         null=True,
         help_text="Imagen especial para el slider del home en versión celular/móvil (solo se usa si 'mostrar en slider' está marcado)"
     )
+    orden_slider = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Orden en el Slider",
+        help_text="Posición de aparición en el slider del home. Si hay colisión, las demás se desplazan automáticamente."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -79,6 +84,25 @@ class Marca(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_unique_slug(Marca, self.nombre, self.pk)
+
+        # Lógica de reordenamiento automático en el slider si mostrar_en_slider es True y el orden es > 0
+        if self.mostrar_en_slider and self.orden_slider > 0:
+            duplicate = Marca.objects.filter(
+                mostrar_en_slider=True,
+                orden_slider=self.orden_slider
+            )
+            if self.pk:
+                duplicate = duplicate.exclude(pk=self.pk)
+            
+            if duplicate.exists():
+                marcas_a_desplazar = Marca.objects.filter(
+                    mostrar_en_slider=True,
+                    orden_slider__gte=self.orden_slider
+                )
+                if self.pk:
+                    marcas_a_desplazar = marcas_a_desplazar.exclude(pk=self.pk)
+                
+                marcas_a_desplazar.update(orden_slider=F('orden_slider') + 1)
 
         # Procesar imagen principal de marca a 398x164px WEBP
         if self.imagen:
