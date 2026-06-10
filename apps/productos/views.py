@@ -1403,8 +1403,8 @@ def checkout_process(request):
                 print("PAYPHONE DATA:", payphone_data, flush=True)
                 print("PAYPHONE DATA KEYS:", payphone_data.keys() if isinstance(payphone_data, dict) else type(payphone_data), flush=True)
                 direct_url = (
-                    payphone_data.get('payWithCard') or
                     payphone_data.get('payWithPayPhone') or
+                    payphone_data.get('payWithCard') or
                     payphone_data.get('paymentUrl') or
                     payphone_data.get('payUrl') or
                     payphone_data.get('checkoutUrl') or
