@@ -437,8 +437,7 @@
                     <div style="padding:12px 16px 10px;border-bottom:1px solid #e5e7eb;">
                         <div style="font-size:11px;color:#000000;text-transform:uppercase;letter-spacing:.05em;">Hola,
                         </div>
-                        <div style="font-weight:700;color:#000000;font-size:14px;margin-top:2px;">{{
-                            user.get_short_name|default:user.email }}</div>
+                        <div style="font-weight:700;color:#000000;font-size:14px;margin-top:2px;">{{ user.get_short_name|default:user.email }}</div>
                         {% if user.is_staff %}
                         <div style="font-size:11px;color:#000000;font-weight:600;margin-top:3px;">⚡ Administrador</div>
                         {% else %}
@@ -801,7 +800,7 @@
             <!-- Izquierda: Logo + copyright -->
             <div class="footer-minimal-brand">
                 <a href="{% url 'home' %}" class="footer-minimal-logo">
-                    <img src="{% static 'images/logo/iconlogolivenwhite.png' %}" alt="Liven">
+                    <img src="{% static 'images/logo/iconlogolivenwhite.png' %}" alt="Liven" style="height: 28px; width: auto; max-width: 28px; object-fit: contain;">
                     <span class="footer-minimal-logotxt">LIVEN</span>
                 </a>
                 <span class="footer-minimal-sep">·</span>
