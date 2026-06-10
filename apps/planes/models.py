@@ -174,6 +174,7 @@ class SolicitudPlanNovios(models.Model):
     ]
 
     nombres_novios = models.CharField(max_length=255, verbose_name='Nombres de los Novios')
+    apellidos_novios = models.CharField(max_length=255, blank=True, null=True, verbose_name='Apellidos de los Novios')
     email = models.EmailField(verbose_name='Email de contacto')
     telefono = models.CharField(max_length=20, verbose_name='Teléfono / WhatsApp')
     fecha_boda = models.DateField(verbose_name='Fecha tentativa de boda')
@@ -199,6 +200,7 @@ class SolicitudPlanNovios(models.Model):
     )
     clave = models.CharField(max_length=128, blank=True, verbose_name='Clave Portal (Hash)')
     saldo_acumulado = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Saldo Acumulado ($)')
+    monto_minimo_regalo = models.DecimalField(max_digits=10, decimal_places=2, default=50.00, verbose_name='Monto Mínimo de Regalo ($)', help_text='Monto mínimo que se puede regalar en efectivo.')
     procesado = models.BooleanField(default=False, verbose_name='¿Ya se contactó?')
     fecha_solicitud = models.DateTimeField(auto_now_add=True)
 

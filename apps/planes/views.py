@@ -39,6 +39,7 @@ def registro_novios(request):
     """Página dedicada al formulario de registro del Plan de Novios."""
     if request.method == 'POST':
         nombres = request.POST.get('nombres_novios', '').strip()
+        apellidos = request.POST.get('apellidos_novios', '').strip()
         email = request.POST.get('email', '').strip()
         telefono = request.POST.get('telefono', '').strip()
         fecha_boda = request.POST.get('fecha_boda', '')
@@ -51,6 +52,7 @@ def registro_novios(request):
             try:
                 SolicitudPlanNovios.objects.create(
                     nombres_novios=nombres,
+                    apellidos_novios=apellidos,
                     email=email,
                     telefono=telefono,
                     fecha_boda=fecha_boda,
