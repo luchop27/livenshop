@@ -295,8 +295,7 @@
                     <ul class="menu-list">
                         {% for categoria in menu_categorias %}
                         <li class="menu-item-2">
-                            <a href="{{ categoria.get_absolute_url }}" class="menu-link-text link text_black-2">{{
-                                categoria.nombre }}</a>
+                            <a href="{{ categoria.get_absolute_url }}" class="menu-link-text link text_black-2">{{ categoria.nombre }}</a>
                             {% with subs=categoria.subcategorias.all %}
                             {% if subs %}
                             <div class="sub-menu submenu-default">
@@ -304,8 +303,7 @@
                                     {% for sub in subs %}
                                     {% if sub.activo %}
                                     <li>
-                                        <a href="{{ sub.get_absolute_url }}" class="menu-link-text link text_black-2">{{
-                                            sub.nombre }}</a>
+                                        <a href="{{ sub.get_absolute_url }}" class="menu-link-text link text_black-2">{{ sub.nombre }}</a>
                                     </li>
                                     {% endif %}
                                     {% endfor %}
@@ -560,8 +558,7 @@
                                 {% for marca in menu_marcas %}
                                 {% with l=marca.nombre|first|lower %}
                                 {% if l >= "g" and l <= "l" %} <li>
-                                    <a href="{{ marca.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{
-                                        marca.nombre }}</a>
+                                    <a href="{{ marca.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ marca.nombre }}</a>
                     </li>
                     {% endif %}
                     {% endwith %}
@@ -583,8 +580,7 @@
                         {% for marca in menu_marcas %}
                         {% with l=marca.nombre|first|lower %}
                         {% if l >= "m" and l <= "r" %} <li>
-                            <a href="{{ marca.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ marca.nombre
-                                }}</a>
+                            <a href="{{ marca.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ marca.nombre }}</a>
             </li>
             {% endif %}
             {% endwith %}
@@ -607,8 +603,7 @@
                     {% with l=marca.nombre|first|lower %}
                     {% if l >= "s" %}
                     <li>
-                        <a href="{{ marca.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ marca.nombre
-                            }}</a>
+                        <a href="{{ marca.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ marca.nombre }}</a>
                     </li>
                     {% endif %}
                     {% endwith %}
@@ -646,8 +641,7 @@
                             {% for sub in subs %}
                             {% if sub.activo %}
                             <li>
-                                <a href="{{ sub.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ sub.nombre
-                                    }}</a>
+                                <a href="{{ sub.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ sub.nombre }}</a>
                             </li>
                             {% endif %}
                             {% endfor %}
@@ -656,8 +650,7 @@
                 </li>
                 {% else %}
                 <li>
-                    <a href="{{ categoria.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ categoria.nombre
-                        }}</a>
+                    <a href="{{ categoria.get_absolute_url }}" class="sub-nav-link force-menu-liven">{{ categoria.nombre }}</a>
                 </li>
                 {% endif %}
                 {% endwith %}
