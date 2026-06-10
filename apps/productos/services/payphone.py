@@ -1,4 +1,5 @@
 from decimal import Decimal, ROUND_HALF_UP
+import uuid
 import requests
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -31,7 +32,10 @@ def _ensure_payphone_settings():
 def preparar_pago_payphone(pedido):
     _ensure_payphone_settings()
 
-    client_transaction_id = f"PEDIDO-{pedido.id}"
+    client_transaction_id = f"PEDIDO-{pedido.id}-{uuid.uuid4().hex[:10]}"
+    pedido.payphone_client_transaction_id = client_transaction_id
+    pedido.save(update_fields=["payphone_client_transaction_id"])
+
     payload = {
         'amount': to_cents(pedido.total),
         'amountWithoutTax': to_cents(pedido.total),
@@ -73,7 +77,6 @@ def preparar_pago_payphone(pedido):
     response.raise_for_status()
     data = response.json()
 
-    pedido.payphone_client_transaction_id = client_transaction_id
     pedido.payphone_response = data
     pedido.save(update_fields=['payphone_client_transaction_id', 'payphone_response'])
 
