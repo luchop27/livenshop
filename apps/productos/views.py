@@ -1275,157 +1275,164 @@ def checkout_process(request):
     """
     Procesa el formulario de checkout y simula la creación del pedido.
     """
-    cart = Cart(request)
-    if len(cart) == 0:
-        return redirect('productos:view_cart')
+    try:
+        cart = Cart(request)
+        if len(cart) == 0:
+            return redirect('productos:view_cart')
 
-    # Aquí capturaríamos los datos de facturación
-    first_name = request.POST.get('first_name')
-    last_name = request.POST.get('last_name')
-    email = request.POST.get('email')
-    telefono = request.POST.get('phone')
-    pais = request.POST.get('country', 'Ecuador')
-    
-    ciudad = request.POST.get('city')
-    if ciudad == 'Otra':
-        ciudad = request.POST.get('other_city')
+        # Aquí capturaríamos los datos de facturación
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        telefono = request.POST.get('phone')
+        pais = request.POST.get('country', 'Ecuador')
         
-    direccion = request.POST.get('address')
-    codigo_postal = request.POST.get('postal_code')
-    notas = request.POST.get('order_note', '')
-    metodo_pago = request.POST.get('payment_method', 'bank_transfer')
-    print("METODO PAGO RECIBIDO:", metodo_pago)
-    print("PAYPHONE_TOKEN OK:", bool(settings.PAYPHONE_TOKEN))
-    print("PAYPHONE_CLIENT_ID OK:", bool(settings.PAYPHONE_CLIENT_ID))
-    print("PAYPHONE_CLIENT_SECRET OK:", bool(settings.PAYPHONE_CLIENT_SECRET))
-    print("PAYPHONE_APP_ID OK:", bool(settings.PAYPHONE_APP_ID))
-    print("PAYPHONE_ENCODING_PASSWORD OK:", bool(settings.PAYPHONE_ENCODING_PASSWORD))
-    print("PAYPHONE_PREPARE_URL:", settings.PAYPHONE_PREPARE_URL)
-    print("PAYPHONE_CONFIRM_URL:", settings.PAYPHONE_CONFIRM_URL)
-    print("PAYPHONE_RESPONSE_URL:", settings.PAYPHONE_RESPONSE_URL)
-    print("PAYPHONE_CANCEL_URL:", settings.PAYPHONE_CANCEL_URL)
-
-    # Recopilar notas de regalos
-    notas_regalos = ""
-    for item in cart:
-        if item.get('is_gift'):
-            detalle = item.get('detalle_producto', 'Efectivo')
-            notas_regalos += f"Regalo: {item['nombre']} ({detalle}) | De: {item.get('nombre_invitado', '')} | Mensaje: {item.get('mensaje', '')}\n"
+        ciudad = request.POST.get('city')
+        if ciudad == 'Otra':
+            ciudad = request.POST.get('other_city')
             
-    if notas_regalos:
-        notas = notas_regalos + ("\nNotas adicionales: " + notas if notas else "")
+        direccion = request.POST.get('address')
+        codigo_postal = request.POST.get('postal_code')
+        notas = request.POST.get('order_note', '')
+        metodo_pago = request.POST.get('payment_method', 'bank_transfer')
+        print("METODO PAGO RECIBIDO:", metodo_pago, flush=True)
+        print("PAYPHONE_TOKEN OK:", bool(settings.PAYPHONE_TOKEN), flush=True)
+        print("PAYPHONE_CLIENT_ID OK:", bool(settings.PAYPHONE_CLIENT_ID), flush=True)
+        print("PAYPHONE_CLIENT_SECRET OK:", bool(settings.PAYPHONE_CLIENT_SECRET), flush=True)
+        print("PAYPHONE_APP_ID OK:", bool(settings.PAYPHONE_APP_ID), flush=True)
+        print("PAYPHONE_ENCODING_PASSWORD OK:", bool(settings.PAYPHONE_ENCODING_PASSWORD), flush=True)
+        print("PAYPHONE_PREPARE_URL:", settings.PAYPHONE_PREPARE_URL, flush=True)
+        print("PAYPHONE_CONFIRM_URL:", settings.PAYPHONE_CONFIRM_URL, flush=True)
+        print("PAYPHONE_RESPONSE_URL:", settings.PAYPHONE_RESPONSE_URL, flush=True)
+        print("PAYPHONE_CANCEL_URL:", settings.PAYPHONE_CANCEL_URL, flush=True)
 
-    # Crear el Pedido
-    pedido = Pedido.objects.create(
-        usuario=request.user if request.user.is_authenticated else None,
-        nombres=first_name,
-        apellidos=last_name,
-        email=email,
-        telefono=telefono,
-        pais=pais,
-        ciudad=ciudad,
-        direccion=direccion,
-        codigo_postal=codigo_postal,
-        notas=notas,
-        subtotal=cart.get_total_price(),
-        total=cart.get_total_price(),  # Se puede aplicar envío y descuento
-        estado='pendiente',
-        metodo_pago=metodo_pago
-    )
-
-    # Crear los PedidoItem y registrar Movimientos
-    has_gifts = False
-    from apps.planes.models import SolicitudPlanNovios, MovimientoPlan
-    
-    for item in cart:
-        if item.get('is_gift'):
-            has_gifts = True
-            PedidoItem.objects.create(
-                pedido=pedido,
-                producto=None,
-                nombre_producto=item['nombre'],
-                precio=item['precio'],
-                cantidad=item['quantity']
-            )
-            # Registrar Movimiento en el Plan de Novios
-            try:
-                from decimal import Decimal
-                plan_id = item.get('plan_id')
-                if plan_id:
-                    plan = SolicitudPlanNovios.objects.filter(id=plan_id).first()
-                    if plan:
-                        MovimientoPlan.objects.create(
-                            plan=plan,
-                            producto_id=item.get('producto_id'), # Puede ser None si es efectivo
-                            monto=Decimal(item['precio']) * item['quantity'],
-                            descripcion=f"Aporte de {item.get('nombre_invitado', 'Invitado')}: {item.get('mensaje', '')}"
-                        )
-                        # Actualizar campo estático por redundancia
-                        plan.saldo_acumulado += Decimal(item['precio']) * item['quantity']
-                        plan.save()
-            except Exception as e:
-                print(f"Error registrando movimiento de regalo: {e}")
+        # Recopilar notas de regalos
+        notas_regalos = ""
+        for item in cart:
+            if item.get('is_gift'):
+                detalle = item.get('detalle_producto', 'Efectivo')
+                notas_regalos += f"Regalo: {item['nombre']} ({detalle}) | De: {item.get('nombre_invitado', '')} | Mensaje: {item.get('mensaje', '')}\n"
                 
-        else:
-            producto_obj = item['producto']
-            PedidoItem.objects.create(
-                pedido=pedido,
-                producto=producto_obj,
-                nombre_producto=producto_obj.nombre if producto_obj else item.get('nombre', 'Producto'),
-                precio=item['precio'],
-                cantidad=item['quantity']
-            )
-            # Bajo pedido: no reducimos stock
-            pass
-    
-    # ── Enviar Notificación WhatsApp al Administrador si hay regalos ──
-    if has_gifts:
-        try:
-            from .whatsapp_utils import enviar_mensaje_admin_nuevo_regalo
-            enviar_mensaje_admin_nuevo_regalo(pedido)
-        except Exception as e:
-            print(f"Error enviando WhatsApp al admin: {e}")
-    
-    if metodo_pago == 'bank_transfer':
-        # En pago por transferencia el pedido queda creado y el carrito se puede limpiar.
-        cart.clear()
-        return redirect('productos:order_confirmation', pedido_id=pedido.id)
+        if notas_regalos:
+            notas = notas_regalos + ("\nNotas adicionales: " + notas if notas else "")
 
-    if metodo_pago == 'payphone':
-        try:
-            print("ENTRANDO A BLOQUE PAYPHONE")
-            print("PAYPHONE PREPARE URL:", settings.PAYPHONE_PREPARE_URL)
-            print("PAYPHONE RESPONSE URL:", settings.PAYPHONE_RESPONSE_URL)
-            print("PAYPHONE CANCEL URL:", settings.PAYPHONE_CANCEL_URL)
-            payphone_data = preparar_pago_payphone(pedido)
-            print("PEDIDO CREADO:", pedido.id)
-            print("PAYPHONE DATA:", payphone_data)
-            print("PAYPHONE DATA KEYS:", payphone_data.keys() if isinstance(payphone_data, dict) else type(payphone_data))
-            direct_url = (
-                payphone_data.get('payWithCard') or
-                payphone_data.get('payWithPayPhone') or
-                payphone_data.get('paymentUrl') or
-                payphone_data.get('payUrl') or
-                payphone_data.get('checkoutUrl') or
-                payphone_data.get('url') or
-                payphone_data.get('redirectUrl') or
-                payphone_data.get('payment_url')
-            )
-            if direct_url:
-                return redirect(direct_url)
-            return redirect('productos:order_payment_payphone', pedido_id=pedido.id)
-        except Exception as e:
-            print("ERROR PAYPHONE EN CHECKOUT_PROCESS:", repr(e))
-            pedido.estado_pago = 'rechazado'
-            pedido.estado = 'pendiente'
-            pedido.payphone_response = {'error': str(e)}
-            pedido.save(update_fields=['estado_pago', 'estado', 'payphone_response'])
-            messages.error(request, f'Error PayPhone: {e}')
-            return redirect('productos:checkout')
+        # Crear el Pedido
+        pedido = Pedido.objects.create(
+            usuario=request.user if request.user.is_authenticated else None,
+            nombres=first_name,
+            apellidos=last_name,
+            email=email,
+            telefono=telefono,
+            pais=pais,
+            ciudad=ciudad,
+            direccion=direccion,
+            codigo_postal=codigo_postal,
+            notas=notas,
+            subtotal=cart.get_total_price(),
+            total=cart.get_total_price(),  # Se puede aplicar envío y descuento
+            estado='pendiente',
+            metodo_pago=metodo_pago
+        )
 
-    # Si se introduce un metodo de pago no esperado, redirigir al checkout.
-    messages.error(request, 'Método de pago no válido. Por favor, revisa tu selección.')
-    return redirect('productos:checkout')
+        # Crear los PedidoItem y registrar Movimientos
+        has_gifts = False
+        from apps.planes.models import SolicitudPlanNovios, MovimientoPlan
+        
+        for item in cart:
+            if item.get('is_gift'):
+                has_gifts = True
+                PedidoItem.objects.create(
+                    pedido=pedido,
+                    producto=None,
+                    nombre_producto=item['nombre'],
+                    precio=item['precio'],
+                    cantidad=item['quantity']
+                )
+                # Registrar Movimiento en el Plan de Novios
+                try:
+                    from decimal import Decimal
+                    plan_id = item.get('plan_id')
+                    if plan_id:
+                        plan = SolicitudPlanNovios.objects.filter(id=plan_id).first()
+                        if plan:
+                            MovimientoPlan.objects.create(
+                                plan=plan,
+                                producto_id=item.get('producto_id'), # Puede ser None si es efectivo
+                                monto=Decimal(item['precio']) * item['quantity'],
+                                descripcion=f"Aporte de {item.get('nombre_invitado', 'Invitado')}: {item.get('mensaje', '')}"
+                            )
+                            # Actualizar campo estático por redundancia
+                            plan.saldo_acumulado += Decimal(item['precio']) * item['quantity']
+                            plan.save()
+                except Exception as e:
+                    print(f"Error registrando movimiento de regalo: {e}", flush=True)
+                    
+            else:
+                producto_obj = item['producto']
+                PedidoItem.objects.create(
+                    pedido=pedido,
+                    producto=producto_obj,
+                    nombre_producto=producto_obj.nombre if producto_obj else item.get('nombre', 'Producto'),
+                    precio=item['precio'],
+                    cantidad=item['quantity']
+                )
+                # Bajo pedido: no reducimos stock
+                pass
+        
+        # ── Enviar Notificación WhatsApp al Administrador si hay regalos ──
+        if has_gifts:
+            try:
+                from .whatsapp_utils import enviar_mensaje_admin_nuevo_regalo
+                enviar_mensaje_admin_nuevo_regalo(pedido)
+            except Exception as e:
+                print(f"Error enviando WhatsApp al admin: {e}", flush=True)
+        
+        if metodo_pago == 'bank_transfer':
+            # En pago por transferencia el pedido queda creado y el carrito se puede limpiar.
+            cart.clear()
+            return redirect('productos:order_confirmation', pedido_id=pedido.id)
+
+        if metodo_pago == 'payphone':
+            try:
+                print("ENTRANDO A BLOQUE PAYPHONE", flush=True)
+                print("PAYPHONE PREPARE URL:", settings.PAYPHONE_PREPARE_URL, flush=True)
+                print("PAYPHONE RESPONSE URL:", settings.PAYPHONE_RESPONSE_URL, flush=True)
+                print("PAYPHONE CANCEL URL:", settings.PAYPHONE_CANCEL_URL, flush=True)
+                payphone_data = preparar_pago_payphone(pedido)
+                print("PEDIDO CREADO:", pedido.id, flush=True)
+                print("PAYPHONE DATA:", payphone_data, flush=True)
+                print("PAYPHONE DATA KEYS:", payphone_data.keys() if isinstance(payphone_data, dict) else type(payphone_data), flush=True)
+                direct_url = (
+                    payphone_data.get('payWithCard') or
+                    payphone_data.get('payWithPayPhone') or
+                    payphone_data.get('paymentUrl') or
+                    payphone_data.get('payUrl') or
+                    payphone_data.get('checkoutUrl') or
+                    payphone_data.get('url') or
+                    payphone_data.get('redirectUrl') or
+                    payphone_data.get('payment_url')
+                )
+                if direct_url:
+                    return redirect(direct_url)
+                return redirect('productos:order_payment_payphone', pedido_id=pedido.id)
+            except Exception as e:
+                print("ERROR PAYPHONE EN CHECKOUT_PROCESS:", repr(e), flush=True)
+                pedido.estado_pago = 'rechazado'
+                pedido.estado = 'pendiente'
+                pedido.payphone_response = {'error': str(e)}
+                pedido.save(update_fields=['estado_pago', 'estado', 'payphone_response'])
+                messages.error(request, f'Error PayPhone: {e}')
+                return redirect('productos:checkout')
+
+        # Si se introduce un metodo de pago no esperado, redirigir al checkout.
+        messages.error(request, 'Método de pago no válido. Por favor, revisa tu selección.')
+        return redirect('productos:checkout')
+    except Exception as e:
+        import traceback
+        print("ERROR GENERAL CHECKOUT_PROCESS:", repr(e), flush=True)
+        traceback.print_exc()
+        messages.error(request, f"Error procesando checkout: {e}")
+        return redirect("productos:checkout")
 
 def order_payment_payphone(request, pedido_id):
     """
