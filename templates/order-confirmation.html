@@ -99,7 +99,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <h6 class="fw-5 mb-2">Método de Pago</h6>
-                                        <p class="text-secondary mb-0">{{ pedido.get_metodo_pago_display }}</p>
+                                        <p class="text-secondary mb-0">{% if pedido.metodo_pago == 'bank_transfer' %}Transferencia Bancaria / WhatsApp{% elif pedido.metodo_pago == 'payphone' %}Tarjeta de Crédito / Débito (PayPhone){% else %}{{ pedido.metodo_pago }}{% endif %}</p>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <h6 class="fw-5 mb-2">Estado del Pedido</h6>
@@ -173,10 +173,12 @@
                                     <span>Seguir Comprando</span>
                                     <i class="icon icon-arrow-right"></i>
                                 </a>
+                                {% if pedido.metodo_pago == 'bank_transfer' %}
                                 <button type="button" class="tf-btn btn-outline-success animate-hover-btn radius-3 ms-2" id="btn-whatsapp-info">
                                     <span>Contactar por WhatsApp</span>
                                     <i class="icon icon-arrow-right"></i>
                                 </button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -185,7 +187,8 @@
         </section>
         <!-- /page-confirmation -->
 
-<!-- Modal de Información de WhatsApp para Despacho -->
+<!-- Modal de Información de WhatsApp para Despacho (Solo para transferencias bancarias) -->
+{% if pedido.metodo_pago == 'bank_transfer' %}
 <div class="modal fade" id="whatsappInfoModal" tabindex="-1" aria-labelledby="whatsappInfoLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -223,20 +226,24 @@
         </div>
     </div>
 </div>
+{% endif %}
 
+{% if pedido.metodo_pago == 'bank_transfer' %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // URL de WhatsApp con factura profesional, generada en el servidor
     const whatsappURL = "{{ whatsapp_url|escapejs }}";
+    const whatsappModalElement = document.getElementById('whatsappInfoModal');
 
-    const whatsappModal = new bootstrap.Modal(document.getElementById('whatsappInfoModal'));
+    if (!whatsappModalElement || typeof bootstrap === 'undefined') {
+        return;
+    }
 
-    // Mostrar modal automáticamente al cargar la página (con pequeño delay)
+    const whatsappModal = new bootstrap.Modal(whatsappModalElement);
+
     setTimeout(() => {
         whatsappModal.show();
     }, 600);
 
-    // Botón "Contactar por WhatsApp" en la página
     const btnWhatsappInfo = document.getElementById('btn-whatsapp-info');
     if (btnWhatsappInfo) {
         btnWhatsappInfo.addEventListener('click', function(e) {
@@ -245,14 +252,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Botón "Continuar a WhatsApp" dentro del modal
     const btnContinueWhatsapp = document.getElementById('btn-continue-whatsapp');
     if (btnContinueWhatsapp) {
         btnContinueWhatsapp.addEventListener('click', function() {
-            // Abrir WhatsApp con la factura profesional en nueva pestaña
             window.open(whatsappURL, '_blank');
-
-            // Cerrar modal tras 1 segundo
             setTimeout(() => {
                 whatsappModal.hide();
             }, 1000);
@@ -260,5 +263,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+{% endif %}
+
+{% if pedido.metodo_pago == 'bank_transfer' %}
+<script>
+    console.log('Pedido creado - Método de pago:', '{{ pedido.metodo_pago }}');
+</script>
+{% endif %}
 
 {% endblock %}

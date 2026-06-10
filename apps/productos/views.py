@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 from django.core.paginator import Paginator
 from django.db.models import Count, Q, F
 from django.contrib import messages
+from django.conf import settings
 from django.utils.text import slugify
 from .models import Marca, Producto, Categoria, Coleccion, CarritoItem, Imagen, AtributoProducto, ShopGramPost, Pedido, PedidoItem
 from .cart import Cart
@@ -1293,6 +1294,16 @@ def checkout_process(request):
     codigo_postal = request.POST.get('postal_code')
     notas = request.POST.get('order_note', '')
     metodo_pago = request.POST.get('payment_method', 'bank_transfer')
+    print("METODO PAGO RECIBIDO:", metodo_pago)
+    print("PAYPHONE_TOKEN OK:", bool(settings.PAYPHONE_TOKEN))
+    print("PAYPHONE_CLIENT_ID OK:", bool(settings.PAYPHONE_CLIENT_ID))
+    print("PAYPHONE_CLIENT_SECRET OK:", bool(settings.PAYPHONE_CLIENT_SECRET))
+    print("PAYPHONE_APP_ID OK:", bool(settings.PAYPHONE_APP_ID))
+    print("PAYPHONE_ENCODING_PASSWORD OK:", bool(settings.PAYPHONE_ENCODING_PASSWORD))
+    print("PAYPHONE_PREPARE_URL:", settings.PAYPHONE_PREPARE_URL)
+    print("PAYPHONE_CONFIRM_URL:", settings.PAYPHONE_CONFIRM_URL)
+    print("PAYPHONE_RESPONSE_URL:", settings.PAYPHONE_RESPONSE_URL)
+    print("PAYPHONE_CANCEL_URL:", settings.PAYPHONE_CANCEL_URL)
 
     # Recopilar notas de regalos
     notas_regalos = ""
@@ -1382,8 +1393,17 @@ def checkout_process(request):
 
     if metodo_pago == 'payphone':
         try:
+            print("ENTRANDO A BLOQUE PAYPHONE")
+            print("PAYPHONE PREPARE URL:", settings.PAYPHONE_PREPARE_URL)
+            print("PAYPHONE RESPONSE URL:", settings.PAYPHONE_RESPONSE_URL)
+            print("PAYPHONE CANCEL URL:", settings.PAYPHONE_CANCEL_URL)
             payphone_data = preparar_pago_payphone(pedido)
+            print("PEDIDO CREADO:", pedido.id)
+            print("PAYPHONE DATA:", payphone_data)
+            print("PAYPHONE DATA KEYS:", payphone_data.keys() if isinstance(payphone_data, dict) else type(payphone_data))
             direct_url = (
+                payphone_data.get('payWithCard') or
+                payphone_data.get('payWithPayPhone') or
                 payphone_data.get('paymentUrl') or
                 payphone_data.get('payUrl') or
                 payphone_data.get('checkoutUrl') or
@@ -1395,11 +1415,12 @@ def checkout_process(request):
                 return redirect(direct_url)
             return redirect('productos:order_payment_payphone', pedido_id=pedido.id)
         except Exception as e:
+            print("ERROR PAYPHONE EN CHECKOUT_PROCESS:", repr(e))
             pedido.estado_pago = 'rechazado'
             pedido.estado = 'pendiente'
             pedido.payphone_response = {'error': str(e)}
             pedido.save(update_fields=['estado_pago', 'estado', 'payphone_response'])
-            messages.error(request, 'No fue posible preparar el pago con PayPhone. Por favor intenta de nuevo o elige otro método.')
+            messages.error(request, f'Error PayPhone: {e}')
             return redirect('productos:checkout')
 
     # Si se introduce un metodo de pago no esperado, redirigir al checkout.
@@ -1418,6 +1439,8 @@ def order_payment_payphone(request, pedido_id):
 
     payphone_data = pedido.payphone_response or {}
     payment_url = (
+        payphone_data.get('payWithCard') or
+        payphone_data.get('payWithPayPhone') or
         payphone_data.get('paymentUrl') or
         payphone_data.get('payUrl') or
         payphone_data.get('checkoutUrl') or
