@@ -9,9 +9,21 @@
 }
 .tf-toolbar-bottom {
     background-color: #0C2038 !important;
+    /* Auto-hide on scroll */
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.tf-toolbar-bottom.toolbar-hidden {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
 }
 
-
+/* En móvil, el footer necesita padding-bottom para no quedar tapado por la toolbar fija */
+@media (max-width: 1150px) {
+    .footer-minimal {
+        padding-bottom: 70px;
+    }
+}
 /* Links y texto en blanco */
 .tf-toolbar-bottom .toolbar-item a,
 .tf-toolbar-bottom .toolbar-item a:hover,

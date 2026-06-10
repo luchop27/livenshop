@@ -242,7 +242,7 @@
             <a href="{% url 'planes:dejar_regalos_matrimonios' %}" class="back-link">← Volver a matrimonios</a>
             
             <h1 class="gift-form-title" style="font-family: 'Jost', sans-serif; font-size: 26px; color: #1a2744; display: flex; align-items: center; flex-wrap: wrap;">
-                Matrimonio de <span style="font-family: 'Great Vibes', cursive; color: #8A9BA8; font-weight: normal; font-size: 1.55em; text-transform: none; margin-left: 8px; line-height: 1;">{{ s.nombres_novios }}</span>
+                Matrimonio de <span style="font-family: 'Great Vibes', cursive; color: #8A9BA8; font-weight: normal; font-size: 1.55em; text-transform: none; margin-left: 8px; line-height: 1;">{% if s.apellidos_novios %}{{ s.apellidos_novios }}{% else %}{{ s.nombres_novios }}{% endif %}</span>
             </h1>
             <p class="gift-form-desc" style="font-size: 15px; line-height: 1.6; color: #555; margin-bottom: 30px;">
                 Celebra el amor regalando momentos para toda la vida. En Liven, cada aporte ayuda a los novios a transformar su casa en un hogar lleno de estilo, calidez y recuerdos inolvidables.<br><br>
@@ -294,12 +294,12 @@
                                 {% endif %}
                             </div>
                             
-                            <!-- Ojo previsualización global -->
-                            <a href="javascript:void(0);" 
-                               class="preview-eye quickview" 
-                               data-producto-id="{{ prod.id }}"
-                               style="position:absolute; right:55px; color:#1a2744; padding:8px; font-size:16px;" 
-                               title="Ver detalles">
+                            <!-- Ojo abre en nueva pestaña -->
+                            <a href="{{ prod.get_absolute_url }}" 
+                               target="_blank"
+                               class="preview-eye" 
+                               style="position:absolute; right:55px; color:#1a2744; padding:8px; font-size:16px; text-decoration:none;" 
+                               title="Ver detalles del producto en nueva pestaña">
                                 👁️
                             </a>
 
@@ -344,9 +344,9 @@
                         <div class="g-form-group">
                             <label class="g-form-label">Monto del Aporte *</label>
                             <div class="g-monto-wrap">
-                                <input type="number" class="g-form-input" id="detailGiftAmount" name="monto" min="1" step="0.01" value="50.00" required>
+                                <input type="number" class="g-form-input" id="detailGiftAmount" name="monto" min="{{ s.monto_minimo_regalo }}" step="0.01" value="{{ s.monto_minimo_regalo }}" required>
                             </div>
-                            <small id="giftAmountHint" style="color:#888; font-size:11px; display:block; margin-top:4px;">Puedes modificar este valor si deseas dar un abono parcial.</small>
+                            <small id="giftAmountHint" style="color:#888; font-size:11px; display:block; margin-top:4px;">Puedes modificar este valor si deseas dar un abono parcial (Mínimo ${{ s.monto_minimo_regalo }}).</small>
                         </div>
                         
                         <div class="g-form-group" style="display:none;">
@@ -400,6 +400,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const amtInput = document.getElementById('detailGiftAmount');
     const amountHint = document.getElementById('giftAmountHint');
 
+    const minMontoRegalo = parseFloat("{{ s.monto_minimo_regalo|escapejs }}") || 50.00;
+
     window.selectCashGift = function() {
         highlightCard('card-cash');
         donationSection.style.display = 'block';
@@ -410,9 +412,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('hiddenProductImage').value = '/media/tarjeta/targetaregalo.jpg';
         
         giftTitle.innerText = 'Aporte en Efectivo';
-        amtInput.value = '50.00';
-        amtInput.max = '';
-        amountHint.innerText = 'Tú decides el monto que deseas regalar.';
+        amtInput.value = minMontoRegalo.toFixed(2);
+        amtInput.min = minMontoRegalo.toFixed(2);
+        amountHint.innerText = 'Tú decides el monto que deseas regalar (Mínimo $' + minMontoRegalo.toFixed(2) + ').';
         
         updateTotal();
         donationSection.scrollIntoView({ behavior: 'smooth', block: 'center' });

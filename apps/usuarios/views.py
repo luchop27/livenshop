@@ -16,6 +16,11 @@ from apps.productos.models import Producto
 import base64
 import os
 
+# Limpiar variables de entorno de CA Bundle rotas de PostgreSQL en Windows para que requests funcione con SSL
+for var in ["CURL_CA_BUNDLE", "REQUESTS_CA_BUNDLE"]:
+    if var in os.environ and "PostgreSQL" in os.environ[var] and not os.path.exists(os.environ[var]):
+        del os.environ[var]
+
 
 def limpiar_mensajes_pendientes(request):
     """Consume mensajes pendientes para evitar arrastre entre panel admin y frontend."""
@@ -23,31 +28,83 @@ def limpiar_mensajes_pendientes(request):
     storage.used = True
 
 
-def obtener_logo_base64():
-    """Convierte el logo a base64 para usar en emails"""
-    try:
-        logo_path = os.path.join(settings.STATIC_ROOT or settings.BASE_DIR, 'static', 'images', 'logo', 'logoselena.png')
-        if not os.path.exists(logo_path):
-            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo', 'logoselena.png')
-        
-        with open(logo_path, 'rb') as image_file:
-            encoded = base64.b64encode(image_file.read()).decode()
-            return f"data:image/png;base64,{encoded}"
-    except Exception as e:
-        print(f"Error cargando logo: {e}")
-        return ""
+def obtener_logo_url(request):
+    """Obtiene la URL absoluta del logo de la tienda"""
+    if request:
+        # En producción o local, build_absolute_uri crea la URL absoluta completa (ej: https://liven.ec/static/images/logo/1logolivenblanco.png)
+        return request.build_absolute_uri('/static/images/logo/1logolivenblanco.png')
+    return "https://livenshop-media.s3.amazonaws.com/static/images/logo/1logolivenblanco.png"
 
 
 def enviar_email_directo(destinatario, asunto, mensaje_html):
     """
-    Envía emails usando el sistema nativo de Django (SMTP/SES) con fallback a Resend.
+    Envía emails usando primero Resend API, con reintento opcional si es sandbox,
+    y fallback al sistema nativo de Django (SMTP/SES).
     """
+    import json
+    import requests
+    
+    resend_error_info = "No Resend key configured"
+    
+    # 1. Intentar con Resend API primero
+    resend_key = getattr(settings, 'RESEND_API_KEY', None)
+    if resend_key:
+        print(f"🔌 Intentando envío vía Resend API a {destinatario}...")
+        url = "https://api.resend.com/emails"
+        
+        # Primero intentamos con el remitente por defecto de la tienda
+        sender_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'hola@liven.ec')
+        
+        headers = {
+            'Authorization': f'Bearer {resend_key}',
+            'Content-Type': 'application/json'
+        }
+        
+        payload = {
+            "from": f"LivenShop <{sender_email}>",
+            "to": [destinatario],
+            "subject": asunto,
+            "html": mensaje_html
+        }
+        
+        try:
+            response = requests.post(url, headers=headers, json=payload, timeout=10)
+            if response.status_code >= 200 and response.status_code < 300:
+                print(f"✅ Email enviado exitosamente vía Resend a {destinatario}")
+                return True, ""
+            else:
+                try:
+                    error_data = response.json()
+                except Exception:
+                    error_data = {}
+                
+                resend_error_info = f"Resend API error {response.status_code}: {response.text}"
+                print(f"⚠️ Resend devolvió error {response.status_code}: {response.text}")
+                
+                # Si es un error de dominio no verificado o prohibido, reintentamos con onboarding@resend.dev (Sandbox)
+                error_msg = error_data.get('message', '').lower() if error_data else response.text.lower()
+                is_unauthorized_domain = any(x in error_msg for x in ["domain", "verify", "unauthorized", "restrict"]) or response.status_code in [403, 422]
+                
+                if is_unauthorized_domain:
+                    print("🔄 Reintentando con remitente de onboarding (sandbox)...")
+                    payload["from"] = "LivenShop <onboarding@resend.dev>"
+                    retry_response = requests.post(url, headers=headers, json=payload, timeout=10)
+                    if retry_response.status_code >= 200 and retry_response.status_code < 300:
+                        print(f"✅ Email enviado exitosamente vía Resend Sandbox a {destinatario}")
+                        return True, ""
+                    else:
+                        resend_error_info = f"Resend Sandbox error {retry_response.status_code}: {retry_response.text}"
+                        print(f"❌ Falló reintento con onboarding: {retry_response.text}")
+        except Exception as re_e:
+            resend_error_info = f"Resend Connection Exception: {str(re_e)}"
+            print(f"❌ Error conectando a la API de Resend: {re_e}")
+
+    # 2. Fallback: Intentar con SMTP de Django (Configurado para Amazon SES)
     from django.core.mail import EmailMultiAlternatives
     from django.utils.html import strip_tags
     
-    # 1. Intentar con SMTP de Django (Configurado para Amazon SES)
     try:
-        print(f"🚀 Intentando envío vía SMTP/SES a {destinatario}...")
+        print(f"🚀 Fallback: Intentando envío vía SMTP/SES a {destinatario}...")
         sender_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'hola@liven.ec')
         text_content = strip_tags(mensaje_html)
         
@@ -65,36 +122,8 @@ def enviar_email_directo(destinatario, asunto, mensaje_html):
         return True, ""
         
     except Exception as e:
-        print(f"❌ Error en envío SMTP: {str(e)}")
-        # Si falla SMTP, intentamos con Resend API como respaldo
-        if hasattr(settings, 'RESEND_API_KEY') and settings.RESEND_API_KEY:
-            import json
-            import urllib.request
-            try:
-                print(f"🔌 Fallback: Intentando envío vía Resend API...")
-                url = "https://api.resend.com/emails"
-                sender_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'onboarding@resend.dev')
-                
-                payload = {
-                    "from": f"LivenShop <{sender_email}>",
-                    "to": [destinatario],
-                    "subject": asunto,
-                    "html": mensaje_html
-                }
-                
-                req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), method='POST')
-                req.add_header('Authorization', f'Bearer {settings.RESEND_API_KEY}')
-                req.add_header('Content-Type', 'application/json')
-                
-                with urllib.request.urlopen(req) as response:
-                    if 200 <= response.getcode() < 300:
-                        print(f"✅ Email enviado exitosamente vía Resend")
-                        return True, ""
-            except Exception as re_e:
-                print(f"❌ Error también en Resend: {re_e}")
-                return False, f"Error SMTP: {str(e)}. Fallback Resend: {str(re_e)}"
-        
-        return False, f"Error en envío: {str(e)}"
+        print(f"❌ Error final en envío SMTP: {str(e)}")
+        return False, f"Resend falló ({resend_error_info}) y SMTP falló ({str(e)})"
 
 
 def enviar_email_verificacion(request, usuario):
@@ -340,7 +369,7 @@ def enviar_email_verificacion(request, usuario):
 def enviar_email_codigo_recuperacion(request, usuario, codigo):
     """Envía el email con el código de 6 dígitos para recuperación de contraseña"""
     try:
-        logo_src = obtener_logo_base64() or "https://livenshop-media.s3.amazonaws.com/static/images/logo/logoliven.png"
+        logo_src = obtener_logo_url(request)
         nombre_usuario = usuario.nombre or usuario.email.split('@')[0]
         
         mensaje_html = f"""
@@ -349,110 +378,139 @@ def enviar_email_codigo_recuperacion(request, usuario, codigo):
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Recupera tu Contraseña</title>
             <style>
                 body {{
-                    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                    background-color: #f0f2f5;
+                    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background-color: #f7f9fc;
                     margin: 0;
-                    padding: 40px 20px;
+                    padding: 0;
+                    -webkit-font-smoothing: antialiased;
                 }}
-                .email-card {{
-                    max-width: 550px;
+                .wrapper {{
+                    width: 100%;
+                    background-color: #f7f9fc;
+                    padding: 40px 0;
+                }}
+                .container {{
+                    max-width: 580px;
                     margin: 0 auto;
-                    background: #ffffff;
-                    border-radius: 20px;
+                    background-color: #ffffff;
+                    border-radius: 16px;
                     overflow: hidden;
-                    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+                    box-shadow: 0 10px 30px rgba(12, 32, 56, 0.05);
                 }}
                 .header {{
-                    background: #0C2038;
-                    padding: 40px;
+                    background: linear-gradient(135deg, #0C2038 0%, #153254 100%);
+                    padding: 40px 20px;
                     text-align: center;
                 }}
                 .logo {{
-                    max-width: 130px;
-                    height: auto;
+                    max-height: 50px;
+                    width: auto;
                 }}
-                .body {{
-                    padding: 50px 40px;
-                    text-align: center;
-                    color: #2D3748;
+                .content {{
+                    padding: 40px 35px;
+                    color: #334155;
                 }}
-                .greeting {{
+                .title {{
                     font-size: 24px;
                     font-weight: 700;
-                    margin-bottom: 10px;
-                    color: #1A202C;
+                    color: #0C2038;
+                    margin-top: 0;
+                    margin-bottom: 15px;
+                    text-align: center;
                 }}
-                .subtitle {{
+                .greeting {{
                     font-size: 16px;
-                    color: #718096;
-                    margin-bottom: 30px;
+                    line-height: 1.6;
+                    margin-bottom: 25px;
                 }}
-                .code-container {{
-                    background: #F7FAFC;
-                    border: 2px solid #E2E8F0;
+                .code-box {{
+                    background-color: #f8fafc;
+                    border: 2px dashed #C9A96E;
                     border-radius: 12px;
-                    padding: 25px;
+                    padding: 24px;
+                    text-align: center;
                     margin: 30px 0;
                 }}
-                .code-label {{
+                .code-title {{
                     font-size: 12px;
                     text-transform: uppercase;
                     letter-spacing: 2px;
-                    color: #A0AEC0;
-                    margin-bottom: 15px;
-                    display: block;
+                    color: #64748b;
+                    margin-bottom: 10px;
+                    font-weight: 600;
                 }}
-                .code {{
-                    font-size: 42px;
+                .code-number {{
+                    font-size: 38px;
                     font-weight: 800;
                     color: #C9A96E;
-                    letter-spacing: 8px;
+                    letter-spacing: 6px;
                     margin: 0;
+                    font-family: 'Courier New', Courier, monospace;
                 }}
-                .instructions {{
+                .info-text {{
                     font-size: 14px;
                     line-height: 1.6;
-                    color: #4A5568;
-                    margin-bottom: 30px;
+                    color: #64748b;
+                    margin-bottom: 20px;
+                }}
+                .divider {{
+                    height: 1px;
+                    background-color: #e2e8f0;
+                    margin: 30px 0;
                 }}
                 .footer {{
-                    background: #F7FAFC;
-                    padding: 30px;
                     text-align: center;
-                    font-size: 12px;
-                    color: #A0AEC0;
-                    border-top: 1px solid #EDF2F7;
+                    padding: 30px 20px;
+                    background-color: #f8fafc;
+                    border-top: 1px solid #f1f5f9;
                 }}
-                .footer a {{
+                .footer-text {{
+                    font-size: 12px;
+                    color: #94a3b8;
+                    line-height: 1.5;
+                    margin: 5px 0;
+                }}
+                .footer-link {{
                     color: #C9A96E;
                     text-decoration: none;
+                    font-weight: 600;
                 }}
             </style>
         </head>
         <body>
-            <div class="email-card">
-                <div class="header">
-                    <img src="{logo_src}" alt="Liven Shop" class="logo">
-                </div>
-                <div class="body">
-                    <h1 class="greeting">Hola, {nombre_usuario}</h1>
-                    <p class="subtitle">Has solicitado restablecer tu contraseña. Utiliza el siguiente código para continuar:</p>
-                    
-                    <div class="code-container">
-                        <span class="code-label">Código de Verificación</span>
-                        <div class="code">{codigo}</div>
+            <div class="wrapper">
+                <div class="container">
+                    <div class="header">
+                        <img src="{logo_src}" alt="Liven" class="logo">
                     </div>
-                    
-                    <p class="instructions">
-                        Este código es válido por <strong>15 minutos</strong>.<br>
-                        Si no has solicitado este cambio, puedes ignorar este mensaje de forma segura.
-                    </p>
-                </div>
-                <div class="footer">
-                    © 2026 Liven Shop — Boutique de Regalos & Decoración<br>
-                    ¿Tienes dudas? <a href="https://wa.me/593989387657">Contáctanos por WhatsApp</a>
+                    <div class="content">
+                        <h2 class="title">Recuperación de Contraseña</h2>
+                        <p class="greeting">Hola, <strong>{nombre_usuario}</strong>:</p>
+                        <p class="greeting">Recibimos una solicitud para restablecer la contraseña de tu cuenta en <strong>Liven</strong>. Para continuar con el proceso, utiliza el siguiente código de verificación de 6 dígitos:</p>
+                        
+                        <div class="code-box">
+                            <div class="code-title">Código de Verificación</div>
+                            <div class="code-number">{codigo}</div>
+                        </div>
+                        
+                        <p class="info-text" style="text-align: center;">
+                            Este código es válido por <strong>15 minutos</strong>.<br>
+                            Si tú no realizaste esta solicitud, puedes ignorar este correo de forma segura; tu contraseña seguirá siendo la misma.
+                        </p>
+                        
+                        <div class="divider"></div>
+                        
+                        <p class="info-text" style="font-size: 12px; text-align: center;">
+                            Por motivos de seguridad, nunca compartas este código con nadie. El equipo de Liven nunca te pedirá tus credenciales ni códigos por correo ni llamada.
+                        </p>
+                    </div>
+                    <div class="footer">
+                        <p class="footer-text">© 2026 Liven — Boutique de Regalos & Decoración</p>
+                        <p class="footer-text">¿Necesitas ayuda? <a href="https://wa.me/593989387657" class="footer-link">Contáctanos por WhatsApp</a></p>
+                    </div>
                 </div>
             </div>
         </body>

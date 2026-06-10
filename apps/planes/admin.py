@@ -45,10 +45,10 @@ class PlanNoviosAdmin(admin.ModelAdmin):
 
 @admin.register(SolicitudPlanNovios)
 class SolicitudPlanNoviosAdmin(admin.ModelAdmin):
-    list_display = ['foto_miniatura', 'nombres_novios', 'email', 'telefono', 'fecha_boda', 'estado', 'procesado', 'fecha_solicitud']
+    list_display = ['foto_miniatura', 'nombres_novios', 'apellidos_novios', 'email', 'telefono', 'fecha_boda', 'estado', 'procesado', 'fecha_solicitud']
     list_filter = ['estado', 'procesado', 'fecha_solicitud']
     list_editable = ['estado', 'procesado']
-    search_fields = ['nombres_novios', 'email', 'telefono']
+    search_fields = ['nombres_novios', 'apellidos_novios', 'email', 'telefono']
     filter_horizontal = ['productos_regalo']
     inlines = [MovimientoPlanInline]
 
