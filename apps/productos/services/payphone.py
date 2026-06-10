@@ -62,6 +62,9 @@ def preparar_pago_payphone(pedido):
         headers=headers,
         timeout=30,
     )
+    print("PAYPHONE PAYLOAD SIN TOKEN:", payload)
+    print("PAYPHONE STATUS CODE:", response.status_code)
+    print("PAYPHONE RESPONSE TEXT:", response.text)
     response.raise_for_status()
     data = response.json()
 

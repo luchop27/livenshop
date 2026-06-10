@@ -158,23 +158,23 @@
                                     <h6 class="fw-5">Total</h6>
                                     <h6 class="total fw-5" id="checkout-total">${{ cart.get_total_price }}</h6>
                                 </div>
-                                <input type="hidden" name="discount_code_applied" id="discount-code-applied-input" value="">
-                                <input type="hidden" name="discount_amount" id="discount-amount-input" value="0">
+                                <input type="hidden" form="checkout-form" name="discount_code_applied" id="discount-code-applied-input" value="">
+                                <input type="hidden" form="checkout-form" name="discount_amount" id="discount-amount-input" value="0">
                                 
                                 <!-- Opciones de Pago -->
                                 <div class="wd-check-payment">
                                     <div class="fieldset-radio mb_20">
-                                        <input type="radio" name="payment_method" id="bank" class="tf-check" value="bank_transfer" checked>
+                                        <input type="radio" form="checkout-form" name="payment_method" id="bank" class="tf-check" value="bank_transfer" checked>
                                         <label for="bank">Transferencia Bancaria / WhatsApp</label>
                                     </div>
                                     <div class="fieldset-radio mb_20">
-                                        <input type="radio" name="payment_method" id="payphone" class="tf-check" value="payphone">
+                                        <input type="radio" form="checkout-form" name="payment_method" id="payphone" class="tf-check" value="payphone">
                                         <label for="payphone">Tarjeta de Crédito / Débito (Payphone)</label>
                                     </div>
                                     
                                     <p class="text_black-2 mb_20">Tus datos personales serán utilizados para procesar tu pedido y mejorar tu experiencia.</p>
                                     <div class="box-checkbox fieldset-radio mb_20">
-                                        <input type="checkbox" name="terms_accepted" id="check-agree" class="tf-check" required>
+                                        <input type="checkbox" form="checkout-form" name="terms_accepted" id="check-agree" class="tf-check" required>
                                         <label for="check-agree" class="text_black-2">He leído y acepto los términos y condiciones.</label>
                                     </div>
                                 </div>
