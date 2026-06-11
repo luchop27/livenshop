@@ -10,9 +10,10 @@ from django.db.models import Count, Q, F
 from django.contrib import messages
 from django.conf import settings
 from django.utils.text import slugify
+import uuid
 from .models import Marca, Producto, Categoria, Coleccion, CarritoItem, Imagen, AtributoProducto, ShopGramPost, Pedido, PedidoItem
 from .cart import Cart
-from .services.payphone import preparar_pago_payphone, confirmar_pago_payphone
+from .services.payphone import confirmar_pago_payphone, to_cents
 from decimal import Decimal
 
 
@@ -1296,12 +1297,6 @@ def checkout_process(request):
         notas = request.POST.get('order_note', '')
         metodo_pago = request.POST.get('payment_method', 'bank_transfer')
         print("METODO PAGO RECIBIDO:", metodo_pago, flush=True)
-        print("PAYPHONE_TOKEN OK:", bool(settings.PAYPHONE_TOKEN), flush=True)
-        print("PAYPHONE_CLIENT_ID OK:", bool(settings.PAYPHONE_CLIENT_ID), flush=True)
-        print("PAYPHONE_CLIENT_SECRET OK:", bool(settings.PAYPHONE_CLIENT_SECRET), flush=True)
-        print("PAYPHONE_APP_ID OK:", bool(settings.PAYPHONE_APP_ID), flush=True)
-        print("PAYPHONE_ENCODING_PASSWORD OK:", bool(settings.PAYPHONE_ENCODING_PASSWORD), flush=True)
-        print("PAYPHONE_PREPARE_URL:", settings.PAYPHONE_PREPARE_URL, flush=True)
         print("PAYPHONE_CONFIRM_URL:", settings.PAYPHONE_CONFIRM_URL, flush=True)
         print("PAYPHONE_RESPONSE_URL:", settings.PAYPHONE_RESPONSE_URL, flush=True)
         print("PAYPHONE_CANCEL_URL:", settings.PAYPHONE_CANCEL_URL, flush=True)
@@ -1333,6 +1328,13 @@ def checkout_process(request):
             estado='pendiente',
             metodo_pago=metodo_pago
         )
+
+        if metodo_pago == 'payphone':
+            client_transaction_id = f"PEDIDO-{pedido.id}-{uuid.uuid4().hex[:10]}"
+            pedido.payphone_client_transaction_id = client_transaction_id
+            pedido.estado_pago = 'pendiente'
+            pedido.metodo_pago = 'payphone'
+            pedido.save(update_fields=['payphone_client_transaction_id', 'estado_pago', 'metodo_pago'])
 
         # Crear los PedidoItem y registrar Movimientos
         has_gifts = False
@@ -1393,36 +1395,7 @@ def checkout_process(request):
             return redirect('productos:order_confirmation', pedido_id=pedido.id)
 
         if metodo_pago == 'payphone':
-            try:
-                print("ENTRANDO A BLOQUE PAYPHONE", flush=True)
-                print("PAYPHONE PREPARE URL:", settings.PAYPHONE_PREPARE_URL, flush=True)
-                print("PAYPHONE RESPONSE URL:", settings.PAYPHONE_RESPONSE_URL, flush=True)
-                print("PAYPHONE CANCEL URL:", settings.PAYPHONE_CANCEL_URL, flush=True)
-                payphone_data = preparar_pago_payphone(pedido)
-                print("PEDIDO CREADO:", pedido.id, flush=True)
-                print("PAYPHONE DATA:", payphone_data, flush=True)
-                print("PAYPHONE DATA KEYS:", payphone_data.keys() if isinstance(payphone_data, dict) else type(payphone_data), flush=True)
-                direct_url = (
-                    payphone_data.get('payWithPayPhone') or
-                    payphone_data.get('payWithCard') or
-                    payphone_data.get('paymentUrl') or
-                    payphone_data.get('payUrl') or
-                    payphone_data.get('checkoutUrl') or
-                    payphone_data.get('url') or
-                    payphone_data.get('redirectUrl') or
-                    payphone_data.get('payment_url')
-                )
-                if direct_url:
-                    return redirect(direct_url)
-                return redirect('productos:order_payment_payphone', pedido_id=pedido.id)
-            except Exception as e:
-                print("ERROR PAYPHONE EN CHECKOUT_PROCESS:", repr(e), flush=True)
-                pedido.estado_pago = 'rechazado'
-                pedido.estado = 'pendiente'
-                pedido.payphone_response = {'error': str(e)}
-                pedido.save(update_fields=['estado_pago', 'estado', 'payphone_response'])
-                messages.error(request, f'Error PayPhone: {e}')
-                return redirect('productos:checkout')
+            return redirect('productos:order_payment_payphone', pedido_id=pedido.id)
 
         # Si se introduce un metodo de pago no esperado, redirigir al checkout.
         messages.error(request, 'Método de pago no válido. Por favor, revisa tu selección.')
@@ -1435,48 +1408,42 @@ def checkout_process(request):
         return redirect("productos:checkout")
 
 def order_payment_payphone(request, pedido_id):
-    """
-    Página de pago con datos públicos de PayPhone.
-    """
+    """Página interna con la Cajita de Pagos PayPhone."""
     pedido = get_object_or_404(Pedido, id=pedido_id)
 
     if pedido.estado == 'pagado':
         messages.info(request, "Este pedido ya ha sido pagado.")
         return redirect('productos:order_confirmation', pedido_id=pedido.id)
 
-    payphone_data = pedido.payphone_response or {}
-    payment_url = (
-        payphone_data.get('payWithCard') or
-        payphone_data.get('payWithPayPhone') or
-        payphone_data.get('paymentUrl') or
-        payphone_data.get('payUrl') or
-        payphone_data.get('checkoutUrl') or
-        payphone_data.get('url') or
-        payphone_data.get('redirectUrl') or
-        payphone_data.get('payment_url')
-    )
+    if not settings.PAYPHONE_TOKEN or not settings.PAYPHONE_STORE_ID or not settings.PAYPHONE_RESPONSE_URL or not settings.PAYPHONE_CANCEL_URL:
+        messages.error(request, 'La configuración de PayPhone no está completa.')
+        return redirect('productos:checkout')
+
+    total_en_centavos = to_cents(pedido.total)
+    client_transaction_id = pedido.payphone_client_transaction_id or f"PEDIDO-{pedido.id}"
 
     return render(request, 'payphone_payment.html', {
         'pedido': pedido,
-        'payment_url': payment_url,
-        'payphone_data': payphone_data,
+        'payphone_token': settings.PAYPHONE_TOKEN,
+        'payphone_store_id': settings.PAYPHONE_STORE_ID,
+        'client_transaction_id': client_transaction_id,
+        'amount': total_en_centavos,
+        'amount_without_tax': total_en_centavos,
+        'amount_with_tax': 0,
+        'tax': 0,
+        'service': 0,
+        'tip': 0,
+        'currency': 'USD',
+        'reference': f'Pedido #{pedido.id}',
+        'response_url': settings.PAYPHONE_RESPONSE_URL,
+        'cancel_url': settings.PAYPHONE_CANCEL_URL,
     })
 
 
 def payphone_respuesta(request):
     """Procesa la respuesta de PayPhone y confirma la transacción en backend."""
-    transaction_id = (
-        request.GET.get('id') or
-        request.POST.get('id') or
-        request.GET.get('transactionId') or
-        request.POST.get('transactionId')
-    )
-    client_transaction_id = (
-        request.GET.get('clientTransactionId') or
-        request.POST.get('clientTransactionId') or
-        request.GET.get('client_transaction_id') or
-        request.POST.get('client_transaction_id')
-    )
+    transaction_id = request.GET.get('id') or request.POST.get('id')
+    client_transaction_id = request.GET.get('clientTransactionId') or request.POST.get('clientTransactionId')
 
     if not client_transaction_id:
         messages.error(request, 'Respuesta inválida de PayPhone.')
@@ -1487,19 +1454,26 @@ def payphone_respuesta(request):
     try:
         confirm_data = confirmar_pago_payphone(transaction_id, client_transaction_id)
         pedido.payphone_response = confirm_data
-        pedido.payphone_transaction_id = transaction_id
+        pedido.payphone_transaction_id = confirm_data.get('transactionId') or transaction_id
         pedido.payphone_authorization_code = (
             confirm_data.get('authorizationCode') or
             confirm_data.get('authorization_code') or
             confirm_data.get('authorization')
         )
 
-        status = (confirm_data.get('status') or confirm_data.get('paymentStatus') or confirm_data.get('state') or '').lower()
+        status_code = confirm_data.get('statusCode')
+        transaction_status = (
+            confirm_data.get('transactionStatus') or
+            confirm_data.get('status') or
+            confirm_data.get('paymentStatus') or
+            confirm_data.get('state') or
+            ''
+        ).lower()
 
-        if status in ('approved', 'aprobado', 'paid', 'completed', 'completado'):
+        if status_code == 3 or transaction_status == 'approved':
             pedido.estado = 'pagado'
-            pedido.estado_pago = 'aprobado'
-            pedido.transaccion_id = transaction_id
+            pedido.estado_pago = 'pagado'
+            pedido.transaccion_id = pedido.payphone_transaction_id
             pedido.save(update_fields=[
                 'estado',
                 'estado_pago',
@@ -1517,10 +1491,10 @@ def payphone_respuesta(request):
             messages.success(request, 'Pago aprobado. Gracias por tu compra.')
             return redirect('productos:order_confirmation', pedido_id=pedido.id)
 
-        if status in ('cancelled', 'cancelado', 'canceled'):
+        if status_code == 2 or transaction_status in ('cancelled', 'cancelado', 'canceled'):
             pedido.estado_pago = 'cancelado'
             pedido.estado = 'cancelado'
-        elif status in ('rejected', 'rechazado', 'declined', 'denied'):
+        elif transaction_status in ('rejected', 'rechazado', 'declined', 'denied'):
             pedido.estado_pago = 'rechazado'
             pedido.estado = 'pendiente'
         else:
@@ -1533,9 +1507,13 @@ def payphone_respuesta(request):
             'payphone_authorization_code',
             'payphone_response'
         ])
+        if pedido.estado_pago == 'cancelado':
+            messages.warning(request, 'Pago cancelado por PayPhone.')
+        else:
+            messages.error(request, 'No se pudo completar el pago con PayPhone.')
         return render(request, 'payphone_cancelled.html', {
             'pedido': pedido,
-            'status': status,
+            'status': transaction_status or f'status_code_{status_code}',
             'confirm_data': confirm_data,
         })
     except Exception as e:

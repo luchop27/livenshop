@@ -158,6 +158,8 @@ PAYPHONE_APP_ID = os.environ.get('PAYPHONE_APP_ID')
 PAYPHONE_ENCODING_PASSWORD = os.environ.get('PAYPHONE_ENCODING_PASSWORD')
 PAYPHONE_STORE_ID = os.environ.get('PAYPHONE_STORE_ID')
 PAYPHONE_PREPARE_URL = os.environ.get('PAYPHONE_PREPARE_URL')
-PAYPHONE_CONFIRM_URL = os.environ.get('PAYPHONE_CONFIRM_URL')
+PAYPHONE_CONFIRM_URL = os.environ.get('PAYPHONE_CONFIRM_URL', 'https://paymentbox.payphonetodoesposible.com/api/confirm')
 PAYPHONE_RESPONSE_URL = os.environ.get('PAYPHONE_RESPONSE_URL')
 PAYPHONE_CANCEL_URL = os.environ.get('PAYPHONE_CANCEL_URL')
+
+SECURE_REFERRER_POLICY = 'origin-when-cross-origin'
