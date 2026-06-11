@@ -14,8 +14,6 @@ def _ensure_payphone_settings():
     missing = []
     if not settings.PAYPHONE_TOKEN:
         missing.append('PAYPHONE_TOKEN')
-    if not settings.PAYPHONE_PREPARE_URL:
-        missing.append('PAYPHONE_PREPARE_URL')
     if not settings.PAYPHONE_CONFIRM_URL:
         missing.append('PAYPHONE_CONFIRM_URL')
     if not settings.PAYPHONE_RESPONSE_URL:
@@ -89,7 +87,7 @@ def confirmar_pago_payphone(transaction_id, client_transaction_id):
 
     payload = {
         'id': transaction_id,
-        'clientTransactionId': client_transaction_id,
+        'clientTxId': client_transaction_id,
     }
 
     if settings.PAYPHONE_APP_ID:

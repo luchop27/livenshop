@@ -3,24 +3,64 @@
 
 {% block title %}Pago del Pedido #{{ pedido.id }}{% endblock %}
 
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.payphonetodoesposible.com/box/v2.0/payphone-payment-box.css">
+    <script src="https://cdn.payphonetodoesposible.com/box/v2.0/payphone-payment-box.js"></script>
+{% endblock %}
+
 {% block content %}
 <section class="flat-spacing-11">
-    <div class="container text-center">
-        <h2 class="mb-4">Pago del Pedido #{{ pedido.id }}</h2>
-        <p class="mb-5">El monto a pagar es de <strong>${{ pedido.total }}</strong>. Por seguridad, el pago se procesa desde el servidor y el token de PayPhone no se expone en el HTML.</p>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <div class="card border-0 shadow-sm" style="border-radius: 20px; overflow: hidden;">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <p class="text-uppercase mb-2" style="letter-spacing: .12em; opacity: .65;">Checkout seguro</p>
+                            <h2 class="mb-3">Pago del Pedido #{{ pedido.id }}</h2>
+                            <p class="mb-0">El monto a pagar es de <strong>${{ pedido.total }}</strong>.</p>
+                        </div>
 
-        {% if payment_url %}
-            <a href="{{ payment_url }}" class="tf-btn btn-fill radius-3" style="padding: 1rem 2rem; font-size: 1.05rem;">
-                Ir a Pago Seguro con PayPhone
-            </a>
-        {% else %}
-            <div class="alert alert-warning">
-                <p>No se encontró la URL de pago de PayPhone. Por favor intenta de nuevo o contacta soporte.</p>
+                        <div class="mb-4 p-3 rounded-3" style="background:#f7f7f7;">
+                            <div><strong>Referencia:</strong> {{ reference }}</div>
+                            <div><strong>Cliente:</strong> {{ pedido.nombres }} {{ pedido.apellidos }}</div>
+                            <div><strong>Moneda:</strong> {{ currency }}</div>
+                        </div>
+
+                        <div id="pp-button"></div>
+
+                        <div class="text-center mt-4">
+                            <a href="{% url 'productos:checkout' %}" class="tf-btn btn-outline-dark radius-3">
+                                Volver al checkout
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <a href="{% url 'productos:checkout' %}" class="tf-btn btn-outline-dark radius-3">
-                Volver al checkout
-            </a>
-        {% endif %}
+        </div>
     </div>
 </section>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+    const ppb = new PPaymentButtonBox({
+        token: "{{ payphone_token|escapejs }}",
+        clientTransactionId: "{{ client_transaction_id|escapejs }}",
+        amount: {{ amount }},
+        amountWithoutTax: {{ amount_without_tax }},
+        amountWithTax: {{ amount_with_tax }},
+        tax: {{ tax }},
+        service: {{ service }},
+        tip: {{ tip }},
+        currency: "{{ currency|escapejs }}",
+        storeId: "{{ payphone_store_id|escapejs }}",
+        reference: "{{ reference|escapejs }}",
+        lang: "es",
+        defaultMethod: "card",
+        timeZone: -5
+    });
+
+    ppb.render("pp-button");
+});
+</script>
 {% endblock %}
