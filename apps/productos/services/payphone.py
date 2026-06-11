@@ -1,4 +1,5 @@
 from decimal import Decimal, ROUND_HALF_UP
+import uuid
 import requests
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -31,7 +32,10 @@ def _ensure_payphone_settings():
 def preparar_pago_payphone(pedido):
     _ensure_payphone_settings()
 
-    client_transaction_id = f"PEDIDO-{pedido.id}"
+    client_transaction_id = f"PEDIDO-{pedido.id}-{uuid.uuid4().hex[:10]}"
+    pedido.payphone_client_transaction_id = client_transaction_id
+    pedido.save(update_fields=["payphone_client_transaction_id"])
+
     payload = {
         'amount': to_cents(pedido.total),
         'amountWithoutTax': to_cents(pedido.total),
@@ -62,13 +66,17 @@ def preparar_pago_payphone(pedido):
         headers=headers,
         timeout=30,
     )
-    print("PAYPHONE PAYLOAD SIN TOKEN:", payload)
-    print("PAYPHONE STATUS CODE:", response.status_code)
-    print("PAYPHONE RESPONSE TEXT:", response.text)
+    safe_payload = payload.copy()
+    safe_payload.pop("clientSecret", None)
+    safe_payload.pop("encodingPassword", None)
+    safe_payload.pop("clientId", None)
+    safe_payload.pop("appId", None)
+    print("PAYPHONE PAYLOAD SEGURO:", safe_payload, flush=True)
+    print("PAYPHONE STATUS CODE:", response.status_code, flush=True)
+    print("PAYPHONE RESPONSE TEXT:", response.text, flush=True)
     response.raise_for_status()
     data = response.json()
 
-    pedido.payphone_client_transaction_id = client_transaction_id
     pedido.payphone_response = data
     pedido.save(update_fields=['payphone_client_transaction_id', 'payphone_response'])
 
