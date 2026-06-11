@@ -1445,6 +1445,27 @@ def order_payment_payphone(request, pedido_id):
     })
 
 
+def test_payphone_minimal(request, pedido_id):
+    """Página mínima aislada para diagnosticar la Cajita de Pagos PayPhone."""
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    total_en_centavos = to_cents(pedido.total)
+    client_transaction_id = pedido.payphone_client_transaction_id or f"PEDIDO-{pedido.id}"
+
+    return render(request, 'payphone_payment_minimal.html', {
+        'pedido': pedido,
+        'payphone_token': settings.PAYPHONE_TOKEN,
+        'payphone_store_id': settings.PAYPHONE_STORE_ID,
+        'client_transaction_id': client_transaction_id,
+        'amount': total_en_centavos,
+        'amount_without_tax': total_en_centavos,
+        'amount_with_tax': 0,
+        'tax': 0,
+        'service': 0,
+        'tip': 0,
+        'reference': f'Pedido #{pedido.id}',
+    })
+
+
 def payphone_respuesta(request):
     """Procesa la respuesta de PayPhone y confirma la transacción en backend."""
     transaction_id = request.GET.get('id') or request.POST.get('id')
