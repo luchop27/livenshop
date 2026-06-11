@@ -61,6 +61,17 @@ $(document).ready(function() {
                 // Para agregar al carrito
                 $('.btn-add-to-cart-quickview').data('product-id', data.id);
                 
+                // Configurar botón de wishlist
+                var wishlistBtn = $('#quick_view .tf-product-btn-wishlist');
+                wishlistBtn.attr('data-product-id', data.id);
+                if (data.en_wishlist) {
+                    wishlistBtn.addClass('active');
+                    wishlistBtn.find('.tooltip').text('Quitar de Favoritos');
+                } else {
+                    wishlistBtn.removeClass('active');
+                    wishlistBtn.find('.tooltip').text('Agregar a Favoritos');
+                }
+                
                 // Mostrar badges si tiene stock
                 if (data.tiene_stock) {
                     $('.tf-product-info-badges').show();

@@ -19,6 +19,16 @@
 #gallery-swiper-started .swiper-wrapper {
     width: 100% !important;
 }
+
+/* Fix for wishlist button turning completely blue */
+.tf-product-btn-wishlist.active,
+.box-icon.wishlist.active {
+    background-color: #fff !important;
+}
+.tf-product-btn-wishlist.active .icon-delete,
+.box-icon.wishlist.active .icon-delete {
+    color: var(--main) !important;
+}
 </style>
         <!-- breadcrumb -->
         <div class="tf-breadcrumb">
@@ -189,7 +199,7 @@
                                             <span class="btn-quantity plus-btn">+</span>
                                         </div>
                                     </div>
-                                    <a href="#" data-product-id="{{ producto.id }}" class="tf-btn btn-fill radius-3 justify-content-center fw-6 fs-14 flex-grow-1 animate-hover-btn btn-add-to-cart"><span>Agregar al carrito - ${{ producto.precio_final|floatformat:2 }}</span></a>
+                                    <a href="#" data-product-id="{{ producto.id }}" class="tf-btn btn-fill radius-3 justify-content-center fw-6 fs-14 flex-grow-1 animate-hover-btn btn-add-to-cart"><span>Agregar al carrito -&nbsp;</span><span class="tf-qty-price total-price">${{ producto.precio_final|floatformat:2 }}</span></a>
                                 </div>
                             </form>
                         </div>
@@ -261,7 +271,7 @@
         <!-- /productos relacionados -->
 
 
-        <script>
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     // Ocultar slides sobrantes si solo hay una imagen
     const mainSwiper = document.querySelector('#gallery-swiper-started');
@@ -272,6 +282,58 @@ document.addEventListener('DOMContentLoaded', function() {
             mainSwiper.querySelector('.swiper-button-prev')?.style.setProperty('display', 'none');
         }
     }
+
+    // Lógica de cantidad y actualización de precio
+    const basePriceStr = "{{ producto.precio_final|stringformat:'f' }}";
+    const basePrice = parseFloat(basePriceStr) || 0;
+
+    const qtyInputs = document.querySelectorAll('.wg-quantity input[name="number"]');
+    const btnIncreases = document.querySelectorAll('.btn-increase, .plus-btn');
+    const btnDecreases = document.querySelectorAll('.btn-decrease, .minus-btn');
+    const totalPrices = document.querySelectorAll('.total-price');
+
+    function updateQuantity(newQty) {
+        if (newQty < 1) newQty = 1;
+        
+        // Sincronizar todos los inputs (el principal y el del modal sticky)
+        qtyInputs.forEach(inp => inp.value = newQty);
+        
+        // Calcular nuevo precio
+        const newTotal = (basePrice * newQty).toFixed(2);
+        
+        // Actualizar texto de los botones
+        totalPrices.forEach(el => {
+            el.textContent = '$' + newTotal;
+        });
+    }
+
+    btnIncreases.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // main.js podría estar interfiriendo, así que leemos el input directamente y sumamos
+            // pero si main.js ya sumó, estaremos sumando doble si no detenemos la propagación.
+            // Para evitar doble suma de main.js:
+            e.stopPropagation();
+            const currentQty = parseInt(qtyInputs[0].value) || 1;
+            updateQuantity(currentQty + 1);
+        });
+    });
+
+    btnDecreases.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const currentQty = parseInt(qtyInputs[0].value) || 1;
+            updateQuantity(currentQty - 1);
+        });
+    });
+
+    qtyInputs.forEach(inp => {
+        inp.addEventListener('change', (e) => {
+            const currentQty = parseInt(e.target.value) || 1;
+            updateQuantity(currentQty);
+        });
+    });
 });
 </script>
 {% endblock content %}

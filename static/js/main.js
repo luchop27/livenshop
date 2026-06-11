@@ -540,8 +540,12 @@
     $(window).on('scroll', function () {
       var scrollPosition = $(this).scrollTop(); 
       var myElement = $('.tf-sticky-btn-atc');
+      
+      // Calculate how far we are from the bottom
+      var scrollBottom = $(document).height() - $(window).height() - scrollPosition;
 
-      if (scrollPosition >= 500) {
+      // Show if scrolled down at least 500px, but hide if within 250px of the bottom (footer area)
+      if (scrollPosition >= 500 && scrollBottom > 250) {
           myElement.addClass('show');
       } else {
           myElement.removeClass('show');

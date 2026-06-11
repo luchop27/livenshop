@@ -90,6 +90,11 @@
                                     title="{% if usuario.is_active %}Desactivar{% else %}Activar{% endif %}">
                                     <i class="icon-{% if usuario.is_active %}user-x{% else %}user-check{% endif %}"></i>
                                 </button>
+                                <button type="button" class="item text-danger"
+                                    onclick="deleteUser('{{ usuario.id }}', '{{ usuario.email|escapejs }}')"
+                                    title="Eliminar usuario">
+                                    <i class="icon-trash-2"></i>
+                                </button>
                                 {% endif %}
                             </div>
                         </li>
@@ -140,6 +145,20 @@ function toggleUserStatus(userId, email, isActive) {
     const action = isActive ? 'desactivar' : 'activar';
     if (!confirm(`¿${action.charAt(0).toUpperCase() + action.slice(1)} al usuario "${email}"?`)) return;
     fetch(`/usuarios/panel-admin/usuarios/${userId}/toggle-status/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCsrf(), 'Content-Type': 'application/json' },
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) location.reload();
+        else alert('Error: ' + data.message);
+    })
+    .catch(err => alert('Error de conexión.'));
+}
+
+function deleteUser(userId, email) {
+    if (!confirm(`¿Estás seguro de que quieres eliminar DEFINITIVAMENTE al usuario "${email}"?\nEsta acción no se puede deshacer.`)) return;
+    fetch(`/usuarios/panel-admin/usuarios/${userId}/eliminar/`, {
         method: 'POST',
         headers: { 'X-CSRFToken': getCsrf(), 'Content-Type': 'application/json' },
     })

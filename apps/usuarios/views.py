@@ -1270,6 +1270,20 @@ def panel_admin_user_toggle_status(request, usuario_id):
     accion = 'activado' if usuario.is_active else 'desactivado'
     return JsonResponse({'success': True, 'message': f'Usuario {accion} correctamente.', 'is_active': usuario.is_active})
 
+@staff_member_required(login_url='usuarios:login')
+@require_POST
+def panel_admin_user_delete(request, usuario_id):
+    """
+    Elimina un usuario de forma permanente vía POST/JSON.
+    """
+    usuario = get_object_or_404(Usuario, pk=usuario_id)
+
+    if usuario == request.user:
+        return JsonResponse({'success': False, 'message': 'No puedes eliminar tu propia cuenta.'})
+
+    usuario.delete()
+    return JsonResponse({'success': True, 'message': 'Usuario eliminado correctamente.'})
+
 # ==============================================================================
 # NOTIFICACIONES ADMIN (CAMPANITA)
 # ==============================================================================

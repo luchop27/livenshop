@@ -1234,10 +1234,15 @@ def checkout(request):
     
     # Pre-llenar datos si el usuario está autenticado
     if request.user.is_authenticated:
-        context['user_nombre'] = getattr(request.user, 'nombres', '')
-        context['user_apellido'] = getattr(request.user, 'apellidos', '')
+        context['user_nombre'] = getattr(request.user, 'nombre', '')
+        context['user_apellido'] = getattr(request.user, 'apellido', '')
         context['user_email'] = request.user.email
-        # Aquí podrías cargar teléfono u otros datos si los tienes en el modelo Usuario
+        context['user_telefono'] = getattr(request.user, 'telefono', '')
+        
+        if request.user.provincia:
+            context['user_provincia'] = request.user.provincia.nombre
+        if request.user.ciudad:
+            context['user_ciudad'] = request.user.ciudad.nombre
 
     return render(request, 'checkout.html', context)
 
@@ -1633,6 +1638,10 @@ def producto_quick_view(request, producto_id):
             'valor': attr.valor
         })
     
+    # Verificar si está en la wishlist
+    wishlist = request.session.get('wishlist', [])
+    en_wishlist = str(producto.id) in [str(x) for x in wishlist]
+    
     data = {
         'id': producto.id,
         'nombre': producto.nombre,
@@ -1651,6 +1660,7 @@ def producto_quick_view(request, producto_id):
         'categoria': producto.categoria.nombre if producto.categoria else '',
         'marca': producto.marca.nombre if producto.marca else '',
         'url_detalle': producto.get_absolute_url(),
+        'en_wishlist': en_wishlist,
     }
     
     return JsonResponse(data)

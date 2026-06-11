@@ -396,6 +396,41 @@
             
             document.getElementById('checkout-total').textContent = '$' + finalTotal.toFixed(2);
         }
+
+        // Auto-seleccionar provincia y ciudad si están disponibles
+        {% if user_provincia %}
+            if (provinceSelect) {
+                provinceSelect.value = "{{ user_provincia }}";
+                if (window.jQuery && $(provinceSelect).length) {
+                    try { $(provinceSelect).niceSelect('update'); } catch(e) {}
+                }
+                
+                if (window.jQuery) {
+                    $(provinceSelect).trigger('change');
+                } else {
+                    provinceSelect.dispatchEvent(new Event('change'));
+                }
+                
+                {% if user_ciudad %}
+                    citySelect.value = "{{ user_ciudad }}";
+                    if (!citySelect.value) {
+                        citySelect.value = "Otra";
+                        if (otherCityField && otherCityInput) {
+                            otherCityField.classList.remove('d-none');
+                            otherCityInput.setAttribute('required', 'required');
+                            otherCityInput.value = "{{ user_ciudad }}";
+                        }
+                    }
+                    if (window.jQuery && $(citySelect).length) {
+                        try { $(citySelect).niceSelect('update'); } catch(e) {
+                            try { $(citySelect).selectpicker('refresh'); } catch(e2) {}
+                        }
+                    }
+                {% endif %}
+                
+                calculateShipping();
+            }
+        {% endif %}
     });
 </script>
 
