@@ -41,6 +41,7 @@ def preparar_pago_payphone(pedido):
         'amountWithoutTax': to_cents(pedido.total),
         'tax': 0,
         'clientTransactionId': client_transaction_id,
+        'storeId': settings.PAYPHONE_STORE_ID,
         'reference': f'Pedido #{pedido.id}',
         'responseUrl': settings.PAYPHONE_RESPONSE_URL,
         'cancellationUrl': settings.PAYPHONE_CANCEL_URL,
