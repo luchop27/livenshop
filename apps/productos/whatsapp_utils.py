@@ -25,40 +25,24 @@ def generar_mensaje_factura_cliente(pedido, request=None):
     Genera un mensaje estilo FACTURA PROFESIONAL para que el cliente
     lo envíe por WhatsApp a la tienda al finalizar su compra.
     """
-    # ── Encabezado ──────────────────────────────────────────────────────────
+    metodo_pago_display = "Transferencia Bancaria / WhatsApp" if pedido.metodo_pago == 'bank_transfer' else pedido.metodo_pago
+    
     mensaje = (
-        "*ORDEN DE COMPRA - LIVENSHOP*\n"
-        "--------------------------------\n\n"
-        f"*Pedido:* #{pedido.id}\n"
-        f"*Cliente:* {pedido.nombres} {pedido.apellidos}\n"
-        f"*Ciudad:* {pedido.ciudad}, {pedido.pais}\n"
-        f"*Telefono:* {pedido.telefono}\n"
+        f"Hola, soy {pedido.nombres} {pedido.apellidos} y realicé el pedido #{pedido.id}.\n"
+        f"Aquí está mi comprobante de transferencia.\n\n"
+        f"*DETALLES DEL PEDIDO*\n"
+        f"--------------------------------\n"
+        f"*Nombre:* {pedido.nombres} {pedido.apellidos}\n"
+        f"*Email:* {pedido.email}\n"
+        f"*Teléfono:* {pedido.telefono}\n"
+        f"*Método de Pago:* {metodo_pago_display}\n"
+        f"*Total:* ${pedido.total:.2f}\n"
     )
-
-    # ── Detalle de productos ─────────────────────────────────────────────────
-    mensaje += "\n*DETALLE:*\n"
+    
+    mensaje += "\n*PRODUCTOS:*\n"
     for item in pedido.items.all():
         mensaje += f"  - {item.cantidad}x {item.nombre_producto} - ${item.precio:.2f}\n"
-        producto_url = _get_producto_url(item, request=request)
-        if producto_url:
-            mensaje += f"    Ver producto: {producto_url}\n"
-
-    # ── Totales ──────────────────────────────────────────────────────────────
-    mensaje += "\n--------------------------------\n"
-    if pedido.subtotal:
-        mensaje += f"Subtotal: ${pedido.subtotal:.2f}\n"
-
-    mensaje += f"\n*TOTAL A PAGAR: ${pedido.total:.2f}*\n"
-
-    # ── Instrucciones de pago ────────────────────────────────────────────────
-    mensaje += (
-        "\n*INSTRUCCIONES DE PAGO:*\n"
-        "1. Realiza la transferencia al número de cuenta indicado.\n"
-        "2. Envía el comprobante a este WhatsApp.\n"
-        "3. Tu pedido se procesará al confirmar el pago.\n"
-        "\n¡Gracias por comprar en LivenShop!"
-    )
-
+        
     return mensaje
 
 def enviar_mensaje_admin_nuevo_regalo(pedido):

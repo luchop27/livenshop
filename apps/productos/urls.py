@@ -21,6 +21,7 @@ urlpatterns = [
     path('panel-admin/productos/nuevo/', views.panel_admin_product_add, name='panel_admin_product_add'),
     path('panel-admin/productos/<int:producto_id>/editar/', views.panel_admin_product_edit, name='panel_admin_product_edit'),
     path('panel-admin/productos/<int:producto_id>/eliminar/', views.panel_admin_product_delete, name='panel_admin_product_delete'),
+    path('panel-admin/productos/<int:producto_id>/toggle-status/', views.panel_admin_product_toggle_status, name='panel_admin_product_toggle_status'),
     path('panel/shopgram/', views.panel_admin_shopgram_list, name='panel_admin_shopgram_list'),
     path('panel/shopgram/add/', views.panel_admin_shopgram_add, name='panel_admin_shopgram_add'),
     path('panel/shopgram/<int:pk>/edit/', views.panel_admin_shopgram_edit, name='panel_admin_shopgram_edit'),

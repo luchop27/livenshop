@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="wg-table table-product-list">
-                    <ul class="table-title flex gap20 mb-14">
+                    <ul class="table-title flex gap20 mb-14" style="grid-template-columns: minmax(200px, 1.5fr) 60px 130px 90px 110px 140px 90px 80px; display: grid; align-items: center;">
                         <li><div class="body-title">Producto</div></li>
                         <li><div class="body-title">ID</div></li>
                         <li><div class="body-title">Coleccion</div></li>
@@ -66,7 +66,7 @@
 
                     <ul class="flex flex-column">
                         {% for producto in productos %}
-                        <li class="wg-product item-row gap20">
+                        <li class="wg-product item-row gap20" style="grid-template-columns: minmax(200px, 1.5fr) 60px 130px 90px 110px 140px 90px 80px; display: grid; align-items: center;">
                             <div class="name">
                                 <div class="image">
                                     {% with img=producto.imagenes.first %}
@@ -122,16 +122,32 @@
                             </div>
 
                             <div>
-                                {% if producto.activo %}
-                                    <div class="block-available bg-1 fw-7">Activo</div>
-                                {% else %}
-                                    <div class="block-not-available bg-1 fw-7">Inactivo</div>
-                                {% endif %}
+                                <div style="display: flex; gap: 5px; flex-direction: column;">
+                                    <button type="button" class="btn-toggle-status" data-id="{{ producto.id }}" data-action="activar" 
+                                            style="border:none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; width: 100%; text-align: center; cursor: pointer; transition: 0.3s;
+                                            {% if producto.activo %}background: #28a745; color: white; opacity: 1;{% else %}background: #6c757d; color: #fff; opacity: 0.4;{% endif %}">
+                                        Activar
+                                    </button>
+                                    <button type="button" class="btn-toggle-status" data-id="{{ producto.id }}" data-action="inactivar" 
+                                            style="border:none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; width: 100%; text-align: center; cursor: pointer; transition: 0.3s;
+                                            {% if not producto.activo %}background: #dc3545; color: white; opacity: 1;{% else %}background: #6c757d; color: #fff; opacity: 0.4;{% endif %}">
+                                        Inactivar
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="body-text text-main-dark mt-4">{{ producto.created_at|date:"d/m/Y" }}</div>
 
-                            <div class="list-icon-function" style="display:none;">
+                            <div class="list-icon-function">
+                                <div class="item edit">
+                                    <a href="{% url 'productos:panel_admin_product_edit' producto.pk %}"><i class="icon-edit-3"></i></a>
+                                </div>
+                                <div class="item trash text-danger">
+                                    <form method="POST" action="{% url 'productos:panel_admin_product_delete' producto.pk %}" onsubmit="return confirm('¿Eliminar producto?');" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" style="background:none; border:none; padding:0; color:inherit; cursor:pointer;"><i class="icon-trash-2"></i></button>
+                                    </form>
+                                </div>
                             </div>
                         </li>
                         {% empty %}
@@ -185,4 +201,58 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const toggleButtons = document.querySelectorAll('.btn-toggle-status');
+    
+    toggleButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productoId = this.getAttribute('data-id');
+            const accion = this.getAttribute('data-action');
+            
+            const row = this.closest('li');
+            const btnActivar = row.querySelector('button[data-action="activar"]');
+            const btnInactivar = row.querySelector('button[data-action="inactivar"]');
+            
+            // Avoid triggering if already in that state
+            if (accion === 'activar' && btnActivar.style.opacity === '1') return;
+            if (accion === 'inactivar' && btnInactivar.style.opacity === '1') return;
+            
+            fetch(`/panel-admin/productos/${productoId}/toggle-status/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.activo) {
+                        btnActivar.style.background = '#28a745';
+                        btnActivar.style.opacity = '1';
+                        btnInactivar.style.background = '#6c757d';
+                        btnInactivar.style.opacity = '0.4';
+                    } else {
+                        btnActivar.style.background = '#6c757d';
+                        btnActivar.style.opacity = '0.4';
+                        btnInactivar.style.background = '#dc3545';
+                        btnInactivar.style.opacity = '1';
+                    }
+                } else {
+                    alert(data.message || 'Error al cambiar estado.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un problema con la petición.');
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -675,6 +675,14 @@ class TiendaConfig(models.Model):
     instagram_url = models.CharField(max_length=200, blank=True, null=True, default="#", verbose_name="Instagram URL")
     tiktok_url = models.CharField(max_length=200, blank=True, null=True, default="#", verbose_name="TikTok URL")
     pinterest_url = models.CharField(max_length=200, blank=True, null=True, default="#", verbose_name="Pinterest URL")
+    
+    cuenta_bancaria = models.TextField(
+        blank=True, 
+        null=True, 
+        default="Banco Pichincha\nCuenta Ahorros: 2200000000\nNombre: Liven Tienda\nCI: 1111111111",
+        verbose_name="Datos de Cuenta Bancaria",
+        help_text="Información de la cuenta bancaria para transferencias"
+    )
 
     class Meta:
         verbose_name = "Configuración de la Tienda"

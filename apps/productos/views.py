@@ -196,6 +196,16 @@ panel_admin_demo = panel_admin_dashboard
 # ══════════════════════════════════════════════════════
 # PANEL ADMIN — PRODUCTOS
 # ══════════════════════════════════════════════════════
+from django.views.decorators.http import require_POST
+
+@staff_member_required(login_url='usuarios:login')
+@require_POST
+def panel_admin_product_toggle_status(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+    producto.activo = not producto.activo
+    producto.save()
+    accion = 'activado' if producto.activo else 'desactivado'
+    return JsonResponse({'success': True, 'message': f'Producto {accion} correctamente.', 'activo': producto.activo})
 
 @staff_member_required(login_url='usuarios:login')
 def panel_admin_products(request):
