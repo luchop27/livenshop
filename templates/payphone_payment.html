@@ -1,66 +1,162 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}Pago del Pedido #{{ pedido.id }}{% endblock %}
-
-{% block extra_head %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pago del Pedido #{{ pedido.id }}</title>
     <link rel="stylesheet" href="https://cdn.payphonetodoesposible.com/box/v2.0/payphone-payment-box.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #f6f8fc 0%, #eef2f7 100%);
+            color: #111827;
+        }
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .card {
+            width: 100%;
+            max-width: 920px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.10);
+            overflow: hidden;
+        }
+        .card-inner {
+            padding: 32px;
+        }
+        .brand {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: #0f172a;
+            margin-bottom: 14px;
+        }
+        h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+        .subtitle {
+            margin: 0 0 20px;
+            color: #4b5563;
+            font-size: 15px;
+        }
+        .summary {
+            display: grid;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 22px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 14px;
+        }
+        .summary-row strong {
+            color: #0f172a;
+        }
+        .payphone-box {
+            margin-top: 18px;
+        }
+        .actions {
+            margin-top: 24px;
+            text-align: center;
+        }
+        .btn-back {
+            display: inline-block;
+            padding: 12px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            border: 1px solid #d1d5db;
+            color: #111827;
+            background: #fff;
+            font-weight: 600;
+        }
+        .btn-back:hover {
+            background: #f9fafb;
+        }
+        .fallback {
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: #fef3c7;
+            color: #92400e;
+            display: none;
+        }
+    </style>
     <script src="https://cdn.payphonetodoesposible.com/box/v2.0/payphone-payment-box.js"></script>
-{% endblock %}
+</head>
+<body>
+    <main class="page">
+        <section class="card">
+            <div class="card-inner">
+                <div class="brand">Liven</div>
+                <h1>Pago del Pedido #{{ pedido.id }}</h1>
+                <p class="subtitle">Checkout seguro</p>
 
-{% block content %}
-<section class="flat-spacing-11">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-xl-7">
-                <div class="card border-0 shadow-sm" style="border-radius: 20px; overflow: hidden;">
-                    <div class="card-body p-4 p-lg-5">
-                        <div class="text-center mb-4">
-                            <p class="text-uppercase mb-2" style="letter-spacing: .12em; opacity: .65;">Checkout seguro</p>
-                            <h2 class="mb-3">Pago del Pedido #{{ pedido.id }}</h2>
-                            <p class="mb-0">El monto a pagar es de <strong>${{ pedido.total }}</strong>.</p>
-                        </div>
+                <div class="summary">
+                    <div class="summary-row"><span>Monto total</span><strong>${{ pedido.total }}</strong></div>
+                    <div class="summary-row"><span>Referencia</span><span>{{ reference }}</span></div>
+                    <div class="summary-row"><span>Cliente</span><span>{{ pedido.nombres }} {{ pedido.apellidos }}</span></div>
+                    <div class="summary-row"><span>Moneda</span><span>{{ currency }}</span></div>
+                </div>
 
-                        <div class="mb-4 p-3 rounded-3" style="background:#f7f7f7;">
-                            <div><strong>Referencia:</strong> {{ reference }}</div>
-                            <div><strong>Cliente:</strong> {{ pedido.nombres }} {{ pedido.apellidos }}</div>
-                            <div><strong>Moneda:</strong> {{ currency }}</div>
-                        </div>
+                <div id="pp-button" class="payphone-box"></div>
+                <div id="fallback-message" class="fallback">
+                    No se pudo cargar PayPhone. Por favor vuelve al checkout e intenta nuevamente.
+                </div>
 
-                        <div id="pp-button"></div>
-                        <div class="text-center mt-4">
-                            <a href="{% url 'productos:checkout' %}" class="tf-btn btn-outline-dark radius-3">
-                                Volver al checkout
-                            </a>
-                        </div>
-                    </div>
+                <div class="actions">
+                    <a href="{% url 'productos:checkout' %}" class="btn-back">Volver al checkout</a>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
+        </section>
+    </main>
 
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-    const ppb = new PPaymentButtonBox({
-        token: "{{ payphone_token|escapejs }}",
-        clientTransactionId: "{{ client_transaction_id|escapejs }}",
-        amount: {{ amount }},
-        amountWithoutTax: {{ amount_without_tax }},
-        amountWithTax: {{ amount_with_tax }},
-        tax: {{ tax }},
-        service: {{ service }},
-        tip: {{ tip }},
-        currency: "{{ currency|escapejs }}",
-        storeId: "{{ payphone_store_id|escapejs }}",
-        reference: "{{ reference|escapejs }}",
-        lang: "es",
-        defaultMethod: "card",
-        timeZone: -5
+    <script>
+    window.addEventListener("DOMContentLoaded", () => {
+        try {
+            const ppb = new PPaymentButtonBox({
+                token: "{{ payphone_token|escapejs }}",
+                clientTransactionId: "{{ client_transaction_id|escapejs }}",
+                amount: {{ amount }},
+                amountWithoutTax: {{ amount_without_tax }},
+                amountWithTax: {{ amount_with_tax }},
+                tax: {{ tax }},
+                service: {{ service }},
+                tip: {{ tip }},
+                currency: "USD",
+                storeId: "{{ payphone_store_id|escapejs }}",
+                reference: "{{ reference|escapejs }}",
+                lang: "es",
+                defaultMethod: "card",
+                timeZone: -5
+            });
+
+            ppb.render("pp-button");
+        } catch (error) {
+            console.error("ERROR RENDER PAYPHONE:", error);
+
+            const box = document.getElementById("pp-button");
+            if (box) {
+                box.innerHTML = `
+                    <div class="fallback" style="display:block;">
+                        No se pudo cargar PayPhone. Por favor vuelve al checkout e intenta nuevamente.
+                    </div>
+                `;
+            }
+        }
     });
-
-    ppb.render("pp-button");
-});
-</script>
-
-{% endblock %}
+    </script>
+</body>
+</html>

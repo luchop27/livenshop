@@ -65,14 +65,6 @@ def preparar_pago_payphone(pedido):
         headers=headers,
         timeout=30,
     )
-    safe_payload = payload.copy()
-    safe_payload.pop("clientSecret", None)
-    safe_payload.pop("encodingPassword", None)
-    safe_payload.pop("clientId", None)
-    safe_payload.pop("appId", None)
-    print("PAYPHONE PAYLOAD SEGURO:", safe_payload, flush=True)
-    print("PAYPHONE STATUS CODE:", response.status_code, flush=True)
-    print("PAYPHONE RESPONSE TEXT:", response.text, flush=True)
     response.raise_for_status()
     data = response.json()
 

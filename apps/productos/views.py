@@ -1302,9 +1302,8 @@ def checkout_process(request):
         notas = request.POST.get('order_note', '')
         metodo_pago = request.POST.get('payment_method', 'bank_transfer')
         print("METODO PAGO RECIBIDO:", metodo_pago, flush=True)
-        print("PAYPHONE_CONFIRM_URL:", settings.PAYPHONE_CONFIRM_URL, flush=True)
-        print("PAYPHONE_RESPONSE_URL:", settings.PAYPHONE_RESPONSE_URL, flush=True)
-        print("PAYPHONE_CANCEL_URL:", settings.PAYPHONE_CANCEL_URL, flush=True)
+        print("PAYPHONE TOKEN OK:", bool(settings.PAYPHONE_TOKEN), flush=True)
+        print("PAYPHONE STORE ID OK:", bool(settings.PAYPHONE_STORE_ID), flush=True)
 
         # Recopilar notas de regalos
         notas_regalos = ""
@@ -1425,7 +1424,11 @@ def order_payment_payphone(request, pedido_id):
         return redirect('productos:checkout')
 
     total_en_centavos = to_cents(pedido.total)
-    client_transaction_id = pedido.payphone_client_transaction_id or f"PEDIDO-{pedido.id}"
+    client_transaction_id = pedido.payphone_client_transaction_id
+    if not client_transaction_id:
+        client_transaction_id = f"PEDIDO-{pedido.id}-{uuid.uuid4().hex[:10]}"
+        pedido.payphone_client_transaction_id = client_transaction_id
+        pedido.save(update_fields=['payphone_client_transaction_id'])
 
     return render(request, 'payphone_payment.html', {
         'pedido': pedido,
@@ -1445,27 +1448,6 @@ def order_payment_payphone(request, pedido_id):
     })
 
 
-def test_payphone_minimal(request, pedido_id):
-    """Página mínima aislada para diagnosticar la Cajita de Pagos PayPhone."""
-    pedido = get_object_or_404(Pedido, id=pedido_id)
-    total_en_centavos = to_cents(pedido.total)
-    client_transaction_id = pedido.payphone_client_transaction_id or f"PEDIDO-{pedido.id}"
-
-    return render(request, 'payphone_payment_minimal.html', {
-        'pedido': pedido,
-        'payphone_token': settings.PAYPHONE_TOKEN,
-        'payphone_store_id': settings.PAYPHONE_STORE_ID,
-        'client_transaction_id': client_transaction_id,
-        'amount': total_en_centavos,
-        'amount_without_tax': total_en_centavos,
-        'amount_with_tax': 0,
-        'tax': 0,
-        'service': 0,
-        'tip': 0,
-        'reference': f'Pedido #{pedido.id}',
-    })
-
-
 def payphone_respuesta(request):
     """Procesa la respuesta de PayPhone y confirma la transacción en backend."""
     transaction_id = request.GET.get('id') or request.POST.get('id')
@@ -1475,7 +1457,10 @@ def payphone_respuesta(request):
         messages.error(request, 'Respuesta inválida de PayPhone.')
         return redirect('productos:checkout')
 
-    pedido = get_object_or_404(Pedido, payphone_client_transaction_id=client_transaction_id)
+    pedido = Pedido.objects.filter(payphone_client_transaction_id=client_transaction_id).first()
+    if not pedido:
+        messages.error(request, 'No se encontró el pedido asociado a PayPhone.')
+        return redirect('productos:checkout')
 
     try:
         confirm_data = confirmar_pago_payphone(transaction_id, client_transaction_id)
