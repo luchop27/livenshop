@@ -160,7 +160,14 @@
                             </div>
                         </div>
                         {% empty %}
-                            <p>No products found.</p>
+                        <div class="empty-state-shop" style="width:100%;text-align:center;padding:80px 20px;">
+                            <i class="icon icon-bag" style="font-size:3.5rem;color:#ccc;display:block;margin-bottom:20px;"></i>
+                            <h5 style="margin-bottom:8px;">No se encontraron productos</h5>
+                            <p style="color:#888;margin-bottom:28px;">Intenta con otros filtros o explora toda nuestra tienda</p>
+                            <a href="{% url 'productos:lista_productos' %}" class="tf-btn btn-fill animate-hover-btn radius-3 justify-content-center" style="display:inline-flex;min-width:200px;">
+                                <span>Ver todos los productos</span>
+                            </a>
+                        </div>
                         {% endfor %}
 
                         <!-- pagination LIST LAYOUT -->
@@ -261,7 +268,14 @@
                             </div>
                         </div>
                         {% empty %}
-                            <p>No products found.</p>
+                        <div class="empty-state-shop" style="grid-column:1/-1;text-align:center;padding:80px 20px;">
+                            <i class="icon icon-bag" style="font-size:3.5rem;color:#ccc;display:block;margin-bottom:20px;"></i>
+                            <h5 style="margin-bottom:8px;">No se encontraron productos</h5>
+                            <p style="color:#888;margin-bottom:28px;">Intenta con otros filtros o explora toda nuestra tienda</p>
+                            <a href="{% url 'productos:lista_productos' %}" class="tf-btn btn-fill animate-hover-btn radius-3 justify-content-center" style="display:inline-flex;min-width:200px;">
+                                <span>Ver todos los productos</span>
+                            </a>
+                        </div>
                         {% endfor %}
 
                         <!-- pagination GRID LAYOUT -->

@@ -376,8 +376,11 @@
         if (minusBtn) {
             minusBtn.addEventListener('click', function (e) {
                 e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
                 const currentQty = parseInt(quantityInput.value || '1', 10);
                 if (currentQty <= 1) return;
+                quantityInput.value = currentQty - 1;
                 updateCartQuantity(row, currentQty - 1);
             });
         }
@@ -385,11 +388,14 @@
         if (plusBtn) {
             plusBtn.addEventListener('click', function (e) {
                 e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
                 const currentQty = parseInt(quantityInput.value || '1', 10);
                 if (stock > 0 && currentQty >= stock) {
                     notify('Stock máximo alcanzado para este producto.', true);
                     return;
                 }
+                quantityInput.value = currentQty + 1;
                 updateCartQuantity(row, currentQty + 1);
             });
         }
@@ -398,11 +404,10 @@
     document.querySelectorAll('.remove-cart').forEach(function (removeBtn) {
         removeBtn.addEventListener('click', function (e) {
             e.preventDefault();
+            e.stopPropagation();
 
             const productId = this.getAttribute('data-product-id');
             if (!productId) return;
-
-            if (!window.confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) return;
 
             const formData = new FormData();
             formData.append('product_id', productId);

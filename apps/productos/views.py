@@ -1114,6 +1114,33 @@ def cart_add(request):
     except Exception as e:
         return JsonResponse({'success': False, 'message': str(e)})
 
+def cart_detail(request):
+    """
+    Retorna los items del carrito en JSON para actualizar el mini-cart vía AJAX.
+    """
+    cart = Cart(request)
+    items = []
+    for item in cart:
+        producto = item.get('producto')
+        items.append({
+            'cart_key': item.get('cart_key', ''),
+            'producto_id': item.get('producto_id'),
+            'nombre': item.get('nombre', ''),
+            'quantity': item.get('quantity', 1),
+            'precio': str(item.get('precio', '0')),
+            'total': str(item.get('total', '0')),
+            'imagen': item.get('imagen') or '',
+            'stock': producto.stock if producto else 0,
+            'is_gift': item.get('is_gift', False),
+            'producto_url': producto.get_absolute_url() if producto else '',
+        })
+    return JsonResponse({
+        'success': True,
+        'cart_count': len(cart),
+        'cart_total': str(cart.get_total_price()),
+        'items': items,
+    })
+
 @require_POST
 def cart_add_gift(request):
     """

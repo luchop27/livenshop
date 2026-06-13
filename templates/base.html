@@ -1042,6 +1042,95 @@
             const csrfTokenNode = document.querySelector('[name=csrfmiddlewaretoken]');
             const fallbackCsrfToken = csrfTokenNode ? csrfTokenNode.value : '';
 
+            // ── Captura prioritaria: modal del carrito (cantidad + eliminar) ──────
+            // Usa fase CAPTURA para interceptar ANTES que main.js (jQuery bubbling).
+            // Corrige: saltos 1→3 en cantidad (doble-tap/ghost-click) y eliminación errática.
+            let _miniCartUpdateLock = false;
+
+            document.addEventListener('click', function(e) {
+                const plusBtn  = e.target.closest('.tf-mini-cart-item .plus-btn');
+                const minusBtn = e.target.closest('.tf-mini-cart-item .minus-btn');
+
+                if (plusBtn || minusBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+
+                    if (_miniCartUpdateLock) return;
+
+                    const row       = e.target.closest('.tf-mini-cart-item');
+                    const input     = row.querySelector('input[name="number"]');
+                    const productId = row.getAttribute('data-product-id');
+                    const stock     = parseInt(row.getAttribute('data-stock') || '0', 10);
+                    if (!input || !productId) return;
+
+                    const currentQty = parseInt(input.value || '1', 10);
+                    const newQty     = plusBtn ? currentQty + 1 : currentQty - 1;
+
+                    if (newQty < 1) return;
+                    if (plusBtn && stock > 0 && newQty > stock) return;
+
+                    input.value = newQty;
+                    _miniCartUpdateLock = true;
+
+                    const fd = new FormData();
+                    fd.append('product_id', productId);
+                    fd.append('quantity', newQty);
+
+                    fetch("{% url 'productos:cart_update' %}", {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+                        body: fd
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (!data.success) {
+                            input.value = currentQty;
+                            alert(data.message || 'No se pudo actualizar la cantidad.');
+                            return;
+                        }
+                        document.querySelectorAll('.count-box:not(.wishlist-count), .toolbar-count, .tf-cart-count')
+                            .forEach(el => el.textContent = data.cart_count);
+                        document.querySelectorAll('.tf-totals-total-value')
+                            .forEach(el => el.textContent = '$' + parseFloat(data.cart_total).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' USD');
+                    })
+                    .catch(() => { input.value = currentQty; })
+                    .finally(() => { _miniCartUpdateLock = false; });
+                    return;
+                }
+
+                const cartRemoveBtn = e.target.closest('.tf-mini-cart-item .tf-mini-cart-remove, .tf-mini-cart-item .remove-cart');
+                if (cartRemoveBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+
+                    const item      = cartRemoveBtn.closest('.tf-mini-cart-item');
+                    const productId = item ? item.getAttribute('data-product-id') : cartRemoveBtn.getAttribute('data-product-id');
+                    if (!productId) return;
+
+                    const fd = new FormData();
+                    fd.append('product_id', productId);
+
+                    fetch("{% url 'productos:cart_remove' %}", {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+                        body: fd
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert(data.message || 'No se pudo eliminar el producto.');
+                            return;
+                        }
+                        window.location.reload();
+                    })
+                    .catch(() => alert('Ocurrió un error al eliminar el producto.'));
+                    return;
+                }
+            }, { capture: true });
+            // ── Fin captura prioritaria ───────────────────────────────────────────
+
             window.addToCartGlobal = function (productId, quantity, isQuickAdd = false) {
                 if (!productId) {
                     console.error("No product ID provided");
@@ -1074,15 +1163,67 @@
 
                         showCustomToast("Producto agregado al carrito");
 
-                        // Si NO es Quick Add silencioso, podemos recargar para asegurar sincronización en modals
-                        if (!isQuickAdd) {
-                            setTimeout(() => window.location.reload(), 1500);
-                        }
+                        refreshMiniCart(function() {
+                            var cartModal = document.getElementById('shoppingCart');
+                            if (cartModal) {
+                                bootstrap.Modal.getOrCreateInstance(cartModal).show();
+                            }
+                        });
                     })
                     .catch(error => {
                         console.error('Error:', error);
                         // alert("Ocurrió un error al agregar el producto."); // <-- Desactivado para no molestar
                     });
+            }
+
+            function refreshMiniCart(callback) {
+                fetch("{% url 'productos:cart_detail' %}", {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.success) { if (callback) callback(); return; }
+                    document.querySelectorAll('.count-box:not(.wishlist-count), .toolbar-count, .tf-cart-count')
+                        .forEach(function(el) { el.textContent = data.cart_count; });
+                    document.querySelectorAll('.tf-totals-total-value, .cart-total')
+                        .forEach(function(el) { el.textContent = '$' + parseFloat(data.cart_total).toFixed(2) + ' USD'; });
+                    renderMiniCartItems(data.items);
+                    if (callback) callback();
+                })
+                .catch(function() { if (callback) callback(); });
+            }
+
+            function renderMiniCartItems(items) {
+                var container = document.querySelector('.tf-mini-cart-items');
+                if (!container) return;
+                if (!items || items.length === 0) {
+                    container.innerHTML = '<div class="text-center p-4"><div class="mb_20"><i class="icon icon-bag" style="font-size:3rem;color:#ccc;"></i></div><h6 class="mb_10">Tu carrito está vacío</h6><p class="text-muted mb_20">¡Añade productos para comenzar a comprar!</p></div>';
+                    return;
+                }
+                var html = '';
+                items.forEach(function(item) {
+                    var stock = parseInt(item.stock || 0, 10);
+                    var imgSrc = item.imagen || "{% static 'images/products/placeholder.jpg' %}";
+                    var productUrl = item.producto_url || 'javascript:void(0)';
+                    var safeName = (item.nombre || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+                    html += '<div class="tf-mini-cart-item tf-cart-item" data-product-id="' + item.cart_key + '" data-stock="' + stock + '">'
+                        + '<div class="tf-mini-cart-image"><a href="' + productUrl + '"><img src="' + imgSrc + '" alt="' + safeName + '"></a></div>'
+                        + '<div class="tf-mini-cart-info">'
+                        + '<a class="title link" href="' + productUrl + '">' + safeName + '</a>'
+                        + '<div class="price fw-6">$' + item.precio + '</div>'
+                        + '<div class="tf-mini-cart-btns">'
+                        + '<div class="wg-quantity small">'
+                        + '<span class="btn-quantity minus-btn">-</span>'
+                        + '<input type="text" name="number" value="' + item.quantity + '" readonly>'
+                        + '<span class="btn-quantity plus-btn">+</span>'
+                        + '</div>'
+                        + '<div class="tf-mini-cart-remove remove-cart link" data-product-id="' + item.cart_key + '">Eliminar</div>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>';
+                });
+                container.innerHTML = html;
             }
 
             // Delegación de eventos para todos los botones de Add to Cart
@@ -1128,7 +1269,6 @@
                     e.preventDefault();
                     const productId = removeBtn.getAttribute('data-product-id');
                     if (!productId) return;
-                    if (!window.confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) return;
 
                     const formData = new FormData();
                     formData.append('product_id', productId);
@@ -1151,44 +1291,6 @@
                         })
                         .catch(() => alert('Ocurrió un error al eliminar el producto.'));
                     return;
-                }
-
-                // Cambiar cantidad (minus y plus en modal de carrito)
-                // Para view-cart es mejor su propio script, pero para el modal esto ayuda
-                if (e.target.closest('.tf-mini-cart-item .plus-btn') || e.target.closest('.tf-mini-cart-item .minus-btn')) {
-                    const row = e.target.closest('.tf-mini-cart-item');
-                    const productId = row.getAttribute('data-product-id');
-                    const inputQty = row.querySelector('input[name="number"]');
-                    if (!inputQty || !productId) return;
-
-                    // Esperamos 50ms para asegurar que el script principal (main.js) actualice el inputQty
-                    setTimeout(() => {
-                        let currentQty = parseInt(inputQty.value) || 1;
-
-                        const formData = new FormData();
-                        formData.append('product_id', productId);
-                        formData.append('quantity', currentQty);
-
-                        fetch("{% url 'productos:cart_update' %}", {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRFToken': getCookie('csrftoken'),
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: formData
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (!data.success) {
-                                    alert(data.message || 'No se pudo actualizar.');
-                                    return;
-                                }
-                                // Actualizar totales y contador en el DOM sin recargar la página
-                                document.querySelectorAll('.count-box:not(.wishlist-count), .toolbar-count, .tf-cart-count').forEach(el => el.textContent = data.cart_count);
-                                const totalEls = document.querySelectorAll('.tf-totals-total-value');
-                                totalEls.forEach(el => el.textContent = '$' + parseFloat(data.cart_total).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' USD');
-                            });
-                    }, 50);
                 }
 
                 // Wishlist (Favoritos) Toggle
@@ -1233,24 +1335,10 @@
                                     if (iconHeart) iconHeart.style.display = 'none';
                                     if (iconDelete) iconDelete.style.display = 'inline-block';
                                     if (tooltip) tooltip.textContent = 'Eliminar de Favoritos';
-
-                                    // Cambiar a fondo negro/oscuro si usa bg_white
-                                    if (btnWishlist.classList.contains('bg_white')) {
-                                        btnWishlist.classList.remove('bg_white');
-                                        btnWishlist.classList.add('bg_dark');
-                                        btnWishlist.style.color = '#fff';
-                                    }
                                 } else {
                                     if (iconHeart) iconHeart.style.display = 'inline-block';
                                     if (iconDelete) iconDelete.style.display = 'none';
                                     if (tooltip) tooltip.textContent = 'Añadir a Favoritos';
-
-                                    // Restaurar fondo blanco
-                                    if (btnWishlist.classList.contains('bg_dark')) {
-                                        btnWishlist.classList.remove('bg_dark');
-                                        btnWishlist.classList.add('bg_white');
-                                        btnWishlist.style.color = '';
-                                    }
                                 }
 
                                 showCustomToast(data.added ? 'Añadido a Favoritos' : 'Eliminado de Favoritos');
@@ -1314,12 +1402,6 @@
                 if (iconHeart) iconHeart.style.display = 'none';
                 if (iconDelete) iconDelete.style.display = 'inline-block';
                 if (tooltip) tooltip.textContent = 'Eliminar de Favoritos';
-
-                if (btn.classList.contains('bg_white')) {
-                    btn.classList.remove('bg_white');
-                    btn.classList.add('bg_dark');
-                    btn.style.color = '#fff';
-                }
             });
         });
 

@@ -438,7 +438,7 @@ html, body {
 }
 
 #wrapper {
-    overflow: hidden !important;
+    overflow-x: hidden !important;
     max-width: 100% !important;
     width: 100%;
 }
@@ -448,4 +448,14 @@ html, body {
   opacity: 1 !important;
   -webkit-transform: scale(1.06);
   transform: scale(1.06);
+}
+
+/* --- WISHLIST BUTTON ACTIVE STATE --- */
+/* Fondo blanco + ícono en color de marca en todos los contextos (quickview, detalle, home, shop) */
+.box-icon.wishlist.active {
+    background-color: var(--white) !important;
+    color: var(--main) !important;
+}
+.box-icon.wishlist.active .icon-delete {
+    color: var(--main) !important;
 }
