@@ -121,6 +121,22 @@
                                         
                                     </div>
 
+                                    {% if producto.tipo_inventario == "ENTREGA_INMEDIATA" %}
+                                    <div class="tf-product-info-delivery" style="margin-bottom: 16px;">
+                                        <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:#f0faf4;border:1px solid #c3e6cb;border-radius:6px;">
+                                            <span style="width:8px;height:8px;border-radius:50%;background:#28a745;display:inline-block;flex-shrink:0;"></span>
+                                            <span style="font-size:13px;font-weight:600;color:#1a6e3c;">Entrega Inmediata</span>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="tf-product-info-delivery" style="margin-bottom: 16px;">
+                                        <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:#f4f6f9;border:1px solid #d1d9e0;border-radius:6px;">
+                                            <span style="width:8px;height:8px;border-radius:50%;background:#0C2038;display:inline-block;flex-shrink:0;"></span>
+                                            <span style="font-size:13px;font-weight:600;color:#0C2038;">Bajo Pedido</span>
+                                            <span style="font-size:13px;color:#555;">— Disponible para encargo</span>
+                                        </div>
+                                    </div>
+                                    {% endif %}
                                     <div class="tf-product-info-quantity">
                                         <div class="quantity-title fw-6">Cantidad</div>
                                         <div class="wg-quantity">
@@ -249,6 +265,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Lógica de cantidad y actualización de precio
     const basePriceStr = "{{ producto.precio_final|stringformat:'f' }}";
     const basePrice = parseFloat(basePriceStr) || 0;
+    const tipoInventario = "{{ producto.tipo_inventario }}";
+    const maxStock = {{ producto.stock }};
 
     const qtyInputs = document.querySelectorAll('.wg-quantity input[name="number"]');
     const btnIncreases = document.querySelectorAll('.btn-increase, .plus-btn');
@@ -257,17 +275,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateQuantity(newQty) {
         if (newQty < 1) newQty = 1;
-        
-        // Sincronizar todos los inputs (el principal y el del modal sticky)
+        if (tipoInventario === 'ENTREGA_INMEDIATA' && maxStock > 0 && newQty > maxStock) {
+            newQty = maxStock;
+        }
         qtyInputs.forEach(inp => inp.value = newQty);
-        
-        // Calcular nuevo precio
         const newTotal = (basePrice * newQty).toFixed(2);
-        
-        // Actualizar texto de los botones
-        totalPrices.forEach(el => {
-            el.textContent = '$' + newTotal;
-        });
+        totalPrices.forEach(el => { el.textContent = '$' + newTotal; });
     }
 
     btnIncreases.forEach(btn => {

@@ -90,6 +90,40 @@
                     </fieldset>
                 </div>
 
+                <!-- Inventario -->
+                <div class="wg-box mb-30">
+                    <div class="body-title mb-20">Inventario</div>
+                    <div class="cols-lg gap22 mb-20">
+                        <fieldset>
+                            <div class="body-title mb-10">Tipo de inventario <span class="tf-color-1">*</span></div>
+                            <div class="select flex-grow">
+                                <select name="tipo_inventario" id="id_tipo_inventario_panel" class="tf-input">
+                                    <option value="BAJO_PEDIDO" selected>Bajo Pedido</option>
+                                    <option value="ENTREGA_INMEDIATA">Entrega Inmediata (stock físico)</option>
+                                </select>
+                            </div>
+                            <div class="text-tiny text-surface-2 mt-6">Bajo Pedido: siempre disponible. Entrega Inmediata: se controla el stock disponible.</div>
+                        </fieldset>
+                        <fieldset id="stock-fieldset-add" style="display:none;">
+                            <div class="body-title mb-10">Stock disponible</div>
+                            <input class="flex-grow tf-input" type="number" name="stock" id="id_stock_panel" min="0" step="1" placeholder="Ej: 25" value="0">
+                        </fieldset>
+                    </div>
+                    <div id="comportamiento-fieldset-add" style="display:none;">
+                        <fieldset>
+                            <div class="body-title mb-10">Comportamiento al agotarse</div>
+                            <div class="select flex-grow">
+                                <select name="comportamiento_agotamiento" class="tf-input">
+                                    <option value="">-- Sin acción automática --</option>
+                                    <option value="CAMBIAR_A_BAJO_PEDIDO">Cambiar a Bajo Pedido al agotarse</option>
+                                    <option value="DESACTIVAR">Desactivar producto al agotarse</option>
+                                </select>
+                            </div>
+                            <div class="text-tiny text-surface-2 mt-6">Acción automática cuando el stock llega a 0.</div>
+                        </fieldset>
+                    </div>
+                </div>
+
                 <!-- Detalles decorativos -->
                 <div class="wg-box mb-30">
                     <div class="body-title mb-20">Características Decorativas</div>
@@ -249,5 +283,18 @@ function removeImage(idx) {
     const preview = imagesPreview.querySelector(`[data-idx="${idx}"]`);
     if (preview) preview.remove();
 }
+
+// Inventario toggle
+(function() {
+    var sel = document.getElementById('id_tipo_inventario_panel');
+    var stockFs = document.getElementById('stock-fieldset-add');
+    var comportFs = document.getElementById('comportamiento-fieldset-add');
+    function toggle() {
+        var isInmediata = sel.value === 'ENTREGA_INMEDIATA';
+        stockFs.style.display = isInmediata ? '' : 'none';
+        comportFs.style.display = isInmediata ? '' : 'none';
+    }
+    if (sel) { toggle(); sel.addEventListener('change', toggle); }
+})();
 </script>
 {% endblock %}

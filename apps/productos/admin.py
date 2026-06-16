@@ -61,8 +61,11 @@ class MarcaAdmin(admin.ModelAdmin):
 # =====================
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'marca', 'categoria', 'precio', 'precio_oferta', 'stock', 'peso', 'activo', 'destacado']
-    list_filter = ['activo', 'destacado', 'marca', 'categoria', 'coleccion', 'created_at']
+    list_display = [
+        'nombre', 'marca', 'categoria', 'precio', 'precio_oferta',
+        'tipo_inventario', 'stock', 'peso', 'activo', 'destacado',
+    ]
+    list_filter = ['activo', 'destacado', 'tipo_inventario', 'marca', 'categoria', 'coleccion', 'created_at']
     search_fields = ['nombre', 'descripcion_corta', 'descripcion_completa', 'marca__nombre']
     prepopulated_fields = {'slug': ('nombre',)}
     inlines = [ImagenInline, AtributoProductoInline]
@@ -75,7 +78,12 @@ class ProductoAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('Precios y Stock', {
-            'fields': ('precio', 'precio_oferta', 'stock')
+            'fields': ('precio', 'precio_oferta', 'tipo_inventario', 'stock', 'comportamiento_agotamiento'),
+            'description': (
+                'Bajo Pedido: sin control de stock, siempre disponible. '
+                'Entrega Inmediata: stock físico controlado — los campos Stock y '
+                'Comportamiento al agotarse solo aplican a este tipo.'
+            ),
         }),
         ('Detalles del Producto', {
             'fields': ('peso', 'dimensiones', 'material', 'capacidad'),
@@ -91,6 +99,9 @@ class ProductoAdmin(admin.ModelAdmin):
         }),
     )
     readonly_fields = ['created_at', 'updated_at']
+
+    class Media:
+        js = ('admin/js/inventario_toggle.js',)
 
 
 # =====================

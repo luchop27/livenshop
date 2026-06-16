@@ -26,10 +26,31 @@ def _active_marcas():
 # ══════════════════════════════════════════════════════
 
 def home(request):
+    from .models import ProductoDestacadoHome
 
-    productos = Producto.objects.filter(
-        activo=True
-    ).select_related('marca').prefetch_related('imagenes')[:12]
+    # Productos fijados manualmente (posición 1-12)
+    fijados = list(
+        ProductoDestacadoHome.objects.filter(producto__activo=True)
+        .select_related('producto')
+        .prefetch_related('producto__imagenes')
+        .order_by('posicion')
+    )
+    ids_fijados = [d.producto_id for d in fijados]
+
+    # Completar con los más recientes (excluir los ya fijados)
+    n_restantes = 12 - len(fijados)
+    if n_restantes > 0:
+        recientes = list(
+            Producto.objects.filter(activo=True)
+            .exclude(id__in=ids_fijados)
+            .select_related('marca')
+            .prefetch_related('imagenes')
+            .order_by('-created_at')[:n_restantes]
+        )
+    else:
+        recientes = []
+
+    productos = [d.producto for d in fijados] + recientes
 
     categorias = Categoria.objects.filter(
         activo=True,
@@ -131,14 +152,42 @@ def panel_admin_shopgram_delete(request, pk):
     return redirect('productos:panel_admin_shopgram_list')
 
 def productos_por_marca(request, slug):
+    from .models import ProductoDestacadoMarca
+
     if slug == 'todos':
-        productos = Producto.objects.filter(activo=True).prefetch_related('imagenes').select_related('marca')
+        productos_qs = list(
+            Producto.objects.filter(activo=True)
+            .prefetch_related('imagenes')
+            .select_related('marca')
+        )
     else:
         marca = get_object_or_404(Marca, slug=slug, activo=True)
-        productos = Producto.objects.filter(marca=marca, activo=True).prefetch_related('imagenes')
+
+        # Usar selección manual si existe para esta marca
+        fijados = list(
+            ProductoDestacadoMarca.objects.filter(marca=marca, producto__activo=True)
+            .select_related('producto')
+            .prefetch_related('producto__imagenes')
+            .order_by('posicion')
+        )
+        ids_fijados = [d.producto_id for d in fijados]
+
+        # Completar con los más recientes de la marca (excluir ya fijados)
+        n_restantes = 12 - len(fijados)
+        if n_restantes > 0:
+            recientes = list(
+                Producto.objects.filter(marca=marca, activo=True)
+                .exclude(id__in=ids_fijados)
+                .prefetch_related('imagenes')
+                .order_by('-created_at')[:n_restantes]
+            )
+        else:
+            recientes = []
+
+        productos_qs = [d.producto for d in fijados] + recientes
 
     data = []
-    for p in productos:
+    for p in productos_qs:
         imgs = list(p.imagenes.all())
         data.append({
             'id': p.id,
@@ -262,7 +311,16 @@ def panel_admin_product_add(request):
         nombre = request.POST.get('nombre', '').strip()
         precio = request.POST.get('precio', '0')
         precio_oferta = request.POST.get('precio_oferta', '').strip() or None
-        stock = request.POST.get('stock', '9999')
+        tipo_inventario = request.POST.get('tipo_inventario', Producto.BAJO_PEDIDO)
+        if tipo_inventario not in (Producto.BAJO_PEDIDO, Producto.ENTREGA_INMEDIATA):
+            tipo_inventario = Producto.BAJO_PEDIDO
+        try:
+            stock = max(0, int(request.POST.get('stock', '0')))
+        except (ValueError, TypeError):
+            stock = 0
+        comportamiento_agotamiento = request.POST.get('comportamiento_agotamiento', '').strip() or None
+        if comportamiento_agotamiento not in (Producto.CAMBIAR_A_BAJO_PEDIDO, Producto.DESACTIVAR, None):
+            comportamiento_agotamiento = None
         categoria_id = request.POST.get('categoria') or None
         coleccion_id = request.POST.get('coleccion') or None
         descripcion_corta = request.POST.get('descripcion_corta', '').strip()
@@ -293,7 +351,9 @@ def panel_admin_product_add(request):
                 sku=sku,
                 precio=precio,
                 precio_oferta=precio_oferta,
+                tipo_inventario=tipo_inventario,
                 stock=stock,
+                comportamiento_agotamiento=comportamiento_agotamiento,
                 categoria_id=categoria_id,
                 coleccion_id=coleccion_id,
                 marca_id=marca_id,
@@ -343,7 +403,16 @@ def panel_admin_product_edit(request, producto_id):
         nombre = request.POST.get('nombre', '').strip()
         precio = request.POST.get('precio', '0')
         precio_oferta = request.POST.get('precio_oferta', '').strip() or None
-        stock = request.POST.get('stock', '9999')
+        tipo_inventario = request.POST.get('tipo_inventario', Producto.BAJO_PEDIDO)
+        if tipo_inventario not in (Producto.BAJO_PEDIDO, Producto.ENTREGA_INMEDIATA):
+            tipo_inventario = Producto.BAJO_PEDIDO
+        try:
+            stock = max(0, int(request.POST.get('stock', '0')))
+        except (ValueError, TypeError):
+            stock = 0
+        comportamiento_agotamiento = request.POST.get('comportamiento_agotamiento', '').strip() or None
+        if comportamiento_agotamiento not in (Producto.CAMBIAR_A_BAJO_PEDIDO, Producto.DESACTIVAR, None):
+            comportamiento_agotamiento = None
         categoria_id = request.POST.get('categoria') or None
         coleccion_id = request.POST.get('coleccion') or None
         descripcion_corta = request.POST.get('descripcion_corta', '').strip()
@@ -374,7 +443,9 @@ def panel_admin_product_edit(request, producto_id):
             producto.sku = sku
             producto.precio = precio
             producto.precio_oferta = precio_oferta
+            producto.tipo_inventario = tipo_inventario
             producto.stock = stock
+            producto.comportamiento_agotamiento = comportamiento_agotamiento
             producto.categoria_id = categoria_id
             producto.coleccion_id = coleccion_id
             producto.marca_id = marca_id
@@ -1678,6 +1749,7 @@ def producto_quick_view(request, producto_id):
         'precio_oferta': str(producto.precio_oferta) if producto.precio_oferta else None,
         'precio_final': str(producto.precio_final()),
         'stock': producto.stock,
+        'tipo_inventario': producto.tipo_inventario,
         'tiene_stock': producto.tiene_stock(),
         'tiene_oferta': producto.tiene_oferta(),
         'porcentaje_descuento': producto.porcentaje_descuento(),
@@ -1733,16 +1805,168 @@ def wishlist_toggle(request):
 from django.core.paginator import Paginator
 
 @staff_member_required(login_url='usuarios:login')
+def panel_admin_home_destacados(request):
+    """
+    Gestión de los 12 productos que aparecen en la sección
+    'Nuevos Productos' del home. Posiciones vacías se completan
+    automáticamente con los productos más recientes.
+    """
+    from .models import ProductoDestacadoHome
+
+    if request.method == 'POST':
+        # Limpiar selecciones anteriores y guardar las nuevas
+        ProductoDestacadoHome.objects.all().delete()
+        for pos in range(1, 13):
+            producto_id = request.POST.get(f'pos_{pos}', '').strip()
+            if producto_id:
+                try:
+                    producto = Producto.objects.get(pk=int(producto_id), activo=True)
+                    ProductoDestacadoHome.objects.create(posicion=pos, producto=producto)
+                except (Producto.DoesNotExist, ValueError):
+                    pass
+        messages.success(request, 'Selección de productos en Home actualizada.')
+        return redirect('productos:panel_admin_home_destacados')
+
+    # Cargar estado actual
+    fijados = {
+        d.posicion: d.producto
+        for d in ProductoDestacadoHome.objects.select_related('producto').prefetch_related('producto__imagenes').all()
+    }
+    todos_productos = list(
+        Producto.objects.filter(activo=True)
+        .prefetch_related('imagenes')
+        .order_by('nombre')
+    )
+
+    posiciones = []
+    for pos in range(1, 13):
+        posiciones.append({
+            'numero': pos,
+            'producto_actual': fijados.get(pos),
+        })
+
+    return render(request, 'panel_admin/home_destacados.html', {
+        'posiciones': posiciones,
+        'todos_productos': todos_productos,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_home_destacados_marca(request):
+    """
+    Gestión de los productos que aparecen cuando se selecciona una marca
+    en el carrusel del home. El admin elige una marca y asigna hasta 12
+    productos a posiciones fijas. Las posiciones vacías se completan con
+    los más recientes de esa marca.
+    """
+    from .models import ProductoDestacadoMarca
+
+    marcas = list(Marca.objects.filter(activo=True).order_by('nombre'))
+
+    # Marca seleccionada (via GET param o POST)
+    marca_id = None
+    if request.method == 'POST':
+        marca_id = request.POST.get('marca_id', '').strip()
+    else:
+        marca_id = request.GET.get('marca_id', '').strip()
+
+    marca_seleccionada = None
+    if marca_id:
+        try:
+            marca_seleccionada = Marca.objects.get(pk=int(marca_id), activo=True)
+        except (Marca.DoesNotExist, ValueError):
+            marca_seleccionada = None
+
+    if request.method == 'POST' and marca_seleccionada:
+        ProductoDestacadoMarca.objects.filter(marca=marca_seleccionada).delete()
+        for pos in range(1, 13):
+            producto_id = request.POST.get(f'pos_{pos}', '').strip()
+            if producto_id:
+                try:
+                    producto = Producto.objects.get(pk=int(producto_id), activo=True)
+                    ProductoDestacadoMarca.objects.create(
+                        marca=marca_seleccionada, posicion=pos, producto=producto
+                    )
+                except (Producto.DoesNotExist, ValueError):
+                    pass
+        messages.success(request, f'Selección de productos para "{marca_seleccionada.nombre}" actualizada.')
+        return redirect(f"{request.path}?marca_id={marca_seleccionada.pk}")
+
+    posiciones = []
+    todos_productos_marca = []
+    if marca_seleccionada:
+        fijados = {
+            d.posicion: d.producto
+            for d in ProductoDestacadoMarca.objects.filter(marca=marca_seleccionada)
+            .select_related('producto')
+            .prefetch_related('producto__imagenes')
+        }
+        todos_productos_marca = list(
+            Producto.objects.filter(marca=marca_seleccionada, activo=True)
+            .prefetch_related('imagenes')
+            .order_by('nombre')
+        )
+        for pos in range(1, 13):
+            posiciones.append({
+                'numero': pos,
+                'producto_actual': fijados.get(pos),
+            })
+
+    return render(request, 'panel_admin/home_destacados_marca.html', {
+        'marcas': marcas,
+        'marca_seleccionada': marca_seleccionada,
+        'posiciones': posiciones,
+        'todos_productos_marca': todos_productos_marca,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
 def panel_admin_orders(request):
     """
     Lista de pedidos en el panel de administración.
     """
     from .models import Pedido
+    from django.db.models import Q
+    from datetime import datetime
+
     pedidos_list = Pedido.objects.all().order_by('-created_at')
+
+    q = request.GET.get('q', '').strip()
+    email_filter = request.GET.get('email', '').strip()
+    fecha_desde = request.GET.get('fecha_desde', '').strip()
+    fecha_hasta = request.GET.get('fecha_hasta', '').strip()
+
+    if q:
+        pedidos_list = pedidos_list.filter(
+            Q(nombres__icontains=q) | Q(apellidos__icontains=q)
+        )
+    if email_filter:
+        pedidos_list = pedidos_list.filter(email__icontains=email_filter)
+    if fecha_desde:
+        try:
+            pedidos_list = pedidos_list.filter(
+                created_at__date__gte=datetime.strptime(fecha_desde, '%Y-%m-%d').date()
+            )
+        except ValueError:
+            pass
+    if fecha_hasta:
+        try:
+            pedidos_list = pedidos_list.filter(
+                created_at__date__lte=datetime.strptime(fecha_hasta, '%Y-%m-%d').date()
+            )
+        except ValueError:
+            pass
+
     paginator = Paginator(pedidos_list, 20)
-    page_number = request.GET.get('page')
-    pedidos = paginator.get_page(page_number)
-    return render(request, 'panel_admin/order_list.html', {'pedidos': pedidos})
+    pedidos = paginator.get_page(request.GET.get('page'))
+    return render(request, 'panel_admin/order_list.html', {
+
+        'pedidos': pedidos,
+        'q': q,
+        'email_filter': email_filter,
+        'fecha_desde': fecha_desde,
+        'fecha_hasta': fecha_hasta,
+    })
 
 @staff_member_required(login_url='usuarios:login')
 def panel_admin_order_detail(request, pedido_id):
@@ -1758,13 +1982,28 @@ def panel_admin_order_detail(request, pedido_id):
 def panel_admin_order_update_status(request, pedido_id):
     """
     Actualiza el estado de un pedido (ej. pendiente -> pagado).
+    Al pasar a 'pagado' descuenta el stock de productos de Entrega Inmediata.
     """
     from .models import Pedido
     pedido = get_object_or_404(Pedido, pk=pedido_id)
     nuevo_estado = request.POST.get('estado')
     if nuevo_estado in dict(Pedido.ESTADO_CHOICES):
+        estado_anterior = pedido.estado
         pedido.estado = nuevo_estado
         pedido.save()
+
+        # Descontar stock solo al transición pendiente/otro → pagado
+        if nuevo_estado == 'pagado' and estado_anterior != 'pagado':
+            for item in pedido.items.select_related('producto').all():
+                producto = item.producto
+                if (
+                    producto
+                    and producto.tipo_inventario == Producto.ENTREGA_INMEDIATA
+                    and producto.stock > 0
+                ):
+                    producto.stock = max(0, producto.stock - item.cantidad)
+                    producto.save()  # activa auto-transición si llega a 0
+
         messages.success(request, f'Estado del pedido #{pedido.id} actualizado a {pedido.get_estado_display()}.')
     else:
         messages.error(request, 'Estado no válido.')

@@ -81,7 +81,7 @@
                             </thead>
                             <tbody>
                                 {% for item in cart_items %}
-                                    <tr class="tf-cart-item" data-product-id="{{ item.cart_key }}" data-stock="99999">
+                                    <tr class="tf-cart-item" data-product-id="{{ item.cart_key }}" data-stock="{% if item.producto and item.producto.tipo_inventario == 'ENTREGA_INMEDIATA' %}{{ item.producto.stock }}{% else %}0{% endif %}">
                                         <td class="tf-cart-item_product">
                                             {% if item.is_gift %}
                                                 <div class="cart-registry-card">
@@ -392,7 +392,6 @@
                 e.stopImmediatePropagation();
                 const currentQty = parseInt(quantityInput.value || '1', 10);
                 if (stock > 0 && currentQty >= stock) {
-                    notify('Stock máximo alcanzado para este producto.', true);
                     return;
                 }
                 quantityInput.value = currentQty + 1;

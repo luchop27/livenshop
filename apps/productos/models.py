@@ -232,6 +232,22 @@ class Producto(models.Model):
     Producto de decoración del hogar.
     Stock y precio directamente en el producto (sin variantes).
     """
+
+    # --- Inventario ---
+    BAJO_PEDIDO = 'BAJO_PEDIDO'
+    ENTREGA_INMEDIATA = 'ENTREGA_INMEDIATA'
+    TIPO_INVENTARIO_CHOICES = [
+        (BAJO_PEDIDO, 'Bajo Pedido'),
+        (ENTREGA_INMEDIATA, 'Entrega Inmediata'),
+    ]
+
+    CAMBIAR_A_BAJO_PEDIDO = 'CAMBIAR_A_BAJO_PEDIDO'
+    DESACTIVAR = 'DESACTIVAR'
+    COMPORTAMIENTO_CHOICES = [
+        (CAMBIAR_A_BAJO_PEDIDO, 'Cambiar a Bajo Pedido al agotarse'),
+        (DESACTIVAR, 'Desactivar producto al agotarse'),
+    ]
+
     categoria = models.ForeignKey(
         Categoria,
         on_delete=models.SET_NULL,
@@ -277,6 +293,22 @@ class Producto(models.Model):
         help_text="Si tiene precio de oferta, ingrésalo aquí"
     )
     stock = models.PositiveIntegerField(default=0)
+    tipo_inventario = models.CharField(
+        max_length=30,
+        choices=TIPO_INVENTARIO_CHOICES,
+        default=BAJO_PEDIDO,
+        help_text=(
+            "Bajo Pedido: disponible siempre, sin control de stock. "
+            "Entrega Inmediata: stock físico controlado."
+        ),
+    )
+    comportamiento_agotamiento = models.CharField(
+        max_length=30,
+        choices=COMPORTAMIENTO_CHOICES,
+        blank=True,
+        null=True,
+        help_text="Acción automática cuando el stock llega a 0 (solo para Entrega Inmediata).",
+    )
     peso = models.DecimalField(
         max_digits=8,
         decimal_places=2,
@@ -325,6 +357,24 @@ class Producto(models.Model):
             self.sku = self.slug
         else:
             self.sku = self.sku.strip()
+
+        # Auto-transition when ENTREGA_INMEDIATA stock reaches 0
+        if (
+            self.pk
+            and self.tipo_inventario == self.ENTREGA_INMEDIATA
+            and self.stock <= 0
+            and self.comportamiento_agotamiento
+        ):
+            try:
+                prev = Producto.objects.only('stock').get(pk=self.pk)
+                if prev.stock > 0:
+                    if self.comportamiento_agotamiento == self.CAMBIAR_A_BAJO_PEDIDO:
+                        self.tipo_inventario = self.BAJO_PEDIDO
+                    elif self.comportamiento_agotamiento == self.DESACTIVAR:
+                        self.activo = False
+            except Producto.DoesNotExist:
+                pass
+
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -334,7 +384,9 @@ class Producto(models.Model):
             return f"/producto/{self.slug}/"
 
     def tiene_stock(self):
-        return True
+        if self.tipo_inventario == self.ENTREGA_INMEDIATA:
+            return self.stock > 0
+        return True  # BAJO_PEDIDO siempre disponible
 
     def tiene_oferta(self):
         return self.precio_oferta is not None and self.precio_oferta < self.precio
@@ -657,6 +709,67 @@ class PedidoItem(models.Model):
     
     def get_costo(self):
         return self.precio * self.cantidad
+
+
+# -----------------------------
+# PRODUCTOS DESTACADOS EN HOME
+# -----------------------------
+class ProductoDestacadoHome(models.Model):
+    """
+    Permite al administrador fijar manualmente los productos que aparecen
+    en la sección 'Nuevos Productos' del home, en un orden específico (1-12).
+    Las posiciones no ocupadas se rellenan con los productos más recientes.
+    """
+    posicion = models.PositiveSmallIntegerField(
+        unique=True,
+        help_text="Posición en el carrusel del home (1-12)."
+    )
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.CASCADE,
+        related_name='destacado_home',
+        help_text="Producto que aparecerá en esta posición."
+    )
+
+    class Meta:
+        ordering = ['posicion']
+        verbose_name = "Producto destacado en Home"
+        verbose_name_plural = "Productos destacados en Home"
+
+    def __str__(self):
+        return f"Posición {self.posicion}: {self.producto.nombre}"
+
+
+class ProductoDestacadoMarca(models.Model):
+    """
+    Permite al administrador fijar manualmente los productos que aparecen
+    cuando se selecciona una marca en el carrusel del home.
+    Las posiciones no ocupadas se rellenan con los productos más recientes de esa marca.
+    """
+    marca = models.ForeignKey(
+        'Marca',
+        on_delete=models.CASCADE,
+        related_name='productos_destacados_home',
+        help_text="Marca a la que pertenece esta selección."
+    )
+    posicion = models.PositiveSmallIntegerField(
+        help_text="Posición en el carrusel de esa marca (1-12)."
+    )
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.CASCADE,
+        related_name='destacado_marca_home',
+        help_text="Producto que aparecerá en esta posición."
+    )
+
+    class Meta:
+        ordering = ['marca', 'posicion']
+        unique_together = [('marca', 'posicion')]
+        verbose_name = "Producto destacado por marca"
+        verbose_name_plural = "Productos destacados por marca"
+
+    def __str__(self):
+        return f"{self.marca.nombre} — Posición {self.posicion}: {self.producto.nombre}"
 
 
 # -----------------------------

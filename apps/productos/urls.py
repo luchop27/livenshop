@@ -27,6 +27,9 @@ urlpatterns = [
     path('panel/shopgram/<int:pk>/edit/', views.panel_admin_shopgram_edit, name='panel_admin_shopgram_edit'),
     path('panel/shopgram/<int:pk>/delete/', views.panel_admin_shopgram_delete, name='panel_admin_shopgram_delete'),
 
+    path('panel-admin/home/destacados/', views.panel_admin_home_destacados, name='panel_admin_home_destacados'),
+    path('panel-admin/home/destacados-marca/', views.panel_admin_home_destacados_marca, name='panel_admin_home_destacados_marca'),
+
     # ── PANEL ADMIN - PEDIDOS ─────────────────────────
     path('panel-admin/pedidos/', views.panel_admin_orders, name='panel_admin_orders'),
     path('panel-admin/pedidos/<int:pedido_id>/', views.panel_admin_order_detail, name='panel_admin_order_detail'),

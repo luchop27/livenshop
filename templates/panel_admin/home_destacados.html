@@ -1,0 +1,122 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Destacados en Home | Panel Admin{% endblock %}
+{% block menu_product %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="main-content-inner">
+        <div class="main-content-wrap">
+            <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+                <div>
+                    <h3>Productos Destacados en Home</h3>
+                    <p class="text-tiny text-surface-2 mt-4">Selecciona qué producto aparece en cada posición del carrusel "Nuevos Productos". Las posiciones vacías se completan automáticamente con los productos más recientes.</p>
+                </div>
+                <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                    <li><a href="{% url 'panel_admin_demo' %}"><div class="text-tiny">Dashboard</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><a href="{% url 'productos:panel_admin_products' %}"><div class="text-tiny">Productos</div></a></li>
+                    <li><i class="icon-chevron-right"></i></li>
+                    <li><div class="text-tiny">Destacados en Home</div></li>
+                </ul>
+            </div>
+
+            {% if messages %}{% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-20">{{ message }}</div>
+            {% endfor %}{% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Precargar imágenes de productos para el JS -->
+                <script>
+                var PRODUCT_IMAGES = {
+                    {% for p in todos_productos %}
+                    "{{ p.id }}": "{% with img=p.imagenes.first %}{% if img %}{{ img.src }}{% endif %}{% endwith %}",
+                    {% endfor %}
+                };
+                var PRODUCT_NAMES = {
+                    {% for p in todos_productos %}
+                    "{{ p.id }}": "{{ p.nombre|escapejs }}",
+                    {% endfor %}
+                };
+                </script>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;">
+                    {% for pos in posiciones %}
+                    <div class="wg-box" style="padding:20px;">
+                        <div style="display:flex;align-items:center;gap:14px;">
+
+                            <!-- Número de posición -->
+                            <div style="min-width:40px;height:40px;border-radius:50%;background:#0C2038;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">
+                                {{ pos.numero }}
+                            </div>
+
+                            <!-- Thumbnail del producto seleccionado -->
+                            <div style="width:56px;height:56px;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;flex-shrink:0;background:#f5f5f5;">
+                                <img id="thumb_{{ pos.numero }}"
+                                     src="{% if pos.producto_actual %}{% with img=pos.producto_actual.imagenes.first %}{% if img %}{{ img.src }}{% endif %}{% endwith %}{% endif %}"
+                                     alt=""
+                                     style="width:100%;height:100%;object-fit:cover;{% if not pos.producto_actual %}display:none;{% endif %}">
+                            </div>
+
+                            <!-- Select de producto -->
+                            <div style="flex:1;min-width:0;">
+                                <div class="body-title mb-6" style="font-size:12px;">Posición {{ pos.numero }}</div>
+                                <select name="pos_{{ pos.numero }}"
+                                        id="select_{{ pos.numero }}"
+                                        class="tf-input"
+                                        style="width:100%;font-size:13px;"
+                                        onchange="updateThumb({{ pos.numero }}, this.value)">
+                                    <option value="">— Automático (más reciente) —</option>
+                                    {% for p in todos_productos %}
+                                    <option value="{{ p.id }}"
+                                            {% if pos.producto_actual and pos.producto_actual.id == p.id %}selected{% endif %}>
+                                        {{ p.nombre }}{% if p.marca %} · {{ p.marca.nombre }}{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-30" style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <button type="submit" class="tf-button" style="min-width:200px;">
+                        <i class="icon-save"></i> Guardar selección
+                    </button>
+                    <button type="button" class="tf-button style-3" onclick="clearAll()" style="min-width:160px;">
+                        <i class="icon-refresh"></i> Limpiar todo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateThumb(pos, productId) {
+    var img = document.getElementById('thumb_' + pos);
+    if (!img) return;
+    if (productId && PRODUCT_IMAGES[productId]) {
+        img.src = PRODUCT_IMAGES[productId];
+        img.style.display = 'block';
+    } else {
+        img.src = '';
+        img.style.display = 'none';
+    }
+}
+
+function clearAll() {
+    for (var i = 1; i <= 12; i++) {
+        var sel = document.getElementById('select_' + i);
+        if (sel) {
+            sel.value = '';
+            updateThumb(i, '');
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -118,7 +118,12 @@
                             <div class="body-text text-main-dark mt-4">${{ producto.precio_final|floatformat:2 }}</div>
 
                             <div class="body-text text-main-dark mt-4">
-                                <span class="badge" style="background:#28a745;color:white;padding:3px 8px;border-radius:3px;font-size:11px;">Bajo Pedido</span>
+                                {% if producto.tipo_inventario == "ENTREGA_INMEDIATA" %}
+                                    <span class="badge" style="background:#17a2b8;color:white;padding:3px 8px;border-radius:3px;font-size:11px;display:inline-block;margin-bottom:3px;">Entrega Inmediata</span>
+                                    <div class="text-tiny" style="color:#555;">Stock: {{ producto.stock }}</div>
+                                {% else %}
+                                    <span class="badge" style="background:#28a745;color:white;padding:3px 8px;border-radius:3px;font-size:11px;">Bajo Pedido</span>
+                                {% endif %}
                             </div>
 
                             <div>
