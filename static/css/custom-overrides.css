@@ -413,19 +413,26 @@ div.cart-registry-card .names-overlay span {
     margin: 0 4px !important;
 }
 
-/* Mostrar la imagen del slider móvil completa (sin recortar) con altura dinámica */
+/* Slider móvil: altura consistente para todas las imágenes */
 @media (max-width: 767px) {
+    .tf-slideshow,
+    .tf-slideshow .swiper,
+    .tf-slideshow .swiper-wrapper,
+    .tf-slideshow .swiper-slide,
     .tf-slideshow .wrap-slider {
-        height: auto !important;
+        height: 100vh !important;
+        height: 100svh !important; /* respeta la barra del navegador en móvil */
     }
     .tf-slideshow .wrap-slider a {
-        height: auto !important;
         display: block !important;
+        height: 100% !important;
     }
     .tf-slideshow .wrap-slider img {
-        height: auto !important;
+        width: 100% !important;
+        height: 100% !important;
         max-height: unset !important;
-        object-fit: contain !important; /* Muestra el 100% de la imagen sin recortar */
+        object-fit: cover !important;
+        object-position: center center !important;
     }
 }
 

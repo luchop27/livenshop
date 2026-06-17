@@ -46,7 +46,6 @@
 
             {% if marca_seleccionada %}
 
-            <!-- Precargar imágenes de productos -->
             <script>
             var PRODUCT_IMAGES = {
                 {% for p in todos_productos_marca %}
@@ -61,7 +60,7 @@
 
                 <div class="body-title mb-20">
                     Posiciones para <strong>{{ marca_seleccionada.nombre }}</strong>
-                    <span class="text-tiny text-surface-2 ms-2">— selecciona el producto para cada posición (dejar en blanco = automático)</span>
+                    <span class="text-tiny text-surface-2 ms-2">— dejar en blanco = automático (más reciente de la marca)</span>
                 </div>
 
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;">
@@ -69,12 +68,10 @@
                     <div class="wg-box" style="padding:20px;">
                         <div style="display:flex;align-items:center;gap:14px;">
 
-                            <!-- Número de posición -->
                             <div style="min-width:40px;height:40px;border-radius:50%;background:#0C2038;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">
                                 {{ pos.numero }}
                             </div>
 
-                            <!-- Thumbnail -->
                             <div style="width:56px;height:56px;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;flex-shrink:0;background:#f5f5f5;">
                                 <img id="thumb_{{ pos.numero }}"
                                      src="{% if pos.producto_actual %}{% with img=pos.producto_actual.imagenes.first %}{% if img %}{{ img.src }}{% endif %}{% endwith %}{% endif %}"
@@ -82,22 +79,43 @@
                                      style="width:100%;height:100%;object-fit:cover;{% if not pos.producto_actual %}display:none;{% endif %}">
                             </div>
 
-                            <!-- Select -->
                             <div style="flex:1;min-width:0;">
                                 <div class="body-title mb-6" style="font-size:12px;">Posición {{ pos.numero }}</div>
-                                <select name="pos_{{ pos.numero }}"
-                                        id="select_{{ pos.numero }}"
-                                        class="tf-input"
-                                        style="width:100%;font-size:13px;"
-                                        onchange="updateThumb({{ pos.numero }}, this.value)">
-                                    <option value="">— Automático (más reciente) —</option>
-                                    {% for p in todos_productos_marca %}
-                                    <option value="{{ p.id }}"
-                                            {% if pos.producto_actual and pos.producto_actual.id == p.id %}selected{% endif %}>
-                                        {{ p.nombre }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
+
+                                <div class="cps-wrap" data-pos="{{ pos.numero }}" style="position:relative;">
+                                    <input type="hidden" name="pos_{{ pos.numero }}" value="{{ pos.producto_actual.id|default:'' }}">
+
+                                    <input type="text" class="cps-input" autocomplete="off"
+                                           placeholder="— Automático (más reciente) —"
+                                           value="{% if pos.producto_actual %}{{ pos.producto_actual.nombre }}{% endif %}"
+                                           style="width:100%;padding:7px 28px 7px 10px;border:1px solid #d0d0d0;border-radius:6px;font-size:13px;box-sizing:border-box;background:#fff url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%23999%22/></svg>') no-repeat right 10px center;background-size:10px;">
+
+                                    <div class="cps-dropdown" style="display:none;position:absolute;z-index:1000;top:calc(100% + 2px);left:0;right:0;background:#fff;border:1px solid #ccc;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.14);flex-direction:column;max-height:260px;min-width:260px;">
+                                        <div class="cps-list" style="overflow-y:auto;flex:1;">
+                                            <div class="cps-item" data-value="" data-label=""
+                                                 style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:12px;color:#888;">
+                                                <div style="width:32px;height:32px;flex-shrink:0;"></div>
+                                                <span>— Automático (más reciente) —</span>
+                                            </div>
+                                            {% for p in todos_productos_marca %}
+                                            {% with img=p.imagenes.first %}
+                                            <div class="cps-item"
+                                                 data-value="{{ p.id }}"
+                                                 data-label="{{ p.nombre }}"
+                                                 style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:13px;">
+                                                {% if img %}
+                                                <img src="{{ img.src }}" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:4px;flex-shrink:0;">
+                                                {% else %}
+                                                <div style="width:32px;height:32px;background:#f0f0f0;border-radius:4px;flex-shrink:0;"></div>
+                                                {% endif %}
+                                                <span>{{ p.nombre }}</span>
+                                            </div>
+                                            {% endwith %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -124,11 +142,16 @@
     </div>
 </div>
 
+<style>
+.cps-item:hover { background: #f5f7fa; }
+.cps-input:focus { outline: none; border-color: #0C2038; box-shadow: 0 0 0 2px rgba(12,32,56,.1); }
+</style>
+
 <script>
 function updateThumb(pos, productId) {
     var img = document.getElementById('thumb_' + pos);
     if (!img) return;
-    if (productId && PRODUCT_IMAGES && PRODUCT_IMAGES[productId]) {
+    if (productId && typeof PRODUCT_IMAGES !== 'undefined' && PRODUCT_IMAGES[productId]) {
         img.src = PRODUCT_IMAGES[productId];
         img.style.display = 'block';
     } else {
@@ -139,12 +162,71 @@ function updateThumb(pos, productId) {
 
 function clearAll() {
     for (var i = 1; i <= 12; i++) {
-        var sel = document.getElementById('select_' + i);
-        if (sel) {
-            sel.value = '';
-            updateThumb(i, '');
+        var wrap = document.querySelector('.cps-wrap[data-pos="' + i + '"]');
+        if (wrap) {
+            wrap.querySelector('input[type=hidden]').value = '';
+            wrap.querySelector('.cps-input').value = '';
         }
+        updateThumb(i, '');
     }
 }
+
+function cpsFilter(dd, q) {
+    q = (q || '').toLowerCase();
+    dd.querySelectorAll('.cps-item').forEach(function(item) {
+        var label = (item.dataset.label || '').toLowerCase();
+        item.style.display = (!q || label.includes(q)) ? '' : 'none';
+    });
+}
+
+var _cpsOpen = null;
+
+document.addEventListener('focus', function(e) {
+    if (!e.target.classList.contains('cps-input')) return;
+    var wrap = e.target.closest('.cps-wrap');
+    var dd   = wrap.querySelector('.cps-dropdown');
+    if (_cpsOpen && _cpsOpen !== dd) { _cpsOpen.style.display = 'none'; }
+    cpsFilter(dd, e.target.value);
+    dd.style.display = 'flex';
+    _cpsOpen = dd;
+}, true);
+
+document.addEventListener('input', function(e) {
+    if (!e.target.classList.contains('cps-input')) return;
+    var wrap = e.target.closest('.cps-wrap');
+    var dd   = wrap.querySelector('.cps-dropdown');
+    wrap.querySelector('input[type=hidden]').value = '';
+    cpsFilter(dd, e.target.value);
+    if (dd.style.display !== 'flex') { dd.style.display = 'flex'; _cpsOpen = dd; }
+});
+
+document.addEventListener('mousedown', function(e) {
+    var item = e.target.closest('.cps-item');
+    if (!item) return;
+    e.preventDefault();
+    var wrap  = item.closest('.cps-wrap');
+    var pos   = parseInt(wrap.dataset.pos);
+    var value = item.dataset.value || '';
+    var label = item.dataset.label || '';
+
+    wrap.querySelector('input[type=hidden]').value = value;
+    wrap.querySelector('.cps-input').value = label;
+    updateThumb(pos, value);
+
+    wrap.querySelector('.cps-dropdown').style.display = 'none';
+    _cpsOpen = null;
+    wrap.querySelector('.cps-input').blur();
+});
+
+document.addEventListener('blur', function(e) {
+    if (!e.target.classList.contains('cps-input')) return;
+    var wrap        = e.target.closest('.cps-wrap');
+    var hiddenInput = wrap.querySelector('input[type=hidden]');
+    setTimeout(function() {
+        wrap.querySelector('.cps-dropdown').style.display = 'none';
+        _cpsOpen = null;
+        if (!hiddenInput.value) { e.target.value = ''; }
+    }, 100);
+}, true);
 </script>
 {% endblock %}
