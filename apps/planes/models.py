@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 from apps.productos.utils import compress_image_to_webp
 
 
@@ -175,6 +176,7 @@ class SolicitudPlanNovios(models.Model):
 
     nombres_novios = models.CharField(max_length=255, verbose_name='Nombres de los Novios')
     apellidos_novios = models.CharField(max_length=255, blank=True, null=True, verbose_name='Apellidos de los Novios')
+    slug = models.SlugField(max_length=300, unique=True, blank=True, verbose_name='Slug (URL amigable)')
     email = models.EmailField(verbose_name='Email de contacto')
     telefono = models.CharField(max_length=20, verbose_name='Teléfono / WhatsApp')
     fecha_boda = models.DateField(verbose_name='Fecha tentativa de boda')
@@ -209,9 +211,24 @@ class SolicitudPlanNovios(models.Model):
         verbose_name_plural = 'Solicitudes de Planes'
         ordering = ['-fecha_solicitud']
 
+    def _generate_slug(self):
+        base = self.nombres_novios or ''
+        if self.apellidos_novios:
+            base = f"{base} y {self.apellidos_novios}"
+        return slugify(base)
+
     def save(self, *args, **kwargs):
         if self.foto_pareja and not self.foto_pareja.name.lower().endswith('.webp'):
             self.foto_pareja = compress_image_to_webp(self.foto_pareja)
+        # Auto-generar slug único si no existe o si el nombre cambió
+        if not self.slug:
+            base_slug = self._generate_slug()
+            slug = base_slug
+            n = 2
+            while SolicitudPlanNovios.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{n}"
+                n += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def __str__(self):

@@ -30,7 +30,9 @@ urlpatterns = [
 
     # ── DEJAR REGALOS ─────────────────────────────────────
     path('dejar-regalos/matrimonios/', views.dejar_regalos_matrimonios, name='dejar_regalos_matrimonios'),
-    path('dejar-regalos/matrimonios/<int:id>/', views.detalle_regalo_matrimonio, name='detalle_regalo_matrimonio'),
+    path('dejar-regalos/matrimonios/<slug:slug>/', views.detalle_regalo_matrimonio, name='detalle_regalo_matrimonio'),
+    # Ruta legada por ID — redirige al slug para no romper links existentes
+    path('dejar-regalos/matrimonios/<int:id>/', views.detalle_regalo_matrimonio_by_id, name='detalle_regalo_matrimonio_by_id'),
     path('dejar-regalos/cumpleanos/', views.dejar_regalos_cumpleanos, name='dejar_regalos_cumpleanos'),
     path('dejar-regalos/otros/', views.dejar_regalos_otros, name='dejar_regalos_otros'),
 

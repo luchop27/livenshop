@@ -44,6 +44,16 @@
 .sol-action.finalizar { background:#f3f4f6; color:#374151; }
 .sol-action.finalizar:hover { background:#6b7280; color:#fff; }
 
+.btn-copy-link {
+    display:inline-flex;align-items:center;gap:6px;padding:6px 14px;
+    border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.04em;
+    text-transform:uppercase;cursor:pointer;border:none;
+    background:linear-gradient(135deg,#1a2744,#0C2038);color:#fff;
+    transition:all .2s;text-decoration:none;
+}
+.btn-copy-link:hover { opacity:.85; transform:translateY(-1px); box-shadow:0 4px 12px rgba(12,32,56,.3); }
+.btn-copy-link.copied { background:linear-gradient(135deg,#166534,#15803d); }
+
 .table-solicitudes-list .table-title,
 .table-solicitudes-list .item-row {
     display: grid;
@@ -155,10 +165,20 @@
                     <div class="text-tiny text-muted mt-4">{{ sol.ciudad|default:"—" }}</div>
                 </div>
 
-                <div class="body-text text-main-dark" style="display:flex; align-items:center;">
+                <div class="body-text text-main-dark" style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;">
                     <span class="badge-estado badge-{{ sol.estado }}">
                         {{ sol.get_estado_display }}
                     </span>
+                    {% if sol.estado == 'aprobado' and sol.slug %}
+                    <button type="button"
+                            class="btn-copy-link"
+                            id="cpbtn-{{ sol.pk }}"
+                            onclick="copyWeddingLink('{{ sol.slug }}', {{ sol.pk }})"
+                            title="Copiar link para enviar a los invitados">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        Link invitados
+                    </button>
+                    {% endif %}
                 </div>
             </li>
             {% empty %}
@@ -179,4 +199,43 @@
     </div><!-- /main-content-wrap -->
   </div><!-- /main-content-inner -->
 </div><!-- /main-content -->
+
+<script>
+function copyWeddingLink(slug, pk) {
+    var url = window.location.origin + '/dejar-regalos/matrimonios/' + slug + '/';
+    var btn = document.getElementById('cpbtn-' + pk);
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(function() {
+            showCopied(btn, url);
+        }).catch(function() {
+            fallbackCopy(btn, url);
+        });
+    } else {
+        fallbackCopy(btn, url);
+    }
+}
+
+function fallbackCopy(btn, url) {
+    var ta = document.createElement('textarea');
+    ta.value = url;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); showCopied(btn, url); } catch(e) { prompt('Copia este link:', url); }
+    document.body.removeChild(ta);
+}
+
+function showCopied(btn, url) {
+    var orig = btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ¡Copiado!';
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('copied');
+    }, 2500);
+}
+</script>
 {% endblock %}

@@ -100,21 +100,19 @@ def dejar_regalos_matrimonios(request):
         'query': q,
     })
 
-def detalle_regalo_matrimonio(request, id):
-    """Página de detalle para dejar un regalo a una pareja específica."""
+def detalle_regalo_matrimonio(request, slug):
+    """Página de detalle para dejar un regalo a una pareja específica (URL por slug)."""
     from django.db.models import Sum
     from apps.planes.models import MovimientoPlan
-    
-    solicitud = get_object_or_404(SolicitudPlanNovios, pk=id, estado='aprobado')
-    
-    # Calcular cuánto se ha abonado a cada producto
+
+    solicitud = get_object_or_404(SolicitudPlanNovios, slug=slug, estado='aprobado')
+
     abonos_por_producto = {}
     movimientos = MovimientoPlan.objects.filter(plan=solicitud, tipo='aporte').values('producto_id').annotate(total_abono=Sum('monto'))
     for m in movimientos:
         if m['producto_id']:
             abonos_por_producto[m['producto_id']] = m['total_abono']
-            
-    # Adjuntamos esta info a los productos
+
     productos_con_abono = []
     for prod in solicitud.productos_regalo.all():
         abono = abonos_por_producto.get(prod.id, 0)
@@ -130,6 +128,12 @@ def detalle_regalo_matrimonio(request, id):
         's': solicitud,
         'productos_con_abono': productos_con_abono,
     })
+
+
+def detalle_regalo_matrimonio_by_id(request, id):
+    """Redirige URLs antiguas por ID al nuevo slug profesional."""
+    solicitud = get_object_or_404(SolicitudPlanNovios, pk=id, estado='aprobado')
+    return redirect('planes:detalle_regalo_matrimonio', slug=solicitud.slug, permanent=True)
 
 
 def dejar_regalos_cumpleanos(request):

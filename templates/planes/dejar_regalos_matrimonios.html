@@ -204,7 +204,7 @@
                     </td>
                     <td class="td-date">{{ s.fecha_boda|date:"F j, Y"|capfirst }}</td>
                     <td class="td-action">
-                        <a href="{% url 'planes:detalle_regalo_matrimonio' s.id %}" class="dr-btn-table">Ver Plan</a>
+                        <a href="{% url 'planes:detalle_regalo_matrimonio' s.slug %}" class="dr-btn-table">Ver Plan</a>
                     </td>
                 </tr>
                 {% endfor %}
