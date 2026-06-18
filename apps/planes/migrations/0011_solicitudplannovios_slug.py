@@ -25,19 +25,38 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # 1. Agregar el campo SIN unique (permite vacíos temporales)
+        # 1. Agregar columna sin unique (el índice _like se crea aquí automáticamente)
         migrations.AddField(
             model_name='solicitudplannovios',
             name='slug',
             field=models.SlugField(blank=True, default='', max_length=300, verbose_name='Slug (URL amigable)'),
             preserve_default=False,
         ),
-        # 2. Llenar los slugs de registros existentes
+        # 2. Llenar slugs de registros existentes
         migrations.RunPython(populate_slugs, migrations.RunPython.noop),
-        # 3. Ahora sí aplicar unique=True
-        migrations.AlterField(
-            model_name='solicitudplannovios',
-            name='slug',
-            field=models.SlugField(blank=True, max_length=300, unique=True, verbose_name='Slug (URL amigable)'),
+        # 3. Agregar UNIQUE por SQL directo — no recrea el índice _like (evita DuplicateTable)
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql="""
+                        ALTER TABLE planes_solicitudplannovios
+                        ADD CONSTRAINT planes_solicitudplannovios_slug_uniq UNIQUE (slug);
+                    """,
+                    reverse_sql="""
+                        ALTER TABLE planes_solicitudplannovios
+                        DROP CONSTRAINT IF EXISTS planes_solicitudplannovios_slug_uniq;
+                    """,
+                ),
+            ],
+            state_operations=[
+                migrations.AlterField(
+                    model_name='solicitudplannovios',
+                    name='slug',
+                    field=models.SlugField(
+                        blank=True, max_length=300, unique=True,
+                        verbose_name='Slug (URL amigable)'
+                    ),
+                ),
+            ],
         ),
     ]
