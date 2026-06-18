@@ -5,8 +5,95 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 import json
 
-from .models import Proyecto, ItemLookbook
+from .models import Proyecto, ItemLookbook, Servicio
 from apps.productos.models import Producto, Categoria, Marca
+
+
+# ══════════════════════════════════════════════════════
+# SERVICIOS PÚBLICO
+# ══════════════════════════════════════════════════════
+
+def servicios_publico(request):
+    servicios = Servicio.objects.filter(activo=True).order_by('posicion')
+    return render(request, 'services.html', {'servicios': servicios})
+
+
+# ══════════════════════════════════════════════════════
+# PANEL ADMIN — SERVICIOS
+# ══════════════════════════════════════════════════════
+
+@staff_member_required(login_url='usuarios:login')
+def panel_servicios_list(request):
+    servicios = Servicio.objects.order_by('posicion')
+    return render(request, 'panel_admin/servicios_list.html', {'servicios': servicios})
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_servicio_add(request):
+    if request.method == 'POST':
+        servicio = _guardar_servicio(request, None)
+        if servicio:
+            messages.success(request, f'Servicio "{servicio.titulo}" creado exitosamente.')
+            return redirect('portafolio:servicios_list')
+    return render(request, 'panel_admin/servicio_form.html', {'accion': 'Nuevo'})
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_servicio_edit(request, servicio_id):
+    servicio = get_object_or_404(Servicio, pk=servicio_id)
+    if request.method == 'POST':
+        servicio = _guardar_servicio(request, servicio)
+        if servicio:
+            messages.success(request, f'Servicio "{servicio.titulo}" actualizado.')
+            return redirect('portafolio:servicios_list')
+    return render(request, 'panel_admin/servicio_form.html', {
+        'accion': 'Editar',
+        'servicio': servicio,
+    })
+
+
+@staff_member_required(login_url='usuarios:login')
+def panel_servicio_delete(request, servicio_id):
+    servicio = get_object_or_404(Servicio, pk=servicio_id)
+    nombre = servicio.titulo
+    servicio.delete()
+    messages.success(request, f'Servicio "{nombre}" eliminado.')
+    return redirect('portafolio:servicios_list')
+
+
+def _guardar_servicio(request, servicio):
+    titulo = request.POST.get('titulo', '').strip()
+    descripcion = request.POST.get('descripcion', '').strip()
+    lado_imagen = request.POST.get('lado_imagen', 'izquierda')
+    posicion = request.POST.get('posicion', '0').strip()
+    activo = request.POST.get('activo') == 'on'
+
+    if not titulo:
+        messages.error(request, 'El título es obligatorio.')
+        return None
+
+    try:
+        posicion = int(posicion)
+    except ValueError:
+        posicion = 0
+
+    if servicio is None:
+        servicio = Servicio()
+
+    servicio.titulo = titulo
+    servicio.descripcion = descripcion
+    servicio.lado_imagen = lado_imagen
+    servicio.posicion = posicion
+    servicio.activo = activo
+
+    imagen = request.FILES.get('imagen')
+    if imagen:
+        servicio.imagen = imagen
+    elif request.POST.get('borrar_imagen') == '1' and servicio.imagen:
+        servicio.imagen = None
+
+    servicio.save()
+    return servicio
 
 
 # ══════════════════════════════════════════════════════

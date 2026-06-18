@@ -1,0 +1,128 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}{{ accion }} Servicio | Panel Admin{% endblock %}
+{% block menu_servicios %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <div class="main-content-inner">
+    <div class="main-content-wrap">
+
+      <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+        <div>
+          <h3>{{ accion }} Servicio</h3>
+          <p style="color:#888;font-size:13px;margin:4px 0 0;">Los servicios aparecen en <strong>/services/</strong> en el orden que establezcas</p>
+        </div>
+        <a href="{% url 'portafolio:servicios_list' %}" class="tf-button style-2">
+          <i class="icon-arrow-left"></i> Volver a lista
+        </a>
+      </div>
+
+      {% if messages %}
+      {% for msg in messages %}
+      <div class="alert alert-{% if msg.tags == 'success' %}success{% else %}danger{% endif %} mb-20">{{ msg }}</div>
+      {% endfor %}
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="wg-box" style="margin-bottom:24px;">
+          <h5 style="margin-bottom:20px;font-size:15px;font-weight:700;">Información del servicio</h5>
+
+          <!-- Título -->
+          <div class="mb-20">
+            <label class="body-title mb-10" style="display:block;font-weight:600;">
+              Título <span style="color:#dc2626;">*</span>
+            </label>
+            <input type="text" name="titulo" class="flex-grow"
+                   value="{{ servicio.titulo|default:'' }}"
+                   placeholder="Ej: Consultoría de Diseño"
+                   style="width:100%;padding:10px 14px;border:1px solid #e0e0e0;border-radius:8px;font-size:14px;" required>
+          </div>
+
+          <!-- Descripción -->
+          <div class="mb-20">
+            <label class="body-title mb-10" style="display:block;font-weight:600;">
+              Descripción <span style="color:#999;font-size:12px;font-weight:400;">(usa una línea en blanco para separar párrafos)</span>
+            </label>
+            <textarea name="descripcion" rows="7"
+                      placeholder="Escribe la descripción del servicio. Separa párrafos con una línea en blanco."
+                      style="width:100%;padding:10px 14px;border:1px solid #e0e0e0;border-radius:8px;font-size:14px;resize:vertical;">{{ servicio.descripcion|default:'' }}</textarea>
+          </div>
+
+          <!-- Posición + Lado imagen -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="mb-20">
+            <div>
+              <label class="body-title mb-10" style="display:block;font-weight:600;">Posición de la imagen</label>
+              <select name="lado_imagen" style="width:100%;padding:10px 14px;border:1px solid #e0e0e0;border-radius:8px;font-size:14px;background:#fff;">
+                <option value="izquierda" {% if servicio.lado_imagen == 'izquierda' or not servicio %}selected{% endif %}>Imagen a la izquierda</option>
+                <option value="derecha" {% if servicio.lado_imagen == 'derecha' %}selected{% endif %}>Imagen a la derecha</option>
+              </select>
+            </div>
+            <div>
+              <label class="body-title mb-10" style="display:block;font-weight:600;">
+                Orden (posición)
+                <span style="color:#999;font-size:12px;font-weight:400;">— menor número = primero</span>
+              </label>
+              <input type="number" name="posicion" min="0"
+                     value="{{ servicio.posicion|default:'0' }}"
+                     style="width:100%;padding:10px 14px;border:1px solid #e0e0e0;border-radius:8px;font-size:14px;">
+            </div>
+          </div>
+
+          <!-- Activo -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <input type="checkbox" name="activo" id="id_activo"
+                   {% if servicio.activo or not servicio %}checked{% endif %}
+                   style="width:16px;height:16px;cursor:pointer;">
+            <label for="id_activo" style="font-weight:600;cursor:pointer;margin:0;">Servicio activo (visible en el sitio)</label>
+          </div>
+        </div>
+
+        <!-- Imagen -->
+        <div class="wg-box" style="margin-bottom:24px;">
+          <h5 style="margin-bottom:20px;font-size:15px;font-weight:700;">Imagen</h5>
+
+          {% if servicio.imagen %}
+          <div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:16px;">
+            <div style="width:180px;height:120px;border-radius:10px;overflow:hidden;border:1px solid #e0e0e0;flex-shrink:0;">
+              <img src="{{ servicio.imagen.url }}" alt="Imagen actual"
+                   style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div>
+              <p style="font-size:13px;color:#666;margin:0 0 8px;">Imagen actual</p>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#dc2626;">
+                <input type="checkbox" name="borrar_imagen" value="1">
+                Eliminar imagen actual
+              </label>
+            </div>
+          </div>
+          {% endif %}
+
+          <div>
+            <label class="body-title mb-10" style="display:block;font-weight:600;">
+              {% if servicio.imagen %}Reemplazar imagen{% else %}Subir imagen{% endif %}
+            </label>
+            <input type="file" name="imagen" accept="image/*"
+                   style="padding:8px;border:1px solid #e0e0e0;border-radius:8px;width:100%;font-size:13px;">
+            <p style="font-size:12px;color:#999;margin:6px 0 0;">Formatos: JPG, PNG, WebP. Se convertirá automáticamente a WebP para mejor rendimiento.</p>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div style="display:flex;gap:12px;align-items:center;">
+          <button type="submit" class="tf-button style-1">
+            <i class="icon-save"></i>
+            {% if servicio %}Guardar cambios{% else %}Crear servicio{% endif %}
+          </button>
+          <a href="{% url 'portafolio:servicios_list' %}" class="tf-button style-2">Cancelar</a>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

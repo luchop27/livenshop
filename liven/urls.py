@@ -8,6 +8,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from apps.productos.views import home, panel_admin_demo
 from apps.usuarios import views as usuarios_views
+from apps.portafolio import views as portafolio_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,7 +25,7 @@ urlpatterns = [
     path('usuarios/', include('apps.usuarios.urls')),
     path('about/', TemplateView.as_view(template_name='about-us.html'), name='about'),
     path('categorias/', TemplateView.as_view(template_name='shop-fullwidth.html'), name='categorias'),
-    path('services/', TemplateView.as_view(template_name='services.html'), name='services'),
+    path('services/', portafolio_views.servicios_publico, name='services'),
     path('contact/', TemplateView.as_view(template_name='contact.html'), name='contact'),
     path('iniciar-sesion/', usuarios_views.login_usuario, name='login'),
     path('cerrar-sesion/', usuarios_views.logout_usuario, name='logout'),

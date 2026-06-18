@@ -233,6 +233,24 @@
                                             </li>
                                         </ul>
                                     </li>
+                                    <li class="menu-item has-children {% block menu_servicios %}{% endblock %}">
+                                        <a href="#" class="menu-item-button">
+                                            <div class="icon"><i class="icon-layers"></i></div>
+                                            <div class="text">Servicios</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'portafolio:servicios_list' %}">
+                                                    <div class="text">Lista de servicios</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'portafolio:servicio_add' %}">
+                                                    <div class="text">Nuevo servicio</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
                                     <li class="menu-item has-children {% block menu_shopgram %}{% endblock %}">
                                         <a href="#" class="menu-item-button">
                                             <div class="icon"><i class="icon-instagram"></i></div>

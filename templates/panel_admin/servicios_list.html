@@ -1,0 +1,113 @@
+{% extends 'panel_admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Servicios | Panel Admin{% endblock %}
+{% block menu_servicios %}active{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <div class="main-content-inner">
+    <div class="main-content-wrap">
+
+      <div class="flex items-center flex-wrap justify-between gap20 mb-30">
+        <div>
+          <h3>Servicios</h3>
+          <p style="color:#888;font-size:13px;margin:4px 0 0;">Estos servicios se muestran en la página /services/ del sitio</p>
+        </div>
+        <a class="tf-button style-1" href="{% url 'portafolio:servicio_add' %}">
+          <i class="icon-plus"></i> Nuevo servicio
+        </a>
+      </div>
+
+      {% if messages %}
+      {% for msg in messages %}
+      <div class="alert alert-{% if msg.tags == 'success' %}success{% else %}danger{% endif %} mb-20">{{ msg }}</div>
+      {% endfor %}
+      {% endif %}
+
+      <div class="wg-box">
+        <div class="wg-table">
+          <ul class="table-title flex gap20 mb-14" style="list-style:none;padding:0;">
+            <li style="flex:0 0 64px;"><div class="body-title">Imagen</div></li>
+            <li style="flex:2;"><div class="body-title">Título</div></li>
+            <li style="flex:1;"><div class="body-title">Posición imagen</div></li>
+            <li style="flex:0 0 60px;text-align:center;"><div class="body-title">Pos.</div></li>
+            <li style="flex:0 0 80px;text-align:center;"><div class="body-title">Estado</div></li>
+            <li style="flex:0 0 100px;text-align:center;"><div class="body-title">Acciones</div></li>
+          </ul>
+
+          <ul class="flex flex-column" style="list-style:none;padding:0;">
+            {% for s in servicios %}
+            <li class="wg-product item-row gap20" style="padding:14px 0;border-bottom:1px solid #f5f5f5;">
+              <div style="flex:0 0 64px;">
+                <div style="width:56px;height:56px;border-radius:8px;overflow:hidden;border:1px solid #e0e0e0;background:#f5f5f5;">
+                  {% if s.imagen %}
+                  <img src="{{ s.imagen.url }}" alt="{{ s.titulo }}" style="width:100%;height:100%;object-fit:cover;">
+                  {% else %}
+                  <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:20px;">
+                    <i class="icon-image"></i>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div style="flex:2;">
+                <strong class="body-text">{{ s.titulo }}</strong>
+                <div class="text-tiny text-muted mt-4" style="font-size:12px;">{{ s.descripcion|truncatechars:80 }}</div>
+              </div>
+              <div style="flex:1;" class="body-text text-main-dark">
+                {{ s.get_lado_imagen_display }}
+              </div>
+              <div style="flex:0 0 60px;text-align:center;" class="body-text">{{ s.posicion }}</div>
+              <div style="flex:0 0 80px;text-align:center;">
+                {% if s.activo %}
+                <span class="block-available bg-1 fw-7">Activo</span>
+                {% else %}
+                <span class="block-not-available bg-1 fw-7">Inactivo</span>
+                {% endif %}
+              </div>
+              <div style="flex:0 0 100px;text-align:center;">
+                <div class="flex items-center gap10" style="justify-content:center;">
+                  <a href="{% url 'portafolio:servicio_edit' s.pk %}" title="Editar" class="cat-action-btn cat-action-edit">
+                    <i class="icon-edit-3"></i>
+                  </a>
+                  <form method="post" action="{% url 'portafolio:servicio_delete' s.pk %}"
+                        onsubmit="return confirm('¿Eliminar el servicio «{{ s.titulo|escapejs }}»?');"
+                        style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" title="Eliminar" class="cat-action-btn cat-action-delete">
+                      <i class="icon-trash-2"></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </li>
+            {% empty %}
+            <li style="padding:40px;text-align:center;color:#aaa;">
+              No hay servicios aún.
+              <a href="{% url 'portafolio:servicio_add' %}" style="color:#c9a96e;">Crear el primero</a>.
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;font-size:12px;color:#aaa;">
+        Tip: cambia la "Posición" para controlar el orden en que aparecen en el sitio.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+.cat-action-btn {
+    display:inline-flex;align-items:center;justify-content:center;
+    width:32px;height:32px;border-radius:6px;border:none;cursor:pointer;
+    font-size:14px;transition:background .18s,transform .15s;text-decoration:none;background:transparent;
+}
+.cat-action-edit { color:#4f46e5;background:rgba(79,70,229,.08); }
+.cat-action-edit:hover { background:rgba(79,70,229,.18);color:#4338ca;transform:scale(1.1); }
+.cat-action-delete { color:#dc2626;background:rgba(220,38,38,.08);padding:0; }
+.cat-action-delete:hover { background:rgba(220,38,38,.18);color:#b91c1c;transform:scale(1.1); }
+</style>
+{% endblock %}

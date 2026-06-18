@@ -43,6 +43,44 @@ class Proyecto(models.Model):
         return self.titulo
 
 
+class Servicio(models.Model):
+    LADO_CHOICES = [
+        ('izquierda', 'Imagen a la izquierda'),
+        ('derecha', 'Imagen a la derecha'),
+    ]
+    titulo = models.CharField(max_length=200, verbose_name='Título')
+    descripcion = models.TextField(
+        verbose_name='Descripción',
+        help_text='Separa párrafos con una línea en blanco.'
+    )
+    imagen = models.ImageField(
+        upload_to='servicios/',
+        blank=True, null=True,
+        verbose_name='Imagen'
+    )
+    lado_imagen = models.CharField(
+        max_length=10,
+        choices=LADO_CHOICES,
+        default='izquierda',
+        verbose_name='Posición de la imagen'
+    )
+    posicion = models.PositiveIntegerField(default=0, verbose_name='Posición')
+    activo = models.BooleanField(default=True, verbose_name='Activo')
+
+    class Meta:
+        ordering = ['posicion']
+        verbose_name = 'Servicio'
+        verbose_name_plural = 'Servicios'
+
+    def save(self, *args, **kwargs):
+        if self.imagen and not self.imagen.name.lower().endswith('.webp'):
+            self.imagen = compress_image_to_webp(self.imagen)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.titulo
+
+
 class ItemLookbook(models.Model):
     proyecto = models.ForeignKey(
         Proyecto,

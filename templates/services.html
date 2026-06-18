@@ -9,149 +9,104 @@
     </div>
 </div>
 
-<!-- Service 01: Consultation -->
+{% for servicio in servicios %}
+<section class="flat-spacing-{% if forloop.first %}16{% elif forloop.last %}15{% else %}10{% endif %}">
+    <div class="container">
+        <div class="tf-grid-layout md-col-2 align-items-center"
+             style="display:flex;align-items:stretch;gap:40px;">
+
+            {% if servicio.lado_imagen == 'izquierda' %}
+            <div class="tf-ourstore-img" style="flex:1;">
+                {% if servicio.imagen %}
+                <img class="lazyload" data-src="{{ servicio.imagen.url }}" src="{{ servicio.imagen.url }}"
+                     alt="{{ servicio.titulo }}" style="width:100%;height:100%;object-fit:cover;display:block;">
+                {% else %}
+                <div style="width:100%;height:100%;min-height:400px;background:#f5f0eb;display:flex;align-items:center;justify-content:center;">
+                    <i class="icon-image" style="font-size:48px;color:#ccc;"></i>
+                </div>
+                {% endif %}
+            </div>
+            <div class="tf-ourstore-content" style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 20px;">
+                <h5 class="mb_24">{{ servicio.titulo }}</h5>
+                {{ servicio.descripcion|linebreaks }}
+            </div>
+
+            {% else %}
+            <div class="tf-ourstore-content" style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 20px;">
+                <h5 class="mb_24">{{ servicio.titulo }}</h5>
+                {{ servicio.descripcion|linebreaks }}
+            </div>
+            <div class="tf-ourstore-img" style="flex:1;">
+                {% if servicio.imagen %}
+                <img class="lazyload" data-src="{{ servicio.imagen.url }}" src="{{ servicio.imagen.url }}"
+                     alt="{{ servicio.titulo }}" style="width:100%;height:100%;object-fit:cover;display:block;">
+                {% else %}
+                <div style="width:100%;height:100%;min-height:400px;background:#f5f0eb;display:flex;align-items:center;justify-content:center;">
+                    <i class="icon-image" style="font-size:48px;color:#ccc;"></i>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</section>
+{% empty %}
 <section class="flat-spacing-16">
-    <div class="container">
-        <div class="tf-grid-layout md-col-2 align-items-center" style="display: flex; align-items: stretch; gap: 40px;">
-            <div class="tf-ourstore-img" style="flex: 1;">
-                <img class="lazyload" data-src="{% static 'images/shop/store/ourstore2.png' %}"
-                    src="{% static 'images/shop/store/ourstore2.png' %}" alt="design consultation"
-                    style="width: 100%; height: 100%; object-fit: cover; display: block;">
-            </div>
-            <div class="tf-ourstore-content" style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 20px;">
-                <h5 class="mb_24">Consultoría de Diseño</h5>
-                <p class="mb_20">La primera etapa en cualquier proyecto — y a menudo todo lo que se necesita para hacer que las cosas avancen. Durante nuestra consulta de 60–90 minutos, recorreremos su espacio juntos para evaluar lo que se necesita y dónde comenzar.</p>
-                <p class="mb_36">Exploramos colores de pintura, distribución de la habitación, ideas de mobiliario, presupuesto, arte, selecciones de acabados y definimos el alcance completo de su proyecto — ya sea que decida trabajar con nosotros más adelante o no.</p>
-            </div>
-        </div>
+    <div class="container" style="text-align:center;padding:60px 20px;">
+        <p style="color:#aaa;font-size:16px;">Próximamente...</p>
     </div>
 </section>
-
-<!-- Service 02: Full Service -->
-<section class="flat-spacing-10">
-    <div class="container">
-        <div class="tf-grid-layout md-col-2" style="display: flex; align-items: stretch; gap: 40px;">
-            <div class="tf-ourstore-content" style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 20px;">
-                <h5 class="mb_24">Experiencia de Diseño Full Service</h5>
-                <p class="mb_20">La solución definitiva sin complicaciones ni esfuerzo. Desde la inspiración inicial hasta los últimos toques finales — nos encargamos de cada detalle para que tú no tengas que hacerlo.</p>
-                <p class="mb_36">Cubrimos planeamiento de espacios, diseño, abastecimiento y instalación. Diseñamos a medida y supervisamos meticulosamente toda la ejecución, elevando tu espacio de ordinario a extraordinario.</p>
-            </div>
-            <div class="tf-ourstore-img" style="flex: 1;">
-                <img class="lazyload" data-src="{% static 'images/shop/store/ourstore2.png' %}"
-                    src="{% static 'images/shop/store/ourstore2.png' %}" alt="full service design"
-                    style="width: 100%; height: 100%; object-fit: cover; display: block;">
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Service 03: Design Only -->
-<section class="flat-spacing-15">
-    <div class="container">
-        <div class="tf-grid-layout md-col-2" style="display: flex; align-items: stretch; gap: 40px;">
-            <div class="tf-ourstore-img" style="flex: 1;">
-                <img class="lazyload" data-src="{% static 'images/shop/store/ourstore2.png' %}"
-                    src="{% static 'images/shop/store/ourstore2.png' %}" alt="design only service"
-                    style="width: 100%; height: 100%; object-fit: cover; display: block;">
-            </div>
-            <div class="tf-ourstore-content" style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 20px;">
-                <h5 class="mb_24">Solo Diseño</h5>
-                <p class="mb_20">Ya sea que estés local o a muchas millas de distancia, este servicio ofrece el mismo planificación personalizada, desarrollo de concepto y colaboración que nuestra oferta full-service — con tú a cargo de la implementación.</p>
-                <p class="mb_36">Perfecto para el entusiasta autónomo de la construcción que quiere dirección de diseño experta. Los clientes locales también tienen acceso al soporte de instalación cuando sea necesario.</p>
-            </div>
-        </div>
-    </div>
-</section>
+{% endfor %}
 
 <!-- Inquire Now Button -->
-<section style="padding: 40px 20px 60px; text-align: center;">
+<section style="padding:40px 20px 60px;text-align:center;">
     <a href="{% url 'contact' %}" class="tf-btn btn-outline-dark radius-3">
         <span>Consultar Ahora</span><i class="icon icon-arrow-right"></i>
     </a>
 </section>
-       <!-- Shop Gram -->
-        <section class="pb-0 flat-spacing-18">
-            <div class="container-full px-0">
-                <div dir="ltr" class="swiper tf-sw-shop-gallery" data-preview="5" data-tablet="3" data-mobile="2"
-                    data-space-lg="0" data-space-md="0">
-                    <div class="swiper-wrapper">
-                        {% for post in shop_gram_posts %}
-                        <div class="swiper-slide">
-                            <a href="{{ post.instagram_url }}" target="_blank" rel="noopener noreferrer">
-                                <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
-                                    <div class="img-style">
-                                        <img class="lazyload img-hover shopgram-img"
-                                            data-src="{{ post.imagen.url }}"
-                                            src="{{ post.imagen.url }}"
-                                            alt="Instagram post">
-                                    </div>
-                                </div>
-                            </a>
+
+<!-- Shop Gram -->
+<section class="pb-0 flat-spacing-18">
+    <div class="container-full px-0">
+        <div dir="ltr" class="swiper tf-sw-shop-gallery" data-preview="5" data-tablet="3" data-mobile="2"
+            data-space-lg="0" data-space-md="0">
+            <div class="swiper-wrapper">
+                {% for post in shop_gram_posts %}
+                <div class="swiper-slide">
+                    <a href="{{ post.instagram_url }}" target="_blank" rel="noopener noreferrer">
+                        <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
+                            <div class="img-style">
+                                <img class="lazyload img-hover shopgram-img"
+                                    data-src="{{ post.imagen.url }}" src="{{ post.imagen.url }}" alt="Instagram post">
+                            </div>
                         </div>
-                        {% empty %}
-                        <p class="text-center w-100 py-4">No hay publicaciones aún.</p>
-                        {% endfor %}
-                    </div>
-                    <div class="absolute-dots sw-dots sw-pagination-gallery justify-content-center"></div>
+                    </a>
                 </div>
+                {% empty %}
+                <p class="text-center w-100 py-4">No hay publicaciones aún.</p>
+                {% endfor %}
             </div>
-        </section>
-        <!-- /Shop Gram -->
-<!-- Responsive fix -->
+            <div class="absolute-dots sw-dots sw-pagination-gallery justify-content-center"></div>
+        </div>
+    </div>
+</section>
+<!-- /Shop Gram -->
+
 <style>
 @media (max-width: 768px) {
-
-    /* 🔥 FORZAR columna (rompe el inline style display:flex) */
-    .tf-grid-layout,
-    .tf-grid-layout.md-col-2 {
+    .tf-grid-layout, .tf-grid-layout.md-col-2 {
         display: flex !important;
         flex-direction: column !important;
         gap: 0 !important;
     }
-
-    /* 🔥 IMPORTANTE: asegurar que cada hijo ocupe todo */
-    .tf-grid-layout > div {
-        width: 100% !important;
-    }
-
-    /* 🔥 Orden SIEMPRE: imagen arriba, texto abajo */
-    .tf-ourstore-img {
-        order: 1;
-        width: 100% !important;
-        min-height: 260px;
-    }
-
-    .tf-ourstore-content {
-        order: 2;
-        width: 100% !important;
-        padding: 20px 15px !important;
-        text-align: center;
-    }
-
-    /* Imagen */
-    .tf-ourstore-img img {
-        width: 100%;
-        height: 280px !important;
-        object-fit: cover;
-    }
-
-    /* 🔥 Reducir espacio entre secciones */
-    .flat-spacing-16,
-    .flat-spacing-15,
-    .flat-spacing-10 {
-        padding-top: 30px !important;
-        padding-bottom: 30px !important;
-    }
-
-    /* 🔥 EXTRA: quitar posibles márgenes raros */
-    .tf-ourstore-content p {
-        margin-bottom: 12px !important;
-    }
-
-    .tf-ourstore-content h5 {
-        margin-bottom: 16px !important;
-    }
-
+    .tf-grid-layout > div { width: 100% !important; }
+    .tf-ourstore-img { order: 1; width: 100% !important; min-height: 260px; }
+    .tf-ourstore-content { order: 2; width: 100% !important; padding: 20px 15px !important; text-align: center; }
+    .tf-ourstore-img img { width: 100%; height: 280px !important; object-fit: cover; }
+    .flat-spacing-16, .flat-spacing-15, .flat-spacing-10 { padding-top: 30px !important; padding-bottom: 30px !important; }
+    .tf-ourstore-content p { margin-bottom: 12px !important; }
+    .tf-ourstore-content h5 { margin-bottom: 16px !important; }
 }
 </style>
 
