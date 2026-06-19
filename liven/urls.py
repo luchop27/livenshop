@@ -26,7 +26,7 @@ urlpatterns = [
     path('about/', TemplateView.as_view(template_name='about-us.html'), name='about'),
     path('categorias/', TemplateView.as_view(template_name='shop-fullwidth.html'), name='categorias'),
     path('services/', portafolio_views.servicios_publico, name='services'),
-    path('contact/', TemplateView.as_view(template_name='contact.html'), name='contact'),
+    path('contact/', portafolio_views.contacto_publico, name='contact'),
     path('iniciar-sesion/', usuarios_views.login_usuario, name='login'),
     path('cerrar-sesion/', usuarios_views.logout_usuario, name='logout'),
     path('registro/', usuarios_views.registrar_usuario, name='register'),

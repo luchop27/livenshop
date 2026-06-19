@@ -6,7 +6,16 @@ from django.contrib import messages
 import json
 
 from .models import Proyecto, ItemLookbook, Servicio
-from apps.productos.models import Producto, Categoria, Marca
+from apps.productos.models import Producto, Categoria, Marca, TiendaConfig
+
+
+# ══════════════════════════════════════════════════════
+# CONTACTO PÚBLICO
+# ══════════════════════════════════════════════════════
+
+def contacto_publico(request):
+    config = TiendaConfig.objects.filter(pk=1).first() or TiendaConfig.objects.first()
+    return render(request, 'contact.html', {'tienda_config': config})
 
 
 # ══════════════════════════════════════════════════════

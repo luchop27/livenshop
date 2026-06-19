@@ -333,10 +333,12 @@ class TiendaConfigAdmin(admin.ModelAdmin):
         ('Redes Sociales', {
             'fields': ('facebook_url', 'twitter_url', 'instagram_url', 'tiktok_url', 'pinterest_url')
         }),
+        ('Pagos / Transferencia', {
+            'fields': ('cuenta_bancaria',),
+        }),
     )
 
     def has_add_permission(self, request):
-        # Evitar crear más de una instancia
         if TiendaConfig.objects.exists():
             return False
         return True
