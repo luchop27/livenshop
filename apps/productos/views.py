@@ -1692,14 +1692,14 @@ def order_confirmation(request, pedido_id):
     whatsapp_url = ''
     try:
         # Usamos el numero de WhatsApp del admin de LivenShop
-        numero_tienda = "593989387657"
+        numero_tienda = "593995443335"
         
         mensaje_factura = generar_mensaje_factura_cliente(pedido, request)
         numero_limpio = numero_tienda.replace('+', '').replace(' ', '').replace('-', '')
         mensaje_encoded = quote(mensaje_factura, encoding='utf-8')
         whatsapp_url = f"https://wa.me/{numero_limpio}?text={mensaje_encoded}"
     except Exception as e:
-        whatsapp_url = 'https://wa.me/593989387657'
+        whatsapp_url = 'https://wa.me/593995443335'
 
     context = {
         'pedido': pedido,
