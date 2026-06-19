@@ -576,17 +576,6 @@
                 .catch(err => console.error('Error cargando productos:', err));
         }
 
-        // Swiper para filtro de marcas (nombres)
-        if (document.querySelector('.tf-sw-brand-filter')) {
-            new Swiper('.tf-sw-brand-filter', {
-                slidesPerView: 'auto',
-                spaceBetween: 8,
-                freeMode: true,
-                grabCursor: true,
-                loop: false,
-            });
-        }
-
         // Event listeners en los botones de marca
         document.querySelectorAll('.brand-item').forEach(btn => {
             btn.addEventListener('click', function (e) {
@@ -603,3 +592,22 @@
 </script>
 
     {% endblock %}
+
+{% block extra_js %}
+<script>
+// Swiper nombres de marca — corre DESPUÉS de swiper-bundle.min.js
+(function() {
+    var el = document.querySelector('.tf-sw-brand-filter');
+    if (!el) return;
+    new Swiper('.tf-sw-brand-filter', {
+        slidesPerView: 'auto',
+        spaceBetween: 16,
+        freeMode: { enabled: true },
+        grabCursor: true,
+        loop: false,
+        touchRatio: 1,
+        touchStartPreventDefault: false,
+    });
+})();
+</script>
+{% endblock %}
