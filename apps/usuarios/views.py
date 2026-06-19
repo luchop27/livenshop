@@ -509,7 +509,7 @@ def enviar_email_codigo_recuperacion(request, usuario, codigo):
                     </div>
                     <div class="footer">
                         <p class="footer-text">© 2026 Liven — Boutique de Regalos & Decoración</p>
-                        <p class="footer-text">¿Necesitas ayuda? <a href="https://wa.me/593989387657" class="footer-link">Contáctanos por WhatsApp</a></p>
+                        <p class="footer-text">¿Necesitas ayuda? <a href="https://wa.me/593995443335" class="footer-link">Contáctanos por WhatsApp</a></p>
                     </div>
                 </div>
             </div>
