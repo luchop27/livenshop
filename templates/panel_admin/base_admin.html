@@ -315,6 +315,13 @@
                                         </ul>
                                     </li>
 
+                                    <li class="menu-item {% block menu_config %}{% endblock %}">
+                                        <a href="{% url 'productos:panel_admin_config' %}">
+                                            <div class="icon"><i class="icon-settings"></i></div>
+                                            <div class="text">Configuración</div>
+                                        </a>
+                                    </li>
+
                                     <li class="menu-item">
                                         <a href="{% url 'home' %}" target="_blank">
                                             <div class="icon"><i class="icon-monitor"></i></div>

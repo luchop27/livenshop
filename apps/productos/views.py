@@ -1978,6 +1978,32 @@ def panel_admin_order_detail(request, pedido_id):
     return render(request, 'panel_admin/order_detail.html', {'pedido': pedido})
 
 @staff_member_required(login_url='usuarios:login')
+@staff_member_required(login_url='usuarios:login')
+def panel_admin_config(request):
+    from .models import TiendaConfig
+    config = TiendaConfig.objects.first()
+    if not config:
+        config = TiendaConfig.objects.create()
+
+    if request.method == 'POST':
+        config.telefono = request.POST.get('telefono', '').strip()
+        config.email = request.POST.get('email', '').strip()
+        config.direccion = request.POST.get('direccion', '').strip()
+        config.horario_apertura = request.POST.get('horario_apertura', '').strip()
+        config.mapa_embed_url = request.POST.get('mapa_embed_url', '').strip()
+        config.facebook_url = request.POST.get('facebook_url', '').strip() or '#'
+        config.instagram_url = request.POST.get('instagram_url', '').strip() or '#'
+        config.tiktok_url = request.POST.get('tiktok_url', '').strip() or '#'
+        config.twitter_url = request.POST.get('twitter_url', '').strip() or '#'
+        config.pinterest_url = request.POST.get('pinterest_url', '').strip() or '#'
+        config.cuenta_bancaria = request.POST.get('cuenta_bancaria', '').strip()
+        config.save()
+        messages.success(request, 'Configuración guardada correctamente.')
+        return redirect('productos:panel_admin_config')
+
+    return render(request, 'panel_admin/config_tienda.html', {'config': config})
+
+
 @require_POST
 def panel_admin_order_update_status(request, pedido_id):
     """

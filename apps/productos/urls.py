@@ -61,6 +61,9 @@ urlpatterns = [
     # ── API ────────────────────────────────────────────
     path('api/producto/<int:producto_id>/quick-view/', views.producto_quick_view, name='producto_quick_view'),
 
+    # ── CONFIGURACIÓN TIENDA ──────────────────────────
+    path('panel-admin/configuracion/', views.panel_admin_config, name='panel_admin_config'),
+
     # ── WISHLIST ───────────────────────────────────────
     path('wishlist/', views.view_wishlist, name='wishlist'),
     path('wishlist/toggle/', views.wishlist_toggle, name='wishlist_toggle'),
