@@ -47,7 +47,7 @@ def generar_mensaje_factura_cliente(pedido, request=None):
 
 def enviar_mensaje_admin_nuevo_regalo(pedido):
     """
-    Simula el envío o la preparación de la notificación al administrador (0989387657) 
+    Simula el envío o la preparación de la notificación al administrador (0995443335) 
     sobre un nuevo aporte para el Plan de Novios.
     Dado que el envío automático requiere una API externa (Twilio, Cloud API),
     aquí registramos el mensaje y lo guardamos en los logs como constancia.
@@ -74,7 +74,7 @@ def enviar_mensaje_admin_nuevo_regalo(pedido):
         
     # Log para el backend
     logger.info(f"\n======================================\n"
-                f"WHATSAPP AUTOMÁTICO A ADMIN (0989387657):\n"
+                f"WHATSAPP AUTOMÁTICO A ADMIN (0995443335):\n"
                 f"{mensaje}"
                 f"\n======================================")
     

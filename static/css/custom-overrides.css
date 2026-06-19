@@ -466,3 +466,43 @@ html, body {
 .box-icon.wishlist.active .icon-delete {
     color: var(--main) !important;
 }
+
+/* --- FOOTER DESARROLLADO POR DUALCORE --- */
+.footer-devbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 20px 10px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+.footer-devbar-txt {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.04em;
+    font-weight: 400;
+}
+.footer-devbar-link {
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+.footer-devbar-link:hover {
+    opacity: 1;
+}
+.footer-devbar-logo {
+    height: 22px;
+    width: auto;
+    display: block;
+    border-radius: 4px;
+}
+
+/* --- MARCAS FILTER — SWIPER NOMBRES --- */
+.tf-sw-brand-filter .swiper-slide {
+    width: auto !important;
+}
+.tf-sw-brand-filter .brand-item {
+    white-space: nowrap;
+    display: inline-block;
+}

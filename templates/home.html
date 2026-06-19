@@ -172,15 +172,16 @@
 <section class="flat-spacing-12 has-line-bottom">
     <div class="container">
         <!-- Sección de selección de marca -->
-        <div class="brand-filter mb-3 d-flex justify-content-center">
-            <div class="nav-brand-filter d-flex gap-2">
-                <div class="nav-brand-list d-flex gap-2">
-                    <!-- Botón "Todos" -->
+        <div class="brand-filter mb-3" style="width:100%;overflow:hidden;">
+            <div class="swiper tf-sw-brand-filter" style="width:100%;">
+                <div class="swiper-wrapper">
                     {% for marca in marcas %}
                     {% if marca.imagen %}
-                    <a href="#" class="brand-item mb_30 fw-7 text-center" data-slug="{{ marca.slug }}">
-                        {{ marca.nombre }}
-                    </a>
+                    <div class="swiper-slide" style="width:auto;">
+                        <a href="#" class="brand-item mb_30 fw-7 text-center" data-slug="{{ marca.slug }}">
+                            {{ marca.nombre }}
+                        </a>
+                    </div>
                     {% endif %}
                     {% endfor %}
                 </div>
@@ -573,6 +574,17 @@
                     }
                 })
                 .catch(err => console.error('Error cargando productos:', err));
+        }
+
+        // Swiper para filtro de marcas (nombres)
+        if (document.querySelector('.tf-sw-brand-filter')) {
+            new Swiper('.tf-sw-brand-filter', {
+                slidesPerView: 'auto',
+                spaceBetween: 8,
+                freeMode: true,
+                grabCursor: true,
+                loop: false,
+            });
         }
 
         // Event listeners en los botones de marca

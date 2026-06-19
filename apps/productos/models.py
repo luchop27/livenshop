@@ -776,10 +776,10 @@ class ProductoDestacadoMarca(models.Model):
 # CONFIGURACIÓN GLOBAL DE LA TIENDA
 # -----------------------------
 class TiendaConfig(models.Model):
-    direccion = models.TextField(default="1234 Fashion Street, Suite 567, New York, NY 10001", verbose_name="Dirección de la Tienda")
-    email = models.EmailField(default="info@fashionshop.com", verbose_name="Correo Electrónico de Contacto")
-    telefono = models.CharField(max_length=50, default="(212) 555-1234", verbose_name="Teléfono de Contacto")
-    horario_apertura = models.TextField(default="Nuestro almacén ha reabierto para compras, exchange Every day 11am to 7pm", verbose_name="Horario de Apertura")
+    direccion = models.TextField(default="C.C Del Portal", verbose_name="Dirección de la Tienda")
+    email = models.EmailField(default="liven_concept@outlook.com", verbose_name="Correo Electrónico de Contacto")
+    telefono = models.CharField(max_length=50, default="0995443335", verbose_name="Teléfono de Contacto")
+    horario_apertura = models.TextField(default="Lun-Vier 10am-8pm | Sáb 9am-7pm", verbose_name="Horario de Apertura")
     mapa_embed_url = models.TextField(default="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d317859.6089702069!2d-0.075949!3d51.508112!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48760349331f38dd%3A0xa8bf49dde1d56467!2sTower%20of%20London!5e0!3m2!1sen!2sus!4v1719221598456!5m2!1sen!2sus", verbose_name="Enlace Iframe de Google Maps", help_text="Pega la URL de src del iframe de compartir mapa")
     
     # Redes sociales
