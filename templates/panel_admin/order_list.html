@@ -92,17 +92,13 @@
                                     {% csrf_token %}
                                     <select name="estado" onchange="this.form.submit()"
                                             style="border:none;border-radius:4px;padding:4px 6px;font-size:12px;font-weight:700;cursor:pointer;width:100%;
-                                            {% if pedido.estado == 'pendiente' %}background:#ffc107;color:#000;
-                                            {% elif pedido.estado == 'pagado' %}background:#28a745;color:#fff;
-                                            {% elif pedido.estado == 'enviado' %}background:#17a2b8;color:#fff;
-                                            {% elif pedido.estado == 'completado' %}background:#007bff;color:#fff;
-                                            {% elif pedido.estado == 'cancelado' %}background:#dc3545;color:#fff;
+                                            {% if pedido.estado == 'pagado' %}background:#28a745;color:#fff;
+                                            {% elif pedido.estado == 'en_proceso' %}background:#f0a500;color:#fff;
+                                            {% elif pedido.estado == 'anulado' %}background:#dc3545;color:#fff;
                                             {% else %}background:#6c757d;color:#fff;{% endif %}">
-                                        <option value="pendiente" {% if pedido.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
                                         <option value="pagado" {% if pedido.estado == 'pagado' %}selected{% endif %}>Pagado</option>
-                                        <option value="enviado" {% if pedido.estado == 'enviado' %}selected{% endif %}>Enviado</option>
-                                        <option value="completado" {% if pedido.estado == 'completado' %}selected{% endif %}>Completado</option>
-                                        <option value="cancelado" {% if pedido.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                                        <option value="en_proceso" {% if pedido.estado == 'en_proceso' %}selected{% endif %}>En Proceso</option>
+                                        <option value="anulado" {% if pedido.estado == 'anulado' %}selected{% endif %}>Anulado</option>
                                     </select>
                                 </form>
                             </div>

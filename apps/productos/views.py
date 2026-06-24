@@ -1974,10 +1974,12 @@ def panel_admin_order_detail(request, pedido_id):
     Detalle de un pedido específico.
     """
     from .models import Pedido
-    pedido = get_object_or_404(Pedido, pk=pedido_id)
+    pedido = get_object_or_404(
+        Pedido.objects.prefetch_related('items__producto__imagenes'),
+        pk=pedido_id,
+    )
     return render(request, 'panel_admin/order_detail.html', {'pedido': pedido})
 
-@staff_member_required(login_url='usuarios:login')
 @staff_member_required(login_url='usuarios:login')
 def panel_admin_config(request):
     from .models import TiendaConfig

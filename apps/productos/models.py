@@ -631,12 +631,9 @@ class ShopGramPost(models.Model):
 # -----------------------------
 class Pedido(models.Model):
     ESTADO_CHOICES = (
-        ('pendiente', 'Pendiente'),
         ('pagado', 'Pagado'),
         ('en_proceso', 'En Proceso'),
-        ('enviado', 'Enviado'),
-        ('entregado', 'Entregado'),
-        ('cancelado', 'Cancelado'),
+        ('anulado', 'Anulado'),
     )
 
     usuario = models.ForeignKey(
@@ -666,7 +663,7 @@ class Pedido(models.Model):
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
     # Estado y seguimiento
-    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
     ESTADO_PAGO_CHOICES = (
         ('pendiente', 'Pendiente'),
         ('aprobado', 'Aprobado'),

@@ -32,17 +32,27 @@ def anuncios_bar(request):
         'anuncios_bar': anuncios
     }
 
+_TIENDA_DEFAULTS = {
+    'email': 'liven_concept@outlook.com',
+    'telefono': '0995443335',
+    'direccion': 'C.C Del Portal',
+    'horario_apertura': 'Lun-Vier 10am-8pm | Sáb 9am-7pm',
+}
+
 def tienda_config(request):
     """Exposes TiendaConfig singleton to all templates."""
     config = TiendaConfig.objects.first()
     if not config:
-        # Create default config to avoid blank or crashing templates
-        config = TiendaConfig.objects.create(
-            direccion="C.C Del Portal",
-            email="liven_concept@outlook.com",
-            telefono="0995443335",
-            horario_apertura="Lun-Vier 10am-8pm | Sáb 9am-7pm",
-        )
+        config = TiendaConfig.objects.create(**_TIENDA_DEFAULTS)
+    else:
+        # Repair empty critical fields so footer/contact always shows something
+        repaired = False
+        for field, default in _TIENDA_DEFAULTS.items():
+            if not getattr(config, field, ''):
+                setattr(config, field, default)
+                repaired = True
+        if repaired:
+            config.save(update_fields=list(_TIENDA_DEFAULTS.keys()))
     return {
         'tienda_config': config
     }
