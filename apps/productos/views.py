@@ -2001,9 +2001,14 @@ def panel_admin_config(request):
         config.cuenta_bancaria = request.POST.get('cuenta_bancaria', '').strip()
         
         # El checkbox de modo navidad enviará "True" o "on" si está activo, o no enviará nada si está inactivo
-        config.modo_navidad = request.POST.get('modo_navidad') in ['True', 'on', '1', 'true']
+        navidad_activo = request.POST.get('modo_navidad') in ['True', 'on', '1', 'true']
+        config.modo_navidad = navidad_activo
         
         config.save()
+        
+        # Sincronización absoluta: Aplicar el mismo estado de navidad a TODOS los registros de la DB para evitar clones rebeldes
+        TiendaConfig.objects.update(modo_navidad=navidad_activo)
+        
         messages.success(request, 'Configuración guardada correctamente.')
         return redirect('productos:panel_admin_config')
 

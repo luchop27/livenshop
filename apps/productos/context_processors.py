@@ -54,7 +54,10 @@ def tienda_config(request):
         if repaired:
             config.save(update_fields=list(_TIENDA_DEFAULTS.keys()))
     
+    # Inmune a clones: Si al menos un registro lo tiene activo, la navidad se enciende.
+    navidad_activa = TiendaConfig.objects.filter(modo_navidad=True).exists()
+    
     return {
         'tienda_config': config,
-        'MODO_NAVIDAD_ACTIVO': config.modo_navidad if config else False
+        'MODO_NAVIDAD_ACTIVO': navidad_activa
     }
