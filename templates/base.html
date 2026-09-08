@@ -30,7 +30,6 @@
     <link rel="apple-touch-icon-precomposed" href="{% static 'images/logo/logofavliven.png' %}">
 
 
-    {% if tienda_config.modo_navidad %}
     <style type="text/css">
 /* 
   MODO NAVIDAD - LIVEN (VERDE ELEGANTE Y AZUL)
@@ -309,7 +308,6 @@ h1.title::before, h2.title::before, h3.title::before, .section-heading::before, 
 }
 
     </style>
-    {% endif %}
 </head>
 
 <body class="preload-wrapper ">
@@ -1972,10 +1970,10 @@ h1.title::before, h2.title::before, h3.title::before, .section-heading::before, 
 
         #header.is-fixed.nav-visible {
             transform: translateY(0);
+        }
     }
 </style>
 
-{% if tienda_config.modo_navidad %}
 <div id="snow"></div>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -1996,6 +1994,5 @@ h1.title::before, h2.title::before, h3.title::before, .section-heading::before, 
       }
   });
 </script>
-{% endif %}
 </body>
 </html>
