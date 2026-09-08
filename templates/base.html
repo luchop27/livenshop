@@ -22,6 +22,9 @@
     <link rel="stylesheet" href="{% static 'css/magnific-popup.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/custom-overrides.css' %}" />
+    {% if tienda_config.modo_navidad %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/navidad.css' %}" />
+    {% endif %}
     {% block extra_head %}{% endblock %}
 
     <!-- Favicon and Touch Icons  -->
@@ -1690,8 +1693,30 @@
 
         #header.is-fixed.nav-visible {
             transform: translateY(0);
-        }
     }
 </style>
 
+{% if tienda_config.modo_navidad %}
+<div id="snow"></div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const snow = document.getElementById("snow");
+      const totalCopos = window.innerWidth < 768 ? 20 : 50;
+
+      for (let i = 0; i < totalCopos; i++) {
+        const copo = document.createElement("div");
+        copo.className = "copos";
+        copo.innerHTML = Math.random() > 0.5 ? "❄" : "❅";
+
+        copo.style.left = Math.random() * 100 + "vw";
+        copo.style.fontSize = (Math.random() * 1.5 + 0.5) + "em";
+        copo.style.animationDuration = (Math.random() * 5 + 5) + "s";
+        copo.style.animationDelay = (Math.random() * 10) + "s";
+
+        snow.appendChild(copo);
+      }
+  });
+</script>
+{% endif %}
+</body>
 </html>

@@ -25,6 +25,32 @@
       <form method="post">
         {% csrf_token %}
 
+        <!-- APARIENCIA Y EVENTOS -->
+        <div class="wg-box mb-24">
+          <h5 style="font-size:15px;font-weight:700;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #f0f0f0;">
+            <i class="icon-zap" style="color:#c9a96e;margin-right:8px;"></i>Eventos Especiales
+          </h5>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:15px;background:#f9f9f9;border-radius:8px;border:1px solid #eee;">
+            <div>
+              <strong style="display:block;font-size:15px;color:#222;margin-bottom:4px;">Modo Navidad (Efecto Nieve y Colores Navideños)</strong>
+              <span style="font-size:12px;color:#777;">Activa una suave nevada en toda la tienda y cambia el color principal a un verde festivo.</span>
+            </div>
+            <div>
+              <label class="switch" style="position:relative;display:inline-block;width:50px;height:24px;">
+                <input type="checkbox" name="modo_navidad" value="True" onchange="this.form.submit()" {% if config.modo_navidad %}checked{% endif %} style="opacity:0;width:0;height:0;">
+                <span class="slider round" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#f97316;transition:.4s;border-radius:24px;"></span>
+                <span class="slider-knob" style="position:absolute;content:'';height:16px;width:16px;left:4px;bottom:4px;background-color:white;transition:.4s;border-radius:50%;"></span>
+              </label>
+              <!-- Estilos in-line temporales para el switch si no existen -->
+              <style>
+                .switch input:checked + .slider { background-color: #166534 !important; }
+                .switch input:focus + .slider { box-shadow: 0 0 1px #166534; }
+                .switch input:checked ~ .slider-knob { transform: translateX(26px); }
+              </style>
+            </div>
+          </div>
+        </div>
+
         <!-- CONTACTO -->
         <div class="wg-box mb-24">
           <h5 style="font-size:15px;font-weight:700;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #f0f0f0;">

@@ -1999,6 +1999,10 @@ def panel_admin_config(request):
         config.twitter_url = request.POST.get('twitter_url', '').strip() or '#'
         config.pinterest_url = request.POST.get('pinterest_url', '').strip() or '#'
         config.cuenta_bancaria = request.POST.get('cuenta_bancaria', '').strip()
+        
+        # El checkbox de modo navidad enviará "True" o "on" si está activo, o no enviará nada si está inactivo
+        config.modo_navidad = request.POST.get('modo_navidad') in ['True', 'on', '1', 'true']
+        
         config.save()
         messages.success(request, 'Configuración guardada correctamente.')
         return redirect('productos:panel_admin_config')

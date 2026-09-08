@@ -793,6 +793,12 @@ class TiendaConfig(models.Model):
         verbose_name="Datos de Cuenta Bancaria",
         help_text="Información de la cuenta bancaria para transferencias"
     )
+    
+    modo_navidad = models.BooleanField(
+        default=False, 
+        verbose_name="Modo Navidad (Nieve)",
+        help_text="Activa el efecto de nieve en toda la tienda."
+    )
 
     class Meta:
         verbose_name = "Configuración de la Tienda"

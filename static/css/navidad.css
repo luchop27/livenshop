@@ -1,0 +1,275 @@
+/* 
+  MODO NAVIDAD - LIVEN (VERDE ELEGANTE Y AZUL)
+  Este archivo se carga solo cuando el modo Navidad está activado.
+  * EL AZUL ORIGINAL ES INQUEBRANTABLE *
+*/
+
+/* 1. Paleta Navideña */
+:root {
+  --navidad-green: #143621; /* Verde bosque muy oscuro, elegante */
+  --navidad-green-light: #245236;
+  --navidad-gold: #c9a96e; /* Dorado Liven */
+  --navidad-gold-light: #e6c57a;
+}
+
+/* 2. Efecto Nieve Mágico */
+#snow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+#snow div {
+  position: absolute;
+  top: -40px;
+  animation-name: nieve, copos;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.copos {
+  color: #ffffff;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+  font-size: 1.2em;
+}
+
+.copos.f1 { left: 10%; animation-duration: 6s; }
+.copos.f2 { left: 30%; font-size: 1.8em; animation-duration: 8s; }
+.copos.f3 { left: 55%; animation-duration: 10s; }
+.copos.f4 { left: 80%; font-size: 1.5em; animation-duration: 7s; }
+
+@keyframes nieve { from { top: -50px; } to { top: 110vh; } }
+@keyframes copos { from { transform: translateX(0) rotate(0deg); } to { transform: translateX(40px) rotate(360deg); } }
+
+/* 3. Acentos Verdes en Botones e Insignias (Hovers y Labels) */
+
+/* Botones: Se mantienen azules normalmente, solo cambian al hover */
+.tf-btn.btn-fill:hover,
+.tf-button.style-1:hover,
+button[type="submit"]:hover,
+.btn-primary:hover {
+    background-color: var(--navidad-green) !important;
+    border-color: var(--navidad-green) !important;
+    color: var(--navidad-gold-light) !important;
+    transition: all 0.3s ease;
+}
+
+/* Insignias de Oferta o Nuevo en productos (Badges) */
+.sale-label,
+.new-label,
+.badge-sale,
+.product-badge {
+    background-color: var(--navidad-green) !important;
+    color: var(--navidad-gold) !important;
+    border: 1px solid var(--navidad-gold);
+    box-shadow: 0 2px 5px rgba(20, 54, 33, 0.3);
+}
+
+/* Bordes elegantes en Hover para tarjetas de producto o colecciones */
+.card-product:hover,
+.product-item:hover,
+.collection-item:hover,
+.wg-box:hover {
+    border-color: var(--navidad-green) !important;
+    box-shadow: 0 4px 15px rgba(20, 54, 33, 0.15);
+    transition: all 0.3s ease;
+}
+
+/* 4. Divisores Festivos */
+.divider-wrap {
+    background: linear-gradient(90deg, transparent, var(--navidad-gold) 45%, var(--navidad-green) 50%, var(--navidad-gold) 55%, transparent) !important;
+    opacity: 0.8;
+}
+
+/* Pequeñas secciones de Anuncios (Barra superior - Announcement bar) */
+.announcement-bar.bg_liven-blue {
+    /* Mantendremos el azul liven-blue, pero agregaremos un pequeñísimo borde dorado/verde abajo */
+    border-bottom: 2px solid var(--navidad-green);
+}
+
+/* 5. Elementos Gráficos y Marcas de Agua (SVGs) */
+
+/* Adornos de estrellas junto a Títulos Principales */
+h1.title, h2.title, h3.title, .section-heading, .heading {
+    position: relative;
+    display: inline-block;
+}
+
+h1.title::after, h2.title::after, h3.title::after, .section-heading::after, .heading::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    vertical-align: middle;
+    /* Estrella de Belén Dorada SVG */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c9a96e'%3E%3Cpath d='M12 0l2.5 8.5H24l-7.5 5.5 2.5 10L12 18l-9.5 6 2.5-10L-2.5 8.5H7z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.8;
+}
+
+h1.title::before, h2.title::before, h3.title::before, .section-heading::before, .heading::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 10px;
+    vertical-align: middle;
+    /* Estrella Dorada más pequeña */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c9a96e'%3E%3Cpath d='M12 0l2.5 8.5H24l-7.5 5.5 2.5 10L12 18l-9.5 6 2.5-10L-2.5 8.5H7z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.6;
+}
+
+/* 6. Fondos de secciones secundarias (ej: suscripción/citas) */
+.section-subscribe, 
+.section-quote, 
+.footer-secondary {
+    background-color: var(--navidad-green) !important;
+    color: var(--navidad-gold) !important;
+    border-top: 1px solid var(--navidad-gold);
+}
+
+/* Adorno: Esfera Colgante Minimalista en el Footer */
+#footer {
+    position: relative;
+    overflow: visible;
+}
+
+#footer::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: 5%;
+    width: 60px;
+    height: 120px;
+    /* Vector SVG Esfera Navideña Dorada/Verde elegante */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cline x1='50' y1='0' x2='50' y2='80' stroke='%23c9a96e' stroke-width='2'/%3E%3Ccircle cx='50' cy='110' r='30' fill='%23143621' stroke='%23c9a96e' stroke-width='3'/%3E%3Cpath d='M35 95 Q50 110 65 95' stroke='%23c9a96e' stroke-width='1.5' fill='none'/%3E%3Cpath d='M35 125 Q50 110 65 125' stroke='%23c9a96e' stroke-width='1.5' fill='none'/%3E%3Crect x='45' y='75' width='10' height='10' fill='%23c9a96e'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: top;
+    z-index: 10;
+    pointer-events: none;
+    animation: swing 6s ease-in-out infinite alternate;
+    transform-origin: top center;
+}
+
+@keyframes swing {
+    0% { transform: rotate(-5deg); }
+    100% { transform: rotate(5deg); }
+}
+
+/* =========================================
+   7. ADORNOS COLGANTES EN MENÚS DESPLEGABLES
+=========================================== */
+
+/* Animación Péndulo Realista (Física con Decay) */
+@keyframes pendulum-decay {
+    0% { transform: rotate(40deg); }
+    15% { transform: rotate(-30deg); }
+    30% { transform: rotate(20deg); }
+    45% { transform: rotate(-10deg); }
+    60% { transform: rotate(5deg); }
+    75% { transform: rotate(-2deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Configuraciones comunes de los adornos colgantes de menús */
+.box-nav-ul > li.menu-item .sub-menu {
+    /* overflow visible es clave para que los adornos cuelguen fuera del submenu si es necesario, 
+       pero por lo general los submenu en Liven tienen dropdown hacia abajo y los adornos flotan libres */
+    position: absolute; 
+}
+
+.box-nav-ul > li.menu-item .sub-menu::before,
+.box-nav-ul > li.menu-item .sub-menu::after {
+    content: '';
+    position: absolute;
+    top: 100%; /* Cuelgan justo desde el borde inferior del menú */
+    width: 30px;
+    height: 110px; /* Espacio para el hilo y el svg */
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: contain;
+    transform-origin: top center; /* Giran desde arriba como un péndulo */
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Inician el balanceo solo cuando se hace hover al menu padre y este se despliega */
+.box-nav-ul > li.menu-item:hover .sub-menu::before,
+.box-nav-ul > li.menu-item:hover .sub-menu::after {
+    animation: pendulum-decay 2.5s ease-in-out forwards;
+}
+
+/* === 1. Marcas (nth-child 1) === */
+.box-nav-ul > li.menu-item:nth-child(1) .sub-menu::before {
+    left: 20%;
+    /* Estrella Dorada */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'%3E%3Cline x1='25' y1='0' x2='25' y2='60' stroke='rgba(255,255,255,0.4)' stroke-width='1.5'/%3E%3Cpath d='M25 60 l5 15 h15 l-12 10 l5 15 l-13-10 l-13 10 l5-15 l-12-10 h15 z' fill='%23c9a96e' opacity='0.9'/%3E%3C/svg%3E");
+}
+.box-nav-ul > li.menu-item:nth-child(1) .sub-menu::after {
+    right: 20%;
+    /* Muñeco de nieve */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'%3E%3Cline x1='25' y1='0' x2='25' y2='50' stroke='rgba(255,255,255,0.4)' stroke-width='1.5'/%3E%3Ccircle cx='25' cy='65' r='12' fill='rgba(255,255,255,0.9)'/%3E%3Ccircle cx='25' cy='85' r='16' fill='rgba(255,255,255,0.9)'/%3E%3Ccircle cx='20' cy='62' r='1.5' fill='%23143621'/%3E%3Ccircle cx='30' cy='62' r='1.5' fill='%23143621'/%3E%3Cpath d='M22 68 Q25 72 28 68' stroke='%23143621' stroke-width='1.5' fill='none'/%3E%3Crect x='17' y='50' width='16' height='4' fill='%23143621'/%3E%3Crect x='20' y='42' width='10' height='8' fill='%23143621'/%3E%3C/svg%3E");
+}
+
+/* === 2. Categorías (nth-child 2) === */
+.box-nav-ul > li.menu-item:nth-child(2) .sub-menu::after {
+    left: 50%;
+    margin-left: -15px; /* Centrado */
+    /* Estrella Dorada sutil */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'%3E%3Cline x1='25' y1='0' x2='25' y2='60' stroke='rgba(255,255,255,0.4)' stroke-width='1.5'/%3E%3Cpath d='M25 60 l5 15 h15 l-12 10 l5 15 l-13-10 l-13 10 l5-15 l-12-10 h15 z' fill='%23c9a96e' opacity='0.9'/%3E%3C/svg%3E");
+}
+
+/* === 3. Planes (nth-child 3) === */
+.box-nav-ul > li.menu-item:nth-child(3) .sub-menu::before {
+    left: 30%;
+    /* Esfera Dorada */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'%3E%3Cline x1='25' y1='0' x2='25' y2='60' stroke='rgba(255,255,255,0.4)' stroke-width='1.5'/%3E%3Ccircle cx='25' cy='80' r='18' fill='%23c9a96e' opacity='0.9'/%3E%3Cpath d='M10 70 Q25 90 40 70' stroke='white' stroke-width='1' fill='none'/%3E%3Crect x='20' y='58' width='10' height='4' fill='%23143621'/%3E%3C/svg%3E");
+}
+.box-nav-ul > li.menu-item:nth-child(3) .sub-menu::after {
+    right: 30%;
+    /* Esfera Verde */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'%3E%3Cline x1='25' y1='0' x2='25' y2='75' stroke='rgba(255,255,255,0.4)' stroke-width='1.5'/%3E%3Ccircle cx='25' cy='95' r='18' fill='%23143621' stroke='%23c9a96e' stroke-width='2' opacity='0.9'/%3E%3Cpath d='M10 85 Q25 105 40 85' stroke='%23c9a96e' stroke-width='1' fill='none'/%3E%3Crect x='20' y='73' width='10' height='4' fill='%23c9a96e'/%3E%3C/svg%3E");
+}
+
+/* === 4+ Otros (nth-child 4+) === */
+.box-nav-ul > li.menu-item:nth-child(n+4) .sub-menu::after {
+    right: 40%;
+    /* Copo de nieve simplificado y elegante */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'%3E%3Cline x1='25' y1='0' x2='25' y2='50' stroke='rgba(255,255,255,0.4)' stroke-width='1.5'/%3E%3Ccircle cx='25' cy='65' r='10' fill='rgba(255,255,255,0.8)'/%3E%3Cpath d='M15 65 L35 65 M25 55 L25 75 M18 58 L32 72 M18 72 L32 58' stroke='%23143621' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+
+/* =========================================
+   8. GUIRNALDA DECORATIVA EN EL NAVBAR
+=========================================== */
+
+/* Aplicamos position relative para anclar la guirnalda en el borde inferior */
+#header.header-default {
+    position: relative;
+    border-bottom: none; 
+}
+
+/* Pseudo-elemento con patrón SVG simulando pino, esferas rojas/doradas y luces LED */
+#header.header-default::after {
+    content: '';
+    position: absolute;
+    bottom: -75px; /* Cuelga tapando el filo del header y hacia abajo */
+    left: 0;
+    width: 100%;
+    height: 85px; /* Tamaño adecuado para una imagen realista */
+    background-image: url('../images/guirnalda.png');
+    background-repeat: repeat-x;
+    background-size: contain;
+    background-position: top left;
+    filter: drop-shadow(0px 8px 5px rgba(0,0,0,0.3));
+    z-index: 10; 
+    pointer-events: none;
+}
