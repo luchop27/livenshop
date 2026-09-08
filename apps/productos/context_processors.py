@@ -41,7 +41,7 @@ _TIENDA_DEFAULTS = {
 
 def tienda_config(request):
     """Exposes TiendaConfig singleton to all templates."""
-    config = TiendaConfig.objects.first()
+    config = TiendaConfig.objects.order_by('-id').first()
     if not config:
         config = TiendaConfig.objects.create(**_TIENDA_DEFAULTS)
     else:
@@ -53,6 +53,8 @@ def tienda_config(request):
                 repaired = True
         if repaired:
             config.save(update_fields=list(_TIENDA_DEFAULTS.keys()))
+    
     return {
-        'tienda_config': config
+        'tienda_config': config,
+        'MODO_NAVIDAD_ACTIVO': config.modo_navidad if config else False
     }

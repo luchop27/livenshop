@@ -1983,7 +1983,7 @@ def panel_admin_order_detail(request, pedido_id):
 @staff_member_required(login_url='usuarios:login')
 def panel_admin_config(request):
     from .models import TiendaConfig
-    config = TiendaConfig.objects.first()
+    config = TiendaConfig.objects.order_by('-id').first()
     if not config:
         config = TiendaConfig.objects.create()
 
