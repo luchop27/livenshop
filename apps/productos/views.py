@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods, require_POST
 from django.core.paginator import Paginator
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q, F, Max
 from django.contrib import messages
 from django.conf import settings
 from django.utils.text import slugify
@@ -926,6 +926,23 @@ def panel_admin_category_delete(request, categoria_id):
     categoria.delete()
     messages.success(request, f'Categoría "{nombre}" eliminada correctamente.')
     return redirect('productos:panel_admin_categories')
+
+@staff_member_required(login_url='usuarios:login')
+@require_POST
+def panel_admin_category_reorder(request):
+    """
+    Actualiza el campo 'posicion' de las categorías según el nuevo orden
+    recibido desde el drag & drop del panel admin.
+    Espera 'order[]' con los IDs de categoría en el nuevo orden deseado.
+    """
+    orden_ids = request.POST.getlist('order[]')
+    if not orden_ids:
+        return JsonResponse({'success': False, 'message': 'No se recibió ningún orden.'})
+
+    for index, categoria_id in enumerate(orden_ids):
+        Categoria.objects.filter(pk=categoria_id).update(posicion=index)
+
+    return JsonResponse({'success': True, 'message': 'Orden actualizado correctamente.'})
 
 class MarcaListView(ListView):
     model = Producto

@@ -68,21 +68,32 @@
                     </a>
                 </div>
 
+                {% if search %}
+                <div class="alert alert-warning mt-14 mb-0" style="font-size:13px;">
+                    <i class="icon-info"></i> El reordenamiento (arrastrar) está desactivado mientras hay una búsqueda activa, para no descuadrar el orden real.
+                    <a href="{% url 'productos:panel_admin_categories' %}{% if categoria_padre %}?padre={{ categoria_padre.id }}{% endif %}">Quitar búsqueda</a>.
+                </div>
+                {% else %}
+                <div class="mt-14 mb-0" style="font-size:13px;color:#6b7280;">
+                    <i class="icon-menu"></i> Arrastra <strong>⠿</strong> para reordenar, o usa <strong>⇧</strong> para mandar una categoría al inicio.
+                </div>
+                {% endif %}
+
                 <div class="wg-table table-all-category">
                     <ul class="table-title flex gap20 mb-14">
                         <li><div class="body-title">Categoria</div></li>
                         <li><div class="body-title">Slug</div></li>
                         <li><div class="body-title">Subcategorias</div></li>
                         <li><div class="body-title">Productos</div></li>
-                        <li><div class="body-title">Posicion</div></li>
+                        <li><div class="body-title">Orden</div></li>
                         <li><div class="body-title">Estado</div></li>
                         <li><div class="body-title">Acciones</div></li>
                     </ul>
 
                     {% if categorias %}
-                    <ul class="flex flex-column">
+                    <ul class="flex flex-column" id="cat-sortable-list" data-search-active="{% if search %}1{% else %}0{% endif %}">
                         {% for categoria in categorias %}
-                        <li class="wg-product item-row gap20">
+                        <li class="wg-product item-row gap20 cat-sortable-row" data-id="{{ categoria.id }}">
                             <div class="name">
                                 <div style="display:flex;align-items:center;gap:10px;">
                                     <div style="width:44px;height:44px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#f5f5f5;border:1px solid #e0e0e0;">
@@ -116,7 +127,18 @@
                             </div>
 
                             <div class="body-text text-main-dark mt-4">{{ categoria.num_productos }}</div>
-                            <div class="body-text text-main-dark mt-4">{{ categoria.posicion }}</div>
+
+                            <div class="body-text text-main-dark mt-4 cat-position-cell" style="display:flex;align-items:center;gap:8px;">
+                                {% if not search %}
+                                <span class="cat-drag-handle" title="Arrastrar para reordenar" style="cursor:grab;font-size:16px;color:#9ca3af;user-select:none;">⠿</span>
+                                {% endif %}
+                                <span class="cat-pos-number" style="min-width:18px;text-align:center;">{{ categoria.posicion }}</span>
+                                {% if not search %}
+                                <button type="button" class="cat-action-btn cat-action-top" title="Mover al inicio" data-id="{{ categoria.id }}">
+                                    <i class="icon-chevrons-up"></i>
+                                </button>
+                                {% endif %}
+                            </div>
 
                             <div class="body-text text-main-dark mt-4">
                                 {% if categoria.activo %}
@@ -209,5 +231,97 @@
     color: #b91c1c;
     transform: scale(1.1);
 }
+
+.cat-action-top {
+    color: #059669;
+    background: rgba(5, 150, 105, 0.08);
+    width: 28px;
+    height: 28px;
+}
+.cat-action-top:hover {
+    background: rgba(5, 150, 105, 0.18);
+    color: #047857;
+    transform: scale(1.1);
+}
+
+.cat-sortable-row.cat-dragging {
+    opacity: 0.4;
+    background: #f3f4f6;
+}
+.cat-sortable-row.cat-drag-over {
+    border-top: 2px solid #4f46e5;
+}
 </style>
+
+{% if categorias and not search %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script>
+(function () {
+    const list = document.getElementById('cat-sortable-list');
+    if (!list) return;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function renumberDisplay() {
+        list.querySelectorAll('.cat-sortable-row').forEach((row, index) => {
+            const numEl = row.querySelector('.cat-pos-number');
+            if (numEl) numEl.textContent = index;
+        });
+    }
+
+    function saveOrder() {
+        const ids = Array.from(list.querySelectorAll('.cat-sortable-row')).map(row => row.dataset.id);
+        const formData = new FormData();
+        ids.forEach(id => formData.append('order[]', id));
+
+        fetch("{% url 'productos:panel_admin_category_reorder' %}", {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken },
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) {
+                alert(data.message || 'No se pudo guardar el nuevo orden.');
+            } else {
+                renumberDisplay();
+            }
+        })
+        .catch(() => alert('Ocurrió un error guardando el orden.'));
+    }
+
+    // Drag & drop
+    new Sortable(list, {
+        handle: '.cat-drag-handle',
+        animation: 150,
+        ghostClass: 'cat-dragging',
+        onEnd: saveOrder
+    });
+
+    // Botón "mover al inicio"
+    list.addEventListener('click', function (e) {
+        const btn = e.target.closest('.cat-action-top');
+        if (!btn) return;
+        const row = btn.closest('.cat-sortable-row');
+        if (!row) return;
+        list.prepend(row);
+        saveOrder();
+    });
+})();
+</script>
+{% endif %}
 {% endblock %}
