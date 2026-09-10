@@ -9,6 +9,7 @@ urlpatterns = [
     path('panel-admin/categorias/nueva/', views.panel_admin_category_add, name='panel_admin_category_add'),
     path('panel-admin/categorias/<int:categoria_id>/editar/', views.panel_admin_category_edit, name='panel_admin_category_edit'),
     path('panel-admin/categorias/<int:categoria_id>/eliminar/', views.panel_admin_category_delete, name='panel_admin_category_delete'),
+    path('panel-admin/categorias/reordenar/', views.panel_admin_category_reorder, name='panel_admin_category_reorder'),  # ← AGREGAR ESTA LÍNEA
     path('panel-admin/marcas/', views.panel_admin_brands, name='panel_admin_brands'),
     path('panel-admin/marcas/nueva/', views.panel_admin_brand_add, name='panel_admin_brand_add'),
     path('panel-admin/marcas/<int:brand_id>/editar/', views.panel_admin_brand_edit, name='panel_admin_brand_edit'),
