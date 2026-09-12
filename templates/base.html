@@ -245,9 +245,57 @@ button[type="submit"]:hover,
     /* Copo de nieve simplificado y elegante */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'%3E%3Cline x1='25' y1='0' x2='25' y2='50' stroke='rgba(255,255,255,0.4)' stroke-width='1.5'/%3E%3Ccircle cx='25' cy='65' r='10' fill='rgba(255,255,255,0.8)'/%3E%3Cpath d='M15 65 L35 65 M25 55 L25 75 M18 58 L32 72 M18 72 L32 58' stroke='%23143621' stroke-width='1.5'/%3E%3C/svg%3E");
 }
+/* =========================================
+   8. DECORACIÓN NAVIDEÑA - BOLAS COLGANTES
+=========================================== */
 
+#header.header-default {
+    position: relative;
+}
 
+#header.header-default::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 220px;
+    margin-top: -5px;
 
+    background-image: url('{% static "images/adornos_navidad.png" %}');
+    background-repeat: repeat-x;
+    background-size: auto 220px;
+    background-position: top center;
+
+    filter: drop-shadow(0px 5px 4px rgba(0, 0, 0, 0.25));
+    z-index: 10;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    #header.header-default::after {
+        height: 160px;
+        background-size: auto 160px;
+        margin-top: 1px;
+    }
+}
+
+@media (max-width: 480px) {
+    #header.header-default::after {
+        height: 160px;
+        background-size: auto 160px;
+        margin-top: 1px;
+    }
+}
+
+/* Efecto "pegado al filo" — SOLO desktop */
+@media (min-width: 769px) {
+    #header.header-default.decoration-pinned::after {
+        position: fixed;
+        top: 0;
+        margin-top: 0;
+    }
+}
     </style>
 </head>
 
@@ -730,7 +778,9 @@ button[type="submit"]:hover,
     </div>
     </div>
     </header>
+    
     <!-- /Header -->
+    <div id="headerSentinel" style="height:1px; width:1px; pointer-events:none;"></div>
     <!-- Mobile Menu -->
     <div class="offcanvas offcanvas-start canvas-mb" id="mobileMenu">
         <span class="icon-close icon-close-popup" data-bs-dismiss="offcanvas" aria-label="Close"></span>
@@ -1934,6 +1984,66 @@ button[type="submit"]:hover,
         snow.appendChild(copo);
       }
   });
+</script>
+<script>
+(function () {
+    const header = document.getElementById('header');
+    const sentinel = document.getElementById('headerSentinel');
+    if (!header || !sentinel) return;
+
+    const observer = new IntersectionObserver(
+        function (entries) {
+            if (window.innerWidth <= 768) {
+                header.classList.remove('decoration-pinned');
+                return;
+            }
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    header.classList.remove('decoration-pinned');
+                } else {
+                    header.classList.add('decoration-pinned');
+                }
+            });
+        },
+        { threshold: 0 }
+    );
+
+    observer.observe(sentinel);
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth <= 768) {
+            header.classList.remove('decoration-pinned');
+        }
+    });
+})();
+</script>
+<script>
+(function () {
+    const header = document.getElementById('header');
+    if (!header) return;
+
+    const decoHeight = 160; // debe coincidir con el height del ::after en móvil
+
+    function syncMobileTransform() {
+        if (window.innerWidth > 768) {
+            header.style.transform = '';
+            return;
+        }
+        if (header.classList.contains('nav-hidden')) {
+            header.style.transform = `translateY(calc(-100% - ${decoHeight}px))`;
+        } else if (header.classList.contains('is-fixed')) {
+            header.style.transform = 'translateY(0)';
+        } else {
+            header.style.transform = '';
+        }
+    }
+
+    const observer = new MutationObserver(syncMobileTransform);
+    observer.observe(header, { attributes: true, attributeFilter: ['class'] });
+
+    window.addEventListener('resize', syncMobileTransform);
+    syncMobileTransform();
+})();
 </script>
 </body>
 </html>
