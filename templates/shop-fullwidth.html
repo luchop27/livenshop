@@ -4,24 +4,20 @@
 {% block content %}
 
         <!-- page-title -->
-        <div class="tf-page-title">
+        <div class="tf-page-title style-2">
             <div class="container-full">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="heading text-center">
-                            {% if q %}
-                                Resultados para "{{ q }}"
-                            {% elif categoria_actual %}
-                                {{ categoria_actual.nombre }}
-                            {% elif coleccion_actual %}
-                                {{ coleccion_actual.nombre }}
-                            {% elif marca_actual %}
-                                {{ marca_actual.nombre }}
-                            {% else %}
-                                Todos los Productos
-                            {% endif %}
-                        </div>
-                    </div>
+                <div class="heading text-center">
+                    {% if q %}
+                        Resultados para "{{ q }}"
+                    {% elif categoria_actual %}
+                        {{ categoria_actual.nombre }}
+                    {% elif coleccion_actual %}
+                        {{ coleccion_actual.nombre }}
+                    {% elif marca_actual %}
+                        {{ marca_actual.nombre }}
+                    {% else %}
+                        Todos los Productos
+                    {% endif %}
                 </div>
             </div>
         </div>
