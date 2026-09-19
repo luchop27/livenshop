@@ -144,12 +144,6 @@
                                     <h6 class="subtotal fw-5" id="checkout-subtotal">${{ cart.get_total_price }}</h6>
                                 </div>
                                 
-                                <div class="d-flex justify-content-between line pb_20" id="shipping-line">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <h6 class="fw-5 mb-0">Envío</h6>
-                                    </div>
-                                    <h6 class="fw-5" id="shipping-cost">$0.00</h6>
-                                </div>
                                 <div class="d-flex justify-content-between line pb_20 d-none" id="discount-line">
                                     <h6 class="fw-5 text-success">Descuento (<span id="discount-code-applied"></span>)</h6>
                                     <h6 class="fw-5 text-success" id="discount-amount">-$0.00</h6>
@@ -160,7 +154,9 @@
                                 </div>
                                 <input type="hidden" form="checkout-form" name="discount_code_applied" id="discount-code-applied-input" value="">
                                 <input type="hidden" form="checkout-form" name="discount_amount" id="discount-amount-input" value="0">
-                                
+                                <p class="tf-cart-tax">
+                                    El envío se coordina directamente con el cliente al confirmar tu pedido.
+                                </p>
                                 <!-- Opciones de Pago -->
                                 <div class="wd-check-payment">
                                     <div class="fieldset-radio mb_20">
@@ -172,7 +168,7 @@
                                         <label for="payphone">Tarjeta de Crédito / Débito (Payphone)</label>
                                     </div>
                                     
-                                    <p class="text_black-2 mb_20">Tus datos personales serán utilizados para procesar tu pedido y mejorar tu experiencia.</p>
+                                    <p class="tf-cart-tax">Tus datos personales serán utilizados para procesar tu pedido y mejorar tu experiencia.</p>
                                     <div class="box-checkbox fieldset-radio mb_20">
                                         <input type="checkbox" form="checkout-form" name="terms_accepted" id="check-agree" class="tf-check" required>
                                         <label for="check-agree" class="text_black-2">He leído y acepto los términos y condiciones.</label>
@@ -198,14 +194,6 @@
         const citySelect = document.getElementById('city');
         const otherCityField = document.getElementById('other-city-field');
         const otherCityInput = document.getElementById('other-city');
-        
-        function getShippingCost(cityName, cartTotal) {
-            if (!cityName) return 0;
-            if (cityName.toLowerCase() === 'quito') {
-                return cartTotal > 50 ? 0 : 3;
-            }
-            return cartTotal >= 90 ? 0 : 7;
-        }
 
         // Diccionario de Provincias y Ciudades de Ecuador
         const ecuadorData = {
@@ -285,7 +273,7 @@
                     }
                 }
                 
-                calculateShipping();
+                calculateTotal();
             };
             
             if (window.jQuery) {
@@ -305,7 +293,7 @@
                     otherCityInput.removeAttribute('required');
                     otherCityInput.value = '';
                 }
-                calculateShipping();
+                calculateTotal();
             };
             
             if (window.jQuery) {
@@ -367,14 +355,14 @@
             document.getElementById('discount-amount').textContent = '-$' + amount.toFixed(2);
             document.getElementById('discount-code-applied').textContent = code;
             document.getElementById('discount-amount-input').value = amount.toFixed(2);
-            calculateShipping();
+            calculateTotal();
         }
         
         function removeDiscount() {
             document.getElementById('discount-line').classList.add('d-none');
             document.getElementById('discount-amount-input').value = '0';
             showDiscountMessage('', '');
-            calculateShipping();
+            calculateTotal();
         }
 
         function showDiscountMessage(message, type) {
@@ -383,17 +371,11 @@
             el.className = 'text-muted ' + (type === 'success' ? 'text-success' : 'text-danger');
         }
 
-        function calculateShipping() {
-            const city = citySelect.value.trim();
+        function calculateTotal() {
             const subtotalText = document.getElementById('checkout-subtotal').textContent.trim();
             const subtotal = parseFloat(subtotalText.replace('$', '')) || 0;
-            
-            const shippingCost = getShippingCost(city, subtotal);
-            document.getElementById('shipping-cost').textContent = '$' + shippingCost.toFixed(2);
-            
             const discountAmount = parseFloat(document.getElementById('discount-amount-input').value) || 0;
-            const finalTotal = subtotal + shippingCost - discountAmount;
-            
+            const finalTotal = subtotal - discountAmount;
             document.getElementById('checkout-total').textContent = '$' + finalTotal.toFixed(2);
         }
 
@@ -428,7 +410,7 @@
                     }
                 {% endif %}
                 
-                calculateShipping();
+                calculateTotal();
             }
         {% endif %}
     });
