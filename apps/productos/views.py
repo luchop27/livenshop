@@ -67,32 +67,17 @@ def home(request):
         mostrar_en_slider=True
     ).order_by('orden_slider', 'nombre')
 
-    shop_gram_posts = ShopGramPost.objects.filter(
-        activo=True
-    )[:10]
-
     marcas = Marca.objects.filter(
         activo=True
     ).order_by('nombre')
-
-    anuncios_bar = Coleccion.objects.filter(
-        activo=True,
-        es_promocion=True
-    ).exclude(
-        texto_anuncio__isnull=True
-    ).exclude(
-        texto_anuncio__exact=''
-    )
 
     return render(request, 'home.html', {
         'productos': productos,
         'categorias': categorias,
         'colecciones': colecciones,
         'marcas_slider': marcas_slider,
-        'shop_gram_posts': shop_gram_posts,
         'marcas': marcas,
         'tiene_slides': marcas_slider.exists() or colecciones.exists(),
-        'anuncios_bar': anuncios_bar,
     })
 
 def panel_admin_shopgram_list(request):
