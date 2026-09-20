@@ -23,14 +23,14 @@
 </style>
 <section class="tf-slideshow slider-effect-fade slider-home-5 position-relative" style="overflow:hidden;">
     <div dir="ltr" class="swiper tf-sw-slideshow" data-preview="1" data-tablet="1" data-mobile="1" data-centered="false"
-        data-space="0" data-loop="true" data-auto-play="true" data-delay="2000" data-speed="1000">
+        data-space="0" data-loop="true" data-auto-play="true" data-speed="1000">
         <div class="swiper-wrapper">
 
             {% if tiene_slides %}
 
             
                 {% for marca in marcas_slider %}
-                <div class="swiper-slide" lazy="true">
+                <div class="swiper-slide">
                     <div class="wrap-slider">
                     <a href="{{ marca.get_absolute_url }}" style="display: block; width: 100%; height: 100%;">
                         {% if marca.imagen_slider and marca.imagen_slider_movil %}
@@ -51,7 +51,7 @@
                 {% endfor %}
 
                 {% for coleccion in colecciones %}
-                <div class="swiper-slide" lazy="true">
+                <div class="swiper-slide">
                     <div class="wrap-slider">
                     <a href="{{ coleccion.get_absolute_url }}" style="display: block; width: 100%; height: 100%;">
                         {% if coleccion.imagen %}
@@ -70,7 +70,7 @@
 
             {% else %}
 
-            <div class="swiper-slide" lazy="true">
+            <div class="swiper-slide">
                 <div class="wrap-slider">
                     <img class="lazyload" data-src="{% static 'images/slider/plant_slide_1.jpg' %}"
                         src="{% static 'images/slider/plant_slide_1.jpg' %}" alt="slide-01">
@@ -90,7 +90,7 @@
                 </div>
             </div>
 
-            <div class="swiper-slide" lazy="true">
+            <div class="swiper-slide">
                 <div class="wrap-slider">
                     <img class="lazyload" data-src="{% static 'images/slider/plant_slide_2.jpg' %}"
                         src="{% static 'images/slider/plant_slide_2.jpg' %}" alt="slide-02">
@@ -110,7 +110,7 @@
                 </div>
             </div>
 
-            <div class="swiper-slide" lazy="true">
+            <div class="swiper-slide">
                 <div class="wrap-slider">
                     <img class="lazyload" data-src="{% static 'images/slider/plant_slide_3.jpg' %}"
                         src="{% static 'images/slider/plant_slide_3.jpg' %}" alt="slide-03">
@@ -188,63 +188,14 @@
             </div>
         </div>
 
-        <!-- Título -->
-
         <!-- Slider de productos -->
         <div class="hover-sw-nav hover-sw-2">
-            <div dir="ltr" class="swiper tf-sw-product-sell wrap-sw-over" data-preview="4" data-tabley="3"
+            <div dir="ltr" class="swiper tf-sw-product-sell wrap-sw-over" data-preview="4" data-tablet="3"
                 data-mobile="2" data-space-lg="30" data-space-md="15" data-pagination="2" data-pagination-md="3"
                 data-pagination-lg="3">
                 <div class="swiper-wrapper">
                     {% for producto in productos %}
-                    <div class="swiper-slide" lazy="true">
-                        <div class="card-product">
-                            <div class="card-product-wrapper">
-                                <a href="{{ producto.get_absolute_url }}" class="product-img">
-                                    {% with producto.imagenes.all as imgs %}
-                                    {% if imgs.0 %}
-                                    <img class="lazyload img-product" data-src="{{ imgs.0.src }}" src="{{ imgs.0.src }}"
-                                        alt="{{ producto.nombre }}">
-                                    {% endif %}
-                                    {% if imgs.1 %}
-                                    <img class="lazyload img-hover" data-src="{{ imgs.1.src }}" src="{{ imgs.1.src }}"
-                                        alt="{{ producto.nombre }}">
-                                    {% endif %}
-                                    {% endwith %}
-                                </a>
-                                <div class="list-product-btn absolute-2">
-                                    <a href="#"
-                                        class="box-icon bg_white wishlist btn-icon-action {% if producto.id in request.session.wishlist %}active{% endif %}"
-                                        data-product-id="{{ producto.id }}">
-                                        <span class="icon icon-heart"></span>
-                                        <span class="tooltip">Añadir a Favoritos</span>
-                                        <span class="icon icon-delete"></span>
-                                    </a>
-                                    <a href="#quick_view" data-bs-toggle="modal" data-product-id="{{ producto.id }}"
-                                        class="box-icon bg_white quickview tf-btn-loading">
-                                        <span class="icon icon-view"></span>
-                                        <span class="tooltip">Quick View</span>
-                                    </a>
-                                </div>
-                                {% if producto.tiene_oferta %}
-                                <div class="on-sale-wrap text-end">
-                                    <div class="on-sale-item">-{{ producto.porcentaje_descuento }}%</div>
-                                </div>
-                                {% endif %}
-                            </div>
-                            <div class="card-product-info">
-                                <a href="{{ producto.get_absolute_url }}" class="title link">{{ producto.nombre }}</a>
-                                <span class="price">
-                                    {% if producto.tiene_oferta %}
-                                    <span class="old-price">${{ producto.precio }}</span>
-                                    <span class="new-price">${{ producto.precio_oferta }}</span>
-                                    {% else %}
-                                    <span class="new-price">${{ producto.precio }}</span>
-                                    {% endif %}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                    {% include "includes/product_card.html" %}
                     {% endfor %}
                 </div>
             </div>
@@ -261,15 +212,8 @@
 <!-- Product -->
 <section class="flat-spacing-12 has-line-bottom">
     <div class="container">
-        <div class="flat-title wow fadeInUp" data-wow-delay="0s">
+        <div class="flat-title wow fadeInUp">
             <span class="title">NUEVOS PRODUCTOS</span>
-            <!-- <div class="d-flex gap-16 align-items-center">
-                        <div class="nav-sw-arrow nav-next-slider nav-next-product"><span
-                                class="icon icon-arrow1-left"></span></div>
-                        <a href="product-style-05.html" class="tf-btn btn-line fs-12 fw-6">VER TODOS</a>
-                        <div class="nav-sw-arrow nav-prev-slider nav-prev-product"><span
-                                class="icon icon-arrow1-right"></span></div>
-                    </div> -->
         </div>
         <div class="hover-sw-nav hover-sw-2">
             <div dir="ltr" class="swiper tf-sw-product-sell wrap-sw-over" data-preview="4" data-tablet="3"
@@ -277,54 +221,7 @@
                 data-pagination-lg="3">
                 <div class="swiper-wrapper">
                     {% for producto in productos %}
-                    <div class="swiper-slide" lazy="true">
-                        <div class="card-product">
-                            <div class="card-product-wrapper">
-                                <a href="{{ producto.get_absolute_url }}" class="product-img">
-                                    {% with producto.imagenes.all as imgs %}
-                                    {% if imgs.0 %}
-                                    <img class="lazyload img-product" data-src="{{ imgs.0.src }}" src="{{ imgs.0.src }}"
-                                        alt="{{ producto.nombre }}">
-                                    {% endif %}
-                                    {% if imgs.1 %}
-                                    <img class="lazyload img-hover" data-src="{{ imgs.1.src }}" src="{{ imgs.1.src }}"
-                                        alt="{{ producto.nombre }}">
-                                    {% endif %}
-                                    {% endwith %}
-                                </a>
-                                <div class="list-product-btn absolute-2">
-                                    <a href="#"
-                                        class="box-icon bg_white wishlist btn-icon-action {% if producto.id in request.session.wishlist %}active{% endif %}"
-                                        data-product-id="{{ producto.id }}">
-                                        <span class="icon icon-heart"></span>
-                                        <span class="tooltip">Añadir a Favoritos</span>
-                                        <span class="icon icon-delete"></span>
-                                    </a>
-                                    <a href="#quick_view" data-bs-toggle="modal" data-product-id="{{ producto.id }}"
-                                        class="box-icon bg_white quickview tf-btn-loading">
-                                        <span class="icon icon-view"></span>
-                                        <span class="tooltip">Quick View</span>
-                                    </a>
-                                </div>
-                                {% if producto.tiene_oferta %}
-                                <div class="on-sale-wrap text-end">
-                                    <div class="on-sale-item">-{{ producto.porcentaje_descuento }}%</div>
-                                </div>
-                                {% endif %}
-                            </div>
-                            <div class="card-product-info">
-                                <a href="{{ producto.get_absolute_url }}" class="title link">{{ producto.nombre }}</a>
-                                <span class="price">
-                                    {% if producto.tiene_oferta %}
-                                    <span class="old-price">${{ producto.precio }}</span>
-                                    <span class="new-price">${{ producto.precio_oferta }}</span>
-                                    {% else %}
-                                    <span class="new-price">${{ producto.precio }}</span>
-                                    {% endif %}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                    {% include "includes/product_card.html" %}
                     {% endfor %}
 
                 </div>
@@ -341,9 +238,6 @@
 <!-- Categories -->
 <section class="flat-spacing-18">
     <div class="container">
-        <!-- <div class="flat-title">
-                    <span class="title wow fadeInUp" data-wow-delay="0s">CATEGORIAS</span>
-                </div> -->
         <div class="wrap-carousel wrap-mobile">
             <div dir="ltr" class="swiper tf-sw-mobile" data-preview="1.3" data-space="15">
                 <div class="swiper-wrapper grid-mobile-1">
@@ -361,11 +255,11 @@
                                     {% endif %}
                                 </div>
                                 <div class="collection-content">
-                                    <div class="top wow fadeInUp" data-wow-delay="0s">
+                                    <div class="top wow fadeInUp">
                                         <h5 class="heading">{{ categoria.nombre }}</h5>
                                         <p class="subheading">{{ categoria.descripcion|truncatewords:5 }}</p>
                                     </div>
-                                    <div class="bottom wow fadeInUp" data-wow-delay="0s">
+                                    <div class="bottom wow fadeInUp">
                                         <button class="tf-btn btn-line collection-other-link fw-6"><span>Comprar
                                                 ahora</span><i class="icon icon-arrow1-top-left"></i></button>
                                     </div>
@@ -441,9 +335,6 @@
             margin-bottom: 6px !important;
             color: #333 !important;
         }
-        .michelle-p-extra {
-            display: none !important;
-        }
         .card-design-michelle .tf-btn {
             padding: 10px 22px !important;
             font-size: 13px !important;
@@ -460,7 +351,7 @@
                 <p class="text">En <b>Liven Concept Store</b> ofrecemos el servicio de diseño interior personalizado de la mano de Michelle Salazar, diseñadora y directora creativa.</p>
                 <p class="text d-none d-md-block">Creamos espacios residenciales y comerciales con identidad, funcionalidad y una estética cuidadosamente curada, adaptándonos al estilo y esencia de cada cliente.</p>
                 <p class="text d-none d-md-block">Diseño, decoración y selección de piezas exclusivas para transformar tus espacios.</p>
-                <div class="wow fadeInUp" data-wow-delay="0s">
+                <div class="wow fadeInUp">
                     <a href="{% url 'productos:lista_productos' %}" class="tf-btn style-2 fw-7 text-2 btn-fill animate-hover-btn">
                         <span>Comienza hoy</span>
                     </a>
@@ -480,7 +371,7 @@
                 {% if post.imagen %}
                 <div class="swiper-slide">
                     <a href="{{ post.instagram_url }}" target="_blank" rel="noopener noreferrer">
-                        <div class="gallery-item hover-img rounded-0 wow fadeInUp" data-wow-delay="0s">
+                        <div class="gallery-item hover-img rounded-0 wow fadeInUp">
                             <div class="img-style">
                                 <img class="lazyload img-hover shopgram-img" data-src="{{ post.imagen.url }}"
                                     src="{{ post.imagen.url }}" alt="Instagram post">
@@ -500,9 +391,6 @@
 <!-- /Shop Gram -->
 <script>
     (function () {
-        // Guarda referencia al swiper del slider de productos
-        let productoSwiper = null;
-
         function getSwiperInstance() {
             // Busca la instancia Swiper inicializada en el elemento
             const el = document.querySelector('.tf-sw-product-sell');
@@ -577,12 +465,12 @@
         }
 
         // Event listeners en los botones de marca
-        document.querySelectorAll('.brand-item').forEach(btn => {
+        document.querySelectorAll('.brand-filter .brand-item').forEach(btn => {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
 
                 // Actualiza clase activa
-                document.querySelectorAll('.brand-item').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.brand-filter .brand-item').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
 
                 cargarProductos(this.dataset.slug);

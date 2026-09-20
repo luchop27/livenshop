@@ -61,9 +61,9 @@
                                         <div class="swiper-wrapper">
                                             {% for imagen in producto.imagenes.all %}
                                             <div class="swiper-slide">
-                                                <a href="{{ imagen.src }}" target="_blank" class="item" data-pswp-width="770px" data-pswp-height="1075px">
+                                                <div class="item">
                                                     <img class="tf-image-zoom lazyload" data-zoom="{{ imagen.src }}" data-src="{{ imagen.src }}" src="{{ imagen.src }}" alt="{{ producto.nombre }}">
-                                                </a>
+                                                </div>
                                             </div>
                                             {% endfor %}
                                         </div>

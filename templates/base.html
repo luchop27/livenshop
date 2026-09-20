@@ -288,6 +288,17 @@ button[type="submit"]:hover,
     }
 }
 
+/* Breadcrumb (detalle.html): se baja para que las bolas colgantes no lo tapen */
+.tf-breadcrumb {
+    padding-top: 75px;
+}
+
+@media (max-width: 768px) {
+    .tf-breadcrumb {
+        padding-top: 65px;
+    }
+}
+
 /* Efecto "pegado al filo" — SOLO desktop */
 @media (min-width: 769px) {
     #header.header-default.decoration-pinned::after {
